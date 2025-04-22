@@ -1,0 +1,47 @@
+{% extends 'lyve/base.html' %}
+{% block title %}{{ item.name }}{% endblock %}
+{% block content %}
+<div class="container" style="align-items: flex-start; display: flex; margin: 20px">
+    <img src="{{ item.image.url }}" alt="{{ item.name }}" class="image" style="max-width: 40%; margin-right: 20px">
+    <div class="text" style="width: 80%; overflow-wrap: break-word;word-wrap: break-word;">
+        <h1 class="mb-6 text-3xl"><b>{{ item.brands }}</b></h1>
+        <p class="mb-6 text-3xl" style="overflow-wrap: break-word;word-wrap: break-word; color: #444444;
+  white-space: nowrap; font-size: 25px"><b>{{ item.name }}</b></p>
+        <p class="mb-6 text-3xl">{{ item.description }}</p>
+        <p class="mb-6 text-3xl"><b>Ingredients:</b>
+            {% for ingredient in ingredients %}
+                {{ ingredient.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p class="mb-6 text-3xl"><strong>Skintype:</strong> {{ item.skintype }}</p>
+        <button>Add to Routine</button>
+    </div>
+</div>
+{% endblock %}
+
+<style>
+    .container {
+        display: flex;
+        align-items: flex-start; /* Aligns items to the start of the container (top) */
+        margin: 20px; /* Optional: Add some space around the container */
+    }
+
+    .image {
+        max-width: 50%; /* Adjust the width of the image as needed */
+        height: auto; /* Maintain the aspect ratio of the image */
+        margin-right: 20px; /* Optional: Add some space between the image and the text */
+        border-radius: 0.75rem; /* Rounded corners for the image */
+    }
+
+    .text {
+        max-width: 50%; /* Adjust the width of the text container as needed */
+    }
+
+    .mb-6 {
+        margin-bottom: 1.5rem; /* Optional: Margin bottom for spacing */
+    }
+
+    .text-3xl {
+        font-size: 1.875rem; /* Optional: Text size */
+    }
+</style>

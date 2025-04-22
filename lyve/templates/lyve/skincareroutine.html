@@ -1,0 +1,107 @@
+{% extends 'lyve/base.html' %}
+{% load static %}
+
+{% block title %}Skincare Routine{% endblock %}
+
+{% block content %}
+<div class="container mt-6">
+    <div class="row">
+        <div class="col-md-8">
+            <div>
+                <h1>Skincare Routine</h1>
+                <br>
+                <p1>Having a skincare routine isn't just about cleansing your face, it's also about hydrating your skin,
+                    <br>taking care of any skin concerns, and protecting it from the elements. At its most basic, your
+                    <br>skincare routine should always include a cleanser, moisturizer, and sunscreen. Depending on your
+                    <br>skin type and your skin goals, you can add additional treatments to your routine to treat dry,
+                    <br> oily, aging, or acne-prone skin. Here's how to create the best morning and night time skincare
+                    <br>routine for your skin. </p1><br><br>
+                <center>
+                <img src="{% static 'images/skincare.jpeg' %}"
+                width="400" height="275"  >
+                </center>
+
+                <br><br><br>
+                <h4>Step-by-Step Guide</h4><br>
+                <ul>
+                    <li><b>Step 1:</b> Cleansing</li>
+                    <li><b>Step 2:</b> Exfoliation</li>
+                    <li><b>Step 3:</b> Mask</li>
+                    <li><b>Step 4:</b> Toner</li>
+                    <li><b>Step 5:</b> Serum</li>
+                    <li><b>Step 6:</b> Eye care</li>
+                    <li><b>Step 7:</b> Moisturising cream</li>
+                    <li><b>Step 8:</b> Sun protection</li>
+                </ul>
+
+
+                <br><br><br><h5>Step 1: Cleansing</h5>
+                <p1>Washing your face removes excess oil and dirt that can clog pores and cause breakouts. Opt for a
+                    <br>gentle, alcohol-free cleanser to avoid stripping too many oils you need to keep your skin barrier
+                    <br>healthy. You may need a more hydrating oil-based cleanser if you have dry skin. When cleansing in
+                    <br>the morning, splash lukewarm water onto your face and gently rub a face wash with your fingertips.
+                    <br>Then, rinse and pat your skin dry with a towel.</p1>
+                 <br><br><br><h5>Step 2: Exfoliation</h5>
+                <p1>Exfoliating is essential to encourage healthy skin cell turnover, eliminate buildup and relieve <br>
+                    pore congestion. Exfoliants comprise gentle chemical, enzymatic and physical varieties for home<br>
+                    care, as well as more potent peels and treatments which must be administered by a professional. We<br>
+                    recommend consulting with your esthetician to determine the best approach for your skin type and<br>
+                    concerns.</p1>
+                <br><br><br><h5>Step 3: Mask</h5>
+                <p1>An additional treatment to indulge in is a face mask. Face masks contain high amounts of
+                    <br>concentrated vitamins and nutrient-rich ingredients which absorb efficiently into the skin, making<br>
+                     it appear healthy and resilient. In addition to their hydrating and firming benefits, masks can be <br>
+                     used to control more persistent skin concerns like acne, large pores and dark spots.</p1>
+                <br><br><br><h5>Step 4: Toner</h5>
+                <p1>Depending on their ingredients, toners can help hydrate the skin or remove leftover oil and dirt.<br>
+                    Toning is an optional morning step but can benefit people with dry or acne-prone skin. To apply,<br>
+                    soak a cotton pad with toner and gently pat it onto your face. Focus on the "T-zone" (forehead,<br>
+                    nose, and chin) if you have oily or acne-prone skin. You can also splash some toners directly onto<br>
+                    your face. </p1>
+                <br><br><br><h5>Step 5: Serum</h5>
+                <p1>“Serums are essentially shots of extremely concentrated nutrients, hydrators, or antioxidants that
+                    <br>really amp up your skin health as soon as you apply them,” says Dr. Gohara. “People often skip out
+                    <br>on using them, but they’re honestly the heavy lifters of your skincare routine.” So, while serums
+                    <br>are totally optional, they’re often a good  step in leveling up your skincare routine and boosting<br>
+                    your skin health.</p1>
+                <br><br><br><h5>Step 6: Eye Care</h5>
+                <p1>Some areas require a lighter touch. The skin around your eye area is seven times thinner than the<br>
+                    rest of your face and needs to be treated with special care. Regular eye cream application not only<br>
+                    maintains the health, thickness and elasticity of this delicate area, it also reduces the look of<br>
+                    fine lines, wrinkles, dark circles and puffiness.</p1>
+                <br><br><br><h5>Step 7: Moisturising Cream</h5>
+                <p1>Used daily, moisturizers keep skin soft, supple and protected. Moisturizing not only targets and<br>
+                    treats specific issues in the top layers of the skin, it also provides necessary support for the <br>
+                    skin’s natural lipid barrier. A strong and healthy barrier enables the skin to better retain moisture
+                    <br>and repel external irritants. Remember, even oily skin needs moisture and hydration!</p1>
+                <br><br><br><h5>Step 8: Sun Protection</h5>
+                <p1>The final and most crucial step in every skin care routine is sun protection. Daily and consistent
+                    <br>sunscreen use helps protect skin against the damaging rays that contribute to skin irritation,
+                    <br>premature aging and the formation of certain skin cancers. Year-round, apply a broad spectrum
+                    <br>sunscreen or SPF moisturizer to shield your skin from exposure.</p1><br><br><br><br><br>
+
+                <h4>Basic Routine</h4><br>
+                <p1>If you don't want to use this much product you can also create a basic routine so here is what you can do.</p1><br><br>
+               <ul>
+                <li><b>1.Cleanser.</b> Use it to remove grime and residue that’s built up overnight.</li><br>
+                <li><b>2.Moisturizer.</b> This hydrates the skin and can come in the form of creams, gels, or balms.</li><br>
+                <li><b>3.Sunscreen.</b> It’s essential for protecting the skin against the damaging effects of the sun.</li><br><br><br><br><br>
+                   </ul>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="content-section">
+                <h3>Begin Somewhere!</h3>
+                <p class='text-muted'>Learn more about skincare.
+                    <ul class="list-group">
+                        <a href='/skintype' class="list-group-item list-group-item-light">Skin Type</a>
+                        <a href='/labeling' class="list-group-item list-group-item-light">Labeling System</a>
+                        <a href='/skincareroutine' class="list-group-item list-group-item-light">Skincare Routine</a>
+                        <a href='/about' class="list-group-item list-group-item-light">About</a>
+                    </ul>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

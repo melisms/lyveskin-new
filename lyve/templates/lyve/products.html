@@ -1,0 +1,32 @@
+{% extends 'lyve/base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}Products{% endblock %}
+
+{% block content %}
+<div class="mt-6 px-6 py-12 bg-gray-100 rounded-xl">
+    <h2 class="mb-12 text-2xl text-center"><b>Products</b></h2>
+
+    {% for category in categories %}
+    <div class="mt-6 px-6 py-12 bg-gray-100 rounded-xl">
+        <h2 class="mb-12 text-xl text-center" style="font-size: 28px">{{ category.name }}</h2>
+        <div class="clearfix">
+            {% for item in categorized_items|get_item:category %}
+            <div class="item-container" style="display: inline-block; vertical-align: top; width: 18%; box-sizing: border-box; padding: 10px;">
+                <a href="{% url 'item:detail' item.id %}" class="flex items-center p-6 bg-white rounded-xl mb-4" style="background-color: #fafafa;">
+                    <div>
+                        <img src="{{ item.image.url }}" alt="ItemImage" class="rounded-t-xl" style="width: 165px; height: auto;">
+                    </div>
+                    <div class="ml-4">
+                        <h2 class="text-2xl" style="font-size: 18px"><b>{{ item.brands }}</b></h2>
+                        <h3 class="text-xl" style="font-size: 16px; max-width: 182px; overflow: hidden; text-overflow: ellipsis;">{{ item.name }}</h3>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

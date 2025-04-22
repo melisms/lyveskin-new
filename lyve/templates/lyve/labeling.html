@@ -1,0 +1,42 @@
+{% extends 'lyve/base.html' %}
+
+{% block title %}About{% endblock %}
+
+{% block content %}
+<div class="container mt-6">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="mt-6 px-6 py-12 bg-gray-100 rounded-xl">
+                <h2 class="mb-12 text-2xl ">Labeling System</h2>
+                <p class="mb-12 text-2xl ">Skincare can be dangerous for some people, we are trying to minimize risk by labeling the ingredients.</p>
+            </div>
+            <div>
+                <p class="mb-12 text-2xl ">We classify our ingredients by 3 categories; Safe, Neutral, Risky.</p>
+                <p class="mb-12 text-2xl "><span style="color: green; font-weight: bold;">Safe ingredients</span> are mostly natural and very low risk of irritating or damaging skin still should be checked for allergies.</p>
+                <p class="mb-12 text-2xl ">We will be using color <span style="color: green;">green</span> or &#127807; emoji to show safe ingredients</p>
+            </div>
+            <div>
+                <p class="mb-12 text-2xl "><span style="color: steelblue; font-weight: bold;">Neutral ingredients</span> are the middle ground. They have low risk of irritating skin yet not zero.</p>
+                <p class="mb-12 text-2xl ">We will be using &#128528; emoji to show neutral ingredients</p>
+            </div>
+            <div>
+                <p class="mb-12 text-2xl "><span style="color: darkred; font-weight: bold;">Risky ingredients</span> are mostly chemical and should be used in moderation, this ingredients can irritate skin and cause skin damage. For example to use some acids you need to gain immunity by using them little by little. </p>
+                <p class="mb-12 text-2xl ">We will be using color <span style="color: darkred;">red</span> or &#129514; emoji to show risky ingredients</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="content-section">
+                <h3>Begin Somewhere!</h3>
+                <p class='text-muted'>Learn more about skincare.
+                <ul class="list-group">
+                    <a href='/skintype' class="list-group-item list-group-item-light">Skin Type</a>
+                    <a href='/labeling' class="list-group-item list-group-item-light">Labeling System</a>
+                    <a href='/skincareroutine' class="list-group-item list-group-item-light">Skincare Routine</a>
+                    <a href='/about' class="list-group-item list-group-item-light">About</a>
+                </ul>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

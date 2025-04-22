@@ -1,0 +1,74 @@
+{% extends 'lyve/base.html' %}
+{% load static %}
+
+{% block title %}Skin Types{% endblock %}
+
+{% block content %}
+
+
+
+    <div class="container mt-6">
+         <div class="row">
+            <div class="col-md-8">
+                <h1 class="text-center">Skin Types</h1>
+                <br>
+
+                <img src="{% static 'images/6.jpeg' %}"
+                width="400" height="275" style="margin-left: 170px">
+
+                <div class="mt-6 px-6 py-12 bg-gray-100 rounded-xl">
+                 <h4 class="">Oily Skin</h4>
+                 <p1 class="">Oily skin can be due to genetic, environmental and lifestyle factors. Changes in hormone levels can also cause
+                     oily skin, which can lead to blemishes and the appearance of shiny, dull skin. Since the face, back, forehead,
+                     nose, chin and shoulders have many oil glands, it tends to affect these areas.</p1><br><br><br>
+                </div>
+                <div class="mt-6 px-6 py-12 bg-gray-100 rounded-xl">
+                <h4>Dry Skin</h4>
+                <p1>Dry skin makes the skin look and feel rough, itchy, flaky or scaly. The location where these dry patches form vary
+                    from person to person. It's a common condition that affects people of all ages. Dry skin, also known as xerosis or
+                    xeroderma, has many causes, including cold or dry weather, sun damage, harsh soaps, and overbathing.You can do
+                    a lot on your own to improve dry skin, including moisturizing and practicing sun protection year-roundTry various
+                    products and skin care routines to find an approach that works for you.</p1><br><br><br>
+                </div>
+                <div class="mt-6 px-6 py-12 bg-gray-100 rounded-xl" style="padding-bottom: 6px">
+                <h4>Combination Skin</h4>
+                <p1>This skin type features two or more different skin types on the face, and the condition of your skin may fluctuate
+                    between seasons. Typically, the combination skin type is characterized by dry, flaking skin on the cheeks, while
+                    excessive oil and shine appears on other areas of the face.Those with combination skin are in a constant battle
+                    with their T-Zone, which includes the forehead, nose, and chin.</p1><br><br><br>
+                </div>
+                 <div class="mt-6 px-6 py-12 bg-gray-100 rounded-xl" style="padding-bottom: 6px">
+                <h4>Sensitive Skin</h4>
+                <p1>Sensitive skin is quite common and, according to the American Academy of Dermatology, affects 50% of people.
+                    This skin type has fine pores, can be easily irritated and is prone to redness. Often, it will react negatively
+                    to poor lifestyle habits, climate and weather changes, hormonal imbalances and harsh cosmetic ingredients.
+                </p1><br><br><br><br>
+                     <div class="mt-6 px-6 py-12 bg-gray-100 rounded-xl" style="padding-bottom: 6px">
+                <h4>Normal Skin</h4>
+                <p1>“Normal” skin is best described as well-balanced. It has even moisture and hydration and uniform texture, with
+                    small pores and no apparent problem areas. Those with normal skin types may experience occasional dryness or
+                    oiliness as well as the odd breakout. Overall, normal skin looks and feels healthy but may experience mild
+                    dryness or oiliness as well as the occasional breakout, particularly when exposed to environmental stress.</p1><br><br><br>
+                </div>
+
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="content-section">
+                    <h3>Begin Somewhere!</h3>
+                    <p class='text-muted'>Learn more about skincare.
+                        <ul class="list-group">
+                            <a href='/skintype' class="list-group-item list-group-item-light">Skin Type</a>
+                            <a href='/labeling' class="list-group-item list-group-item-light">Labeling System</a>
+                            <a href='/skincareroutine' class="list-group-item list-group-item-light">Skincare Routine</a>
+                            <a href='/about' class="list-group-item list-group-item-light">About</a>
+                        </ul>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock content %}

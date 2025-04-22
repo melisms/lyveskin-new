@@ -1,0 +1,6 @@
+{% extends 'lyve/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content%}
+    <h1 class ="text-2xl pl-4">Welcome {{ user.username|capfirst }}</h1>
+{% endblock %}

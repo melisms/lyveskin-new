@@ -1,0 +1,46 @@
+{% extends "forum/baseforum.html" %}
+{% block content %}
+  <article class="media content-section">
+    <div class="media-body">
+      <div class="article-metadata">
+        <a class="mr-2" href="#">{{ object.author }}</a>
+        <small class="text-muted">{{ object.date_posted|date:"F d, Y" }}</small>
+        {% if object.author == user %}
+          <div>
+            <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{% url 'forum:post-update' object.id %}">Update</a>
+            <a class="btn btn-danger btn-sm mt-1 mb-1" href="{% url 'forum:post-delete' object.id %}">Delete</a>
+          </div>
+        {% endif %}
+      </div>
+      <h2 class="article-title">{{ object.title }}</h2>
+      <p class="article-content">{{ object.content }}</p>
+    </div>
+  </article>
+<section class="comment-section">
+    {% for comment in comments %}
+        <article class="media content-section">
+            <div class="media-body">
+                <div class="article-metadata">
+                    <a class="mr-2" href="#">{{ comment.author }}</a>
+                    <small class="text-muted">{{ comment.date_posted|date:"F d, Y" }}</small>
+                </div>
+                <p class="article-content">{{ comment.content }}</p>
+            </div>
+        </article>
+    {% endfor %}
+</section>
+
+
+{% if user.is_authenticated %}
+<section class="comment-form">
+    <h3>Add a Comment</h3>
+    <form method="post" action="{% url 'forum:add-comment' object.pk %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Add Comment</button>
+    </form>
+</section>
+{% else %}
+<p>You need to <a href="{% url 'login' %}">login</a> to add a comment.</p>
+{% endif %}
+{% endblock content %}

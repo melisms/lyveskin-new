@@ -1,0 +1,46 @@
+{% extends 'lyve/base.html' %}
+{% block content %}
+
+<h1 style="text-align: center; margin-right: 380px">Comparison Results</h1>
+    <p style="text-align: center; margin-right: 380px; font-size: 20px"><b>Category:</b> {{ category }}</p>
+    <div class="container mt-6">
+        <div class="row">
+            <div>
+                <img src="{{ item1.image.url }}" alt="ItemImage" class="rounded-t-xl" style="width: 300px; height: auto; border: 1px solid black;">
+                <p style="width: 300px; overflow-wrap: break-word;word-wrap: break-word;"><b>{{ item1 }}</b></p>
+                <p><b><span style="color: green;">Safe</span> Ingredients:</b> {{ item1_safe_count }}</p>
+                <p><b><span style="color: darkred;">Risky</span> Ingredients:</b> {{ item1_risky_count }}</p>
+                <p class="mb-6 text-3xl" style="width: 300px; overflow-wrap: break-word;word-wrap: break-word;"><b>Ingredients:</b>
+                {% for ingredient in item1.ingredients.all %}
+                 <span style="{% if ingredient.safety == 'S' %} color: green; font-weight: bold; {% elif ingredient.safety == 'R' %} color: darkred; font-weight: bold; {% else %} color: black; {% endif %}">{{ ingredient.name }}</span>{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+                 </p>
+            </div>
+            <div class="ml-6" style="margin-left: 100px">
+                <img src="{{ item2.image.url }}" alt="ItemImage" class="rounded-t-xl" style="width: 300px; height: auto;border: 1px solid black;">
+                <p style="width: 300px; overflow-wrap: break-word;word-wrap: break-word;"><b>{{ item2 }}</b></p>
+                <p><b><span style="color: green;">Safe</span> Ingredients:</b> {{ item2_safe_count }}</p>
+                <p><b><span style="color: darkred;">Risky</span> Ingredients:</b> {{ item2_risky_count }}</p>
+                <p class="mb-6 text-3xl" style="width: 300px; overflow-wrap: break-word;word-wrap: break-word;"><b>Ingredients:</b>
+                {% for ingredient in item2.ingredients.all %}
+                 <span style="{% if ingredient.safety == 'S' %} color: green; font-weight: bold; {% elif ingredient.safety == 'R' %} color: darkred; font-weight: bold; {% else %} color: black; {% endif %}">{{ ingredient.name }}</span>{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+                 </p>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+<style>
+    .ingredient-container {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .ingredient-item {
+        border: 1px solid black;
+        padding: 5px;
+        margin: 5px;
+        flex-grow: 1;
+    }
+</style>

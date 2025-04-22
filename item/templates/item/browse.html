@@ -1,0 +1,52 @@
+{% extends 'lyve/base.html' %}
+
+{% block title %} Search {% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <form method="get" action="{% url 'item:browse' %}">
+                    <input name="query" class="form-control mb-2" type="text" value="{{ query }}" placeholder="Find a product">
+                    <button class="btn btn-primary btn-block mb-2" style="background-color: #007B5F; border-color: #007B5F;">Search</button>
+                </form>
+                <hr>
+                <p class="font-weight-bold">Categories</p>
+                <ul class="list-unstyled">
+                    {% for category in categories %}
+                        <li class="mb-2">
+                            <div class="category-box p-3 border rounded {% if category.id == category_id %} bg-secondary text-white {% endif %}" style="background-color: #F3F3F3; color: black;">
+                                <a href="{% url 'item:browse' %}?query={{ query }}&category={{ category.id }}" style="color: black;">{{ category.name }}</a>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <button class="btn btn-warning btn-block" style="background-color: #007B5F; border-color: #007B5F;">
+                    <a href="{% url 'item:browse' %}" class="text-white">Clear Filters</a>
+                </button>
+            </div>
+            <div class="col-md-9">
+                <div class="clearfix">
+                    {% for item in items %}
+                        <div class="item-container border rounded" style="display: inline-block; vertical-align: top; width: 22%; box-sizing: border-box; padding: 10px;">
+                            <a href="{% url 'item:detail' item.id %}" class="flex items-center p-6 bg-white rounded-xl mb-4" style="background-color: #fafafa;">
+                                <div>
+                                    {% if item.image %}
+                                        <img src="{{ item.image.url }}" alt="ItemImage" class="rounded-t-xl" style="width: 165px; height: 165px;">
+                                    {% else %}
+                                        <!-- Placeholder image or alternative content -->
+                                        <p>No Image Available</p>
+                                    {% endif %}
+                                </div>
+                                <div class="ml-4">
+                                    <h2 class="text-2xl" style="font-size: 18px"><b>{{ item.brands }}</b></h2>
+                                    <h3 class="text-xl" style="font-size: 16px; max-width: 182px; overflow: hidden; text-overflow: ellipsis;">{{ item.name }}</h3>
+                                </div>
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

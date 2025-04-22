@@ -1,0 +1,24 @@
+{% extends 'lyve/base.html' %}
+
+{% block content %}
+<div class="form-container" style="width: 80%">
+    <form method="post">
+        {% csrf_token %}
+        <div style="text-align: center; margin-right: 150px">
+        {{ form.category.label_tag }} {{ form.category }}
+        </div>
+        <div class="form-items row">
+            <div>
+                <div class="form-item" style="margin-left: 200px">{{ form.item1.label_tag }} {{ form.item1 }}</div>
+
+            </div>
+            <div>
+                <div class="form-item" style="margin-left: 100px">{{ form.item2.label_tag }} {{ form.item2 }}</div>
+            </div>
+        </div>
+        <div style="text-align: center; margin-right: 180px">
+        <button type="submit">Compare Items</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends 'lyve/base.html' %}
+
+{% block title %}Ingredients{% endblock %}
+
+{% block content %}
+    <div class="mt-4 px-4 py-8 bg-gray-100 rounded-xl">
+        <h2 class="mb-12 text-2xl text-center">Ingredients</h2>
+        <p class="text-center">Here are the ingredients. Risky and chemical ingredients showed by &#129514;. Neutral ingredients showed by &#128528;. Safe and natural ingredients showed by &#127807;. <br>To learn more, you can check out <a href="/labeling" style="color: #40826D">labeling system</a></p>
+
+        <!-- Alphabet Navigation -->
+        <div class="flex justify-center mb-4">
+            {% for char in '123456ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}
+                <a href="{% url 'lyve:ingredients' letter=char %}" class="text-black" style="color: black; font-weight: bold; border-radius: 50%; background-color: #ffffff;align-items: center;justify-content: center;margin-left: 0.28rem; margin-right: 0.28rem;padding-left: 0.5rem; padding-right: 0.5rem; border: 0.1px solid black; font-size: 18px; padding-top: 0.25rem; padding-bottom: 0.25rem;">{{ char }}</a>
+            {% endfor %}
+        </div>
+
+        <!-- Ingredients Display -->
+        <div class="ingredient-container" style="width: 100%; overflow: hidden">
+            {% for ingredient in ingredients %}
+                <div class="ingredient-item" style="width: 50%; float: left; box-sizing: border-box; padding: 0 15px; margin-bottom: 3px">
+                    <div class="p-6 bg-white rounded">
+                        <h6 class="text-2xl">{{ ingredient.name }}
+                            {% if ingredient.safety == 'S' %}
+                                &#127807;
+                            {% elif ingredient.safety == 'R' %}
+                                &#129514;
+                            {% else %}
+                                &#128528;
+                            {% endif %}
+                        </h6>
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-center">No ingredients found.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="pagination mt-4">
+            <span class="step-links">
+                {% if is_paginated %}
+                    {% if page_obj.has_previous %}
+                        <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
+                        <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                    {% endif %}
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <a class="btn btn-info mb-4" href="?page={{ num }}">{{ num }}</a>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <a class="btn btn-outline-info mb-4" href="?page={{ num }}">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                        <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.next_page_number }}">Next</a>
+                        <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+                    {% endif %}
+                {% endif %}
+            </span>
+        </div>
+    </div>
+{% endblock %}
+
+<style>
+    .ingredient-container {
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .ingredient-item {
+        width: 50%;
+        box-sizing: border-box;
+        float: left;
+        padding: 0 15px;
+        margin-bottom: 20px;
+    }
+
+    .pagination {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .pagination .step-links {
+        display: flex;
+        gap: 10px;
+    }
+
+    .pagination a {
+        text-decoration: none;
+        color: #007bff;
+    }
+
+    .pagination .current {
+        font-weight: bold;
+    }
+</style>
