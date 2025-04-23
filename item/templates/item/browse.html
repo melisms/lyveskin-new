@@ -14,16 +14,26 @@
                 <p class="font-weight-bold">Categories</p>
                 <ul class="list-unstyled">
                     {% for category in categories %}
-                        <li class="mb-2">
-                            <div class="category-box p-3 border rounded {% if category.id == category_id %} bg-secondary text-white {% endif %}" style="background-color: #F3F3F3; color: black;">
-                                <a href="{% url 'item:browse' %}?query={{ query }}&category={{ category.id }}" style="color: black;">{{ category.name }}</a>
-                            </div>
-                        </li>
+                    <li class="mb-2">
+                        <form action="{% url 'item:browse' %}" method="get">
+                            <input type="hidden" name="query" value="{{ query }}">
+                            {% if category.id != category_id %}
+                                <input type="hidden" name="category" value="{{ category.id }}">
+                            {% endif %}
+                            <button type="submit"
+                                    class="btn btn-block {% if category.id == category_id %} bg-secondary text-white {% else %} btn-light {% endif %}"
+                                    style="background-color: #F3F3F3; color: black; border-color: #F3F3F3;">
+                                {{ category.name }}
+                            </button>
+                        </form>
+                    </li>                    
                     {% endfor %}
                 </ul>
-                <button class="btn btn-warning btn-block" style="background-color: #007B5F; border-color: #007B5F;">
-                    <a href="{% url 'item:browse' %}" class="text-white">Clear Filters</a>
-                </button>
+                <a href="{% url 'item:browse' %}"
+                    class="btn btn-warning btn-block text-white"
+                    style="background-color: #007B5F; border-color: #007B5F;">
+                    Clear Filters
+                </a>             
             </div>
             <div class="col-md-9">
                 <div class="clearfix">
