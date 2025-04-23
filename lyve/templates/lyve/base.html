@@ -40,7 +40,7 @@
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
               {% if user.is_authenticated %}
-                <a class="nav-item nav-link" href="{% url 'profile' %}">Profile</a>
+                <a class="nav-item nav-link" href="{% url 'profile' user.id %}">Profile</a>
                 <a class="nav-item nav-link" href="{% url 'logout' %}">Logout</a>
                 <a class="nav-item nav-link" href="{% url 'item:new' %}" style="background-color: #274f42; border-radius: 10px">Add Product</a>
               {% else %}

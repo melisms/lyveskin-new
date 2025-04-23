@@ -21,7 +21,6 @@ from django.contrib.auth import views as auth_views
 from django.urls import path, include
 from users import views as user_views
 
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('register/', user_views.register, name='register'),
@@ -30,5 +29,5 @@ urlpatterns = [
     path("logout/", user_views.logout_view, name="logout"),
     path('', include(('lyve.urls', 'lyve'), namespace='lyve')),
     path('forum/', include(('forum.urls', 'forum'), namespace='forum')),
-    path('profile/', user_views.profile, name='profile'),
+    path('profile/<int:id>/', user_views.profile, name='profile'),
     ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
