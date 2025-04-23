@@ -36,10 +36,14 @@ class NewItemForm(forms.ModelForm):
 
 class ComparisonForm(forms.Form):
     category = forms.ModelChoiceField(queryset=Category.objects.all(), empty_label=None)
-    item1 = forms.ModelChoiceField(queryset=Item.objects.filter(pk__isnull=False), empty_label=None,
-                                   widget=forms.Select(attrs={'style': 'width: 200px;'}))
-    item2 = forms.ModelChoiceField(queryset=Item.objects.filter(pk__isnull=False), empty_label=None,
-                                   widget=forms.Select(attrs={'style': 'width: 200px;'}))
+    item1 = forms.ModelChoiceField(
+        queryset=Item.objects.filter(pk__isnull=False), 
+        empty_label=None,
+        widget=forms.Select(attrs={'style': 'width: 200px;'}))
+    item2 = forms.ModelChoiceField(
+        queryset=Item.objects.filter(pk__isnull=False), 
+        empty_label=None,
+        widget=forms.Select(attrs={'style': 'width: 200px;'}))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -53,4 +57,12 @@ class ComparisonForm(forms.Form):
                     self.fields['item2'].queryset = Item.objects.filter(category=category)
                 except (ValueError, TypeError, Category.DoesNotExist):
                     pass
-
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        # Optionally, add validation to ensure both items are selected
+        item1 = cleaned_data.get('item1')
+        item2 = cleaned_data.get('item2')
+        if item1 and item2 and item1 == item2:
+            raise forms.ValidationError("You cannot compare the same item twice.")
+        return cleaned_data
