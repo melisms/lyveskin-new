@@ -14,7 +14,9 @@
                 {% for ingredient in item1.ingredients.all %}
                  <span style="{% if ingredient.safety == 'S' %} color: green; font-weight: bold; {% elif ingredient.safety == 'R' %} color: darkred; font-weight: bold; {% else %} color: black; {% endif %}">{{ ingredient.name }}</span>{% if not forloop.last %}, {% endif %}
                 {% endfor %}
-                 </p>
+                </p>
+                <h3 id="healthScoreItem1" class="mb-6 text-3xl">Health Score: {{ item1_health_score }}/100</h3>
+                <canvas id="healthChart1" width="300" height="300"></canvas>
             </div>
             <div class="ml-6" style="margin-left: 100px">
                 <img src="{{ item2.image.url }}" alt="ItemImage" class="rounded-t-xl" style="width: 300px; height: auto;border: 1px solid black;">
@@ -25,11 +27,89 @@
                 {% for ingredient in item2.ingredients.all %}
                  <span style="{% if ingredient.safety == 'S' %} color: green; font-weight: bold; {% elif ingredient.safety == 'R' %} color: darkred; font-weight: bold; {% else %} color: black; {% endif %}">{{ ingredient.name }}</span>{% if not forloop.last %}, {% endif %}
                 {% endfor %}
-                 </p>
+                </p>
+                <h3 id="healthScoreItem2" class="mb-6 text-3xl">Health Score: {{ item2_health_score }}/100</h3>
+                <canvas id="healthChart2" width="300" height="300"></canvas>
             </div>
         </div>
     </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var item1SafeCount = {{ item1_safe_count }};
+    var item1RiskyCount = {{ item1_risky_count }};
+    var item2SafeCount = {{ item2_safe_count }};
+    var item2RiskyCount = {{ item2_risky_count }};
 
+    function calculateHealthScore(safeCount, riskyCount) {
+        var totalCount = safeCount + riskyCount;
+
+        if (totalCount === 0) {
+            return 100; // No ingredients, perfect score
+        }
+
+        var riskyPercentage = (riskyCount / totalCount) * 100;
+
+        if (riskyPercentage === 0) {
+            return 100; // No risky ingredients
+        } else if (riskyPercentage <= 20) {
+            return 80; // Low risk
+        } else if (riskyPercentage <= 50) {
+            return 60; // Moderate risk
+        } else {
+            return 40; // High risk
+        }
+    }
+
+    var item1HealthScore = calculateHealthScore(item1SafeCount, item1RiskyCount);
+    var item2HealthScore = calculateHealthScore(item2SafeCount, item2RiskyCount);
+    document.getElementById('healthScoreItem1').innerText = "Health Score: " + item1HealthScore + "/100";
+    document.getElementById('healthScoreItem2').innerText = "Health Score: " + item2HealthScore + "/100";
+    // Chart for Item 1
+    var ctx1 = document.getElementById('healthChart1').getContext('2d');
+    var healthChart1 = new Chart(ctx1, {
+        type: 'doughnut',
+        data: {
+            labels: ['Safe Ingredients', 'Risky Ingredients'],
+            datasets: [{
+                label: 'Ingredient Safety',
+                data: [{{ item1_safe_count }}, {{ item1_risky_count }}],
+                backgroundColor: ['#4CAF50', '#F44336'],
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            cutout: '70%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+
+    // Chart for Item 2
+    var ctx2 = document.getElementById('healthChart2').getContext('2d');
+    var healthChart2 = new Chart(ctx2, {
+        type: 'doughnut',
+        data: {
+            labels: ['Safe Ingredients', 'Risky Ingredients'],
+            datasets: [{
+                label: 'Ingredient Safety',
+                data: [{{ item2_safe_count }}, {{ item2_risky_count }}],
+                backgroundColor: ['#4CAF50', '#F44336'],
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            cutout: '70%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}
 
 <style>

@@ -14,6 +14,7 @@
             {% endfor %}
         </p>
         <p class="mb-6 text-3xl"><strong>Skintype:</strong> {{ item.skintype }}</p>
+        <h3 class="mb-6 text-3xl">Health Score: {{ health_score }}/100</h3>
         <button>Add to Routine</button>
         <a href="{% url 'item:edit_item' item.id %}" class="btn btn-primary">Edit</a>
     </div>

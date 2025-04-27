@@ -50,12 +50,29 @@
 
             <div class="text-center mt-4">
                 <button type="submit" class="btn btn-primary">Update Item</button>
+                <a href="{% url 'item:detail' item.pk %}" class="btn btn-secondary" style="margin-left: 10px;">Cancel</a>
             </div>
         </form>
     </div>
 </div>
 {% endblock %}
 
+<script>
+    const imageInput = document.getElementById('id_image'); // Django uses id_image
+    const imagePreview = document.querySelector('.image');  // Your current img tag
+
+    imageInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+<!-- Add any additional CSS styles here -->
 <style>
     .container {
         display: flex;

@@ -38,11 +38,29 @@ class Item(models.Model):
     def __str__(self):
         return self.brands+' '+self.name
 
+    def calculate_health_score(self):
+        ingredients = self.ingredients.all()
+        safe_count = ingredients.filter(safety='S').count()
+        risky_count = ingredients.filter(safety='R').count()
+        total_count = safe_count + risky_count
 
+        if total_count == 0:
+            return {'score': 100, 'safe': 0, 'risky': 0}
 
+        risky_percentage = (risky_count / total_count) * 100
 
+        if risky_percentage == 0:
+            score = 100
+        elif risky_percentage <= 20:
+            score = 80
+        elif risky_percentage <= 50:
+            score = 60
+        else:
+            score = 40
 
-
-
-
-
+        return {
+            'score': score,
+            'safe': safe_count,
+            'risky': risky_count,
+        }
+    

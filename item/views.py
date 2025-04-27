@@ -11,10 +11,14 @@ from django.contrib import messages
 def detail(request, pk):
     item = get_object_or_404(Item, pk=pk)
     ingredients = item.ingredients.all()
-
+    health_data = item.calculate_health_score()
+    
     return render(request, 'item/detail.html', {
         'item': item,
         'ingredients': ingredients,
+        'health_score': health_data['score'],
+        'safe_count': health_data['safe'],
+        'risky_count': health_data['risky'],
     })
 @login_required
 def create_item(request):
