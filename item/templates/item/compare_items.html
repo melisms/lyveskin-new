@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="form-container" style="width: 80%">
-    <form method="post">
+    <form method="post" id="categoryForm">
         {% csrf_token %}
         <div class="mb-4 text-center">
             <label class="form-label">{{ form.category.label }}</label>
@@ -25,4 +25,15 @@
         </div>
     </form>
 </div>
+
+<script>
+    // Find the category select element
+    const categorySelect = document.getElementById("id_category");  // Django automatically sets id like 'id_FIELDNAME'
+    const form = document.getElementById("categoryForm");
+
+    // Listen for changes
+    categorySelect.addEventListener('change', function() {
+        form.submit(); // Auto-submit the form
+    });
+</script>
 {% endblock %}

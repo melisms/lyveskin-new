@@ -35,14 +35,14 @@ class NewItemForm(forms.ModelForm):
 
 
 class ComparisonForm(forms.Form):
-    category = forms.ModelChoiceField(queryset=Category.objects.all(), empty_label=None)
+    category = forms.ModelChoiceField(queryset=Category.objects.all(), empty_label="--- Select a category ---")
     item1 = forms.ModelChoiceField(
         queryset=Item.objects.filter(pk__isnull=False), 
-        empty_label=None,
+        empty_label="--- Select an item ---",
         widget=forms.Select(attrs={'style': 'width: 200px;'}))
     item2 = forms.ModelChoiceField(
         queryset=Item.objects.filter(pk__isnull=False), 
-        empty_label=None,
+        empty_label="--- Select an item ---",
         widget=forms.Select(attrs={'style': 'width: 200px;'}))
 
     def __init__(self, *args, **kwargs):
