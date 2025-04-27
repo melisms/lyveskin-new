@@ -15,6 +15,7 @@
         </p>
         <p class="mb-6 text-3xl"><strong>Skintype:</strong> {{ item.skintype }}</p>
         <button>Add to Routine</button>
+        <a href="{% url 'item:edit_item' item.id %}" class="btn btn-primary">Edit</a>
     </div>
 </div>
 {% endblock %}

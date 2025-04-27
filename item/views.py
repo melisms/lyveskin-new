@@ -5,7 +5,7 @@ from .forms import NewItemForm
 from django.db.models import Q
 from collections import Counter
 from .forms import ComparisonForm,NewItemForm
-
+from django.contrib import messages
 
 
 def detail(request, pk):
@@ -90,3 +90,17 @@ def comparison_page(request, item_id1, item_id2):
         'item2_safe_count': item2_safe_count,
         'item2_risky_count': item2_risky_count,
     })
+
+def edit_item(request, item_id):
+    item = get_object_or_404(Item, pk=item_id)
+
+    if request.method == 'POST':
+        form = NewItemForm(request.POST, request.FILES, instance=item)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Item updated successfully!')
+            return redirect('item:detail', pk=item.id)  # Redirect back to item detail after update
+    else:
+        form = NewItemForm(instance=item)
+
+    return render(request, 'item/edit_item.html', {'form': form, 'item': item})

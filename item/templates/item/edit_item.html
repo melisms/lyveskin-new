@@ -1,0 +1,79 @@
+{% extends 'lyve/base.html' %}
+
+{% block title %}Edit {{ item.name }}{% endblock %}
+
+{% block content %}
+<div class="container" style="align-items: flex-start; display: flex; margin: 20px">
+    <div style="flex: 1; margin-right: 20px">
+        <img src="{{ item.image.url }}" alt="{{ item.name }}" class="image" style="max-width: 100%; border-radius: 0.75rem;">
+    </div>
+
+    <div style="flex: 2; overflow-wrap: break-word;">
+        <h1 class="mb-6 text-3xl"><b>Edit Item Details</b></h1>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label class="form-label">Brand</label>
+                {{ form.brands }}
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Name</label>
+                {{ form.name }}
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Description</label>
+                {{ form.description }}
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Ingredients (separated by commas)</label>
+                {{ form.ingredients_text }}
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Skin Type</label>
+                {{ form.skintype }}
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Category</label>
+                {{ form.category }}
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Image</label>
+                {{ form.image }}
+            </div>
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-primary">Update Item</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+<style>
+    .container {
+        display: flex;
+        align-items: flex-start;
+        margin: 20px;
+    }
+
+    .image {
+        max-width: 100%;
+        height: auto;
+        border-radius: 0.75rem;
+    }
+
+    .mb-4 {
+        margin-bottom: 1rem;
+    }
+
+    .text-3xl {
+        font-size: 1.875rem;
+    }
+</style>
