@@ -2,77 +2,25 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<div class="container mx-auto p-4">
-    <h1 class="text-2xl font-bold mb-6">Welcome, {{ user_profile.username|capfirst }}</h1>
-    <div class="flex justify-center mt-10">
-        <a href="{% url 'settings_page' %}" class="bg-gray-700 text-white py-2 px-6 rounded-lg hover:bg-gray-800 transition">
-            Settings
-        </a>
-    </div>
+<div class="container mx-auto p-8">
+    <h1 class="text-3xl font-bold mb-8 text-center">Welcome, {{ user_profile.username|capfirst }}</h1>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-
-        <!-- Profile Picture Update -->
-        <div class="bg-white p-6 rounded shadow">
-            <h2 class="text-xl font-semibold mb-4">Profile Picture</h2>
-            
-            <div class="flex flex-col items-center">
-                <img id="profileImage" 
-                     src="{% if user_profile.profile_picture.url %}{{ user_profile.profile_picture.url }}{% else %}https://via.placeholder.com/120{% endif %}" 
-                     alt="Profile Picture" 
-                     class="rounded-full border-2 border-gray-300 mb-4"
-                     style="width: 150px; height: 150px; object-fit: cover;">
-                
-                <form method="POST" enctype="multipart/form-data" action="{% url 'update_settings' %}">
-                    {% csrf_token %}
-                    <div class="mb-4">
-                        <input type="file" name="profile_picture" accept="image/*" onchange="previewImage(event)" class="block w-full text-sm text-gray-500">
-                    </div>
-                    <button type="submit" class="bg-green-500 text-black px-4 py-2 rounded hover:bg-green-600">Update Photo</button>
-
-                </form>
-            </div>
+    <div class="flex flex-col items-center space-y-10">
+        <!-- Profile Picture -->
+        <div class="flex justify-center">
+            <img id="profileImage" 
+                src="{% if user_profile.profile_picture.url %}{{ user_profile.profile_picture.url }}{% else %}https://via.placeholder.com/150{% endif %}" 
+                alt="Profile Picture" 
+                class="rounded-full border-2 border-gray-300"
+                style="width: 150px; height: 150px; object-fit: cover;">
         </div>
 
-        <!-- Password Change -->
-        <div class="bg-white p-6 rounded shadow">
-            <h2 class="text-xl font-semibold mb-4">Change Password</h2>
-            
-            <form method="POST" action="{% url 'update_settings' %}">
-                {% csrf_token %}
-                <div class="mb-4">
-                    <label class="block mb-2 font-semibold" for="current_password">Current Password</label>
-                    <input type="password" id="current_password" name="current_password" class="border rounded w-full py-2 px-3" required>
-                </div>
-                <div class="mb-4">
-                    <label class="block mb-2 font-semibold" for="new_password">New Password</label>
-                    <input type="password" id="new_password" name="new_password" class="border rounded w-full py-2 px-3" required>
-                </div>
-                <div class="mb-4">
-                    <label class="block mb-2 font-semibold" for="confirm_password">Confirm New Password</label>
-                    <input type="password" id="confirm_password" name="confirm_password" class="border rounded w-full py-2 px-3" required>
-                </div>
-                <button type="submit" class="bg-blue-500 text-black px-4 py-2 rounded hover:bg-blue-600">Change Password</button>
-
-            </form>
-          
+        <!-- Settings Button -->
+        <div class="flex justify-center">
+            <a href="{% url 'settings_page' %}" class="bg-green-500 text-black px-8 py-3 rounded-lg hover:bg-green-600 transition">
+                Settings
+            </a>
         </div>
-        
-        
-
     </div>
 </div>
-
-<!-- Real-time image preview -->
-<script>
-    function previewImage(event) {
-        const reader = new FileReader();
-        reader.onload = function(){
-            const output = document.getElementById('profileImage');
-            output.src = reader.result;
-        };
-        reader.readAsDataURL(event.target.files[0]);
-    }
-</script>
-
 {% endblock %}
