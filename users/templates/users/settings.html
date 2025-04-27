@@ -1,0 +1,61 @@
+{% extends 'lyve/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 700px;">
+    <h2 class="text-center mb-4">Profil Ayarları</h2>
+    <div class="card shadow-sm p-4">
+
+        <!-- Profil Fotoğrafı Önizleme -->
+        <div class="text-center mb-4">
+            <img id="profileImage" src="{% if user.profile_picture.url %}{{ user.profile_picture.url }}{% else %}https://via.placeholder.com/120{% endif %}" 
+                 alt="Profil Fotoğrafı" 
+                 class="rounded-circle" 
+                 style="width: 120px; height: 120px; object-fit: cover; border: 2px solid #ccc;">
+        </div>
+
+        <!-- Form Başlangıcı -->
+        <form method="POST" enctype="multipart/form-data" action="{% url 'update_settings' %}">
+            {% csrf_token %}
+
+            <!-- Profil Fotoğrafı -->
+            <div class="form-group">
+                <label for="profile_picture"><strong>Profil Fotoğrafı Seç:</strong></label>
+                <input type="file" id="profile_picture" name="profile_picture" class="form-control-file" accept="image/*" onchange="previewImage(event)">
+            </div>
+
+            <hr>
+
+            <!-- Şifre Değişim Alanı -->
+            <div class="form-group">
+                <label for="current_password"><strong>Mevcut Şifre:</strong></label>
+                <input type="password" id="current_password" name="current_password" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="new_password"><strong>Yeni Şifre:</strong></label>
+                <input type="password" id="new_password" name="new_password" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm_password"><strong>Yeni Şifre (Tekrar):</strong></label>
+                <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
+            </div>
+
+            <button type="submit" class="btn btn-success btn-block mt-4">Güncelle</button>
+        </form>
+        <!-- Form Bitişi -->
+    </div>
+</div>
+
+<script>
+    function previewImage(event) {
+        const reader = new FileReader();
+        reader.onload = function(){
+            const output = document.getElementById('profileImage');
+            output.src = reader.result;
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    }
+</script>
+{% endblock %}

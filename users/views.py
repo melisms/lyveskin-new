@@ -29,3 +29,38 @@ from django.contrib.auth import logout
 def logout_view(request):
     logout(request)
     return render(request, 'users/logout.html')
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+
+
+def update_settings(request):
+    if request.method == 'POST':
+        user = request.user
+
+        if request.FILES.get('profile_picture'):
+            user.profile_picture = request.FILES['profile_picture']
+
+        current_password = request.POST.get('current_password')
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+
+        if new_password and confirm_password and current_password:
+            if new_password == confirm_password:
+                if user.check_password(current_password):
+                    user.set_password(new_password)
+                    user.save()
+                    messages.success(request, 'Şifreniz başarıyla değiştirildi.')
+                    return redirect('login')
+                else:
+                    messages.error(request, 'Mevcut şifreniz yanlış.')
+            else:
+                messages.error(request, 'Yeni şifreler eşleşmiyor.')
+
+        user.save()
+        return redirect('profile', user.id)
+    else:
+        return redirect('profile', request.user.id)
+
+def settings_page(request):
+    return render(request, 'users/settings.html', {'user_profile': request.user})
