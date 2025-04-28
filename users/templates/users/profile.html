@@ -8,11 +8,19 @@
     <div class="flex flex-col items-center space-y-10">
         <!-- Profile Picture -->
         <div class="flex justify-center">
-            <img id="profileImage" 
-                src="{% if user_profile.profile_picture.url %}{{ user_profile.profile_picture.url }}{% else %}https://via.placeholder.com/150{% endif %}" 
-                alt="Profile Picture" 
-                class="rounded-full border-2 border-gray-300"
-                style="width: 150px; height: 150px; object-fit: cover;">
+            {% if user_profile.profile_picture %}
+                <img id="profileImage" 
+                     src="{{ user_profile.profile_picture.url }}" 
+                     alt="Profile Picture" 
+                     class="rounded-full border-2 border-gray-300"
+                     style="width: 150px; height: 150px; object-fit: cover;">
+            {% else %}
+                <img id="profileImage" 
+                     src="https://via.placeholder.com/150" 
+                     alt="Default Profile Picture" 
+                     class="rounded-full border-2 border-gray-300"
+                     style="width: 150px; height: 150px; object-fit: cover;">
+            {% endif %}
         </div>
 
         <!-- Settings Button -->
@@ -24,3 +32,4 @@
     </div>
 </div>
 {% endblock %}
+

@@ -1,11 +1,14 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, PasswordChangeForm
 from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
+from .models import UserProfile
 from .forms import UserRegisterForm
 from django.contrib.auth.decorators import login_required
 from item.models import Item
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
+from django.core.exceptions import ObjectDoesNotExist
 
 def register(request):
     if request.method == 'POST':
@@ -63,4 +66,28 @@ def update_settings(request):
         return redirect('profile', request.user.id)
 
 def settings_page(request):
-    return render(request, 'users/settings.html', {'user_profile': request.user})
+    user = request.user
+
+    try:
+        profile = user.userprofile
+    except ObjectDoesNotExist:
+        profile = UserProfile.objects.create(user=user)
+
+    if request.method == 'POST':
+        # Eğer şifre değiştirme isteniyorsa
+        if 'current_password' in request.POST:
+            password_form = PasswordChangeForm(user=user, data=request.POST)
+            if password_form.is_valid():
+                user = password_form.save()
+                update_session_auth_hash(request, user)
+                return redirect('settings_page')
+
+        # Eğer profil resmi güncelleniyorsa
+        if 'profile_picture' in request.FILES:
+            profile.profile_picture = request.FILES['profile_picture']
+            profile.save()
+            return redirect('settings_page')
+
+    return render(request, 'users/settings.html', {
+        'user_profile': profile,
+    })
