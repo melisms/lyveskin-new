@@ -27,6 +27,8 @@ psutil==6.1.0
 ptyprocess==0.7.0
 pure_eval==0.2.3
 Pygments==2.18.0
+psycopg2==2.9.6
+psycopg2-binary==2.9.6
 python-dateutil==2.9.0.post0
 pyzmq==26.2.0
 six==1.16.0
