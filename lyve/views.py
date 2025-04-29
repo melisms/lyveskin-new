@@ -1,6 +1,11 @@
 from django.shortcuts import render
 from item.models import Category, Item, Ingredient
 
+import requests
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+
 
 def home(request):
     return render(request, "lyve/home.html")
@@ -61,3 +66,27 @@ def skintype(request):
 
 def skincareroutine(request):
         return render(request, "lyve/skincareroutine.html")
+
+
+
+@csrf_exempt
+def ask_ollama(request):
+    if request.method == 'POST':
+        body = json.loads(request.body)
+        question = body.get('question', '')
+
+        ollama_response = requests.post(
+            "http://localhost:11434/api/generate",
+            json={
+                "model": "mistral",
+                "prompt": question,
+                "stream": False  # Burada streaming yok, direkt cevap
+            }
+        )
+
+        response_json = ollama_response.json()
+        answer = response_json.get('response', 'Cevap bulunamadı.')
+
+        return JsonResponse({'answer': answer})
+    else:
+        return JsonResponse({'error': 'POST isteği gerekli.'})
