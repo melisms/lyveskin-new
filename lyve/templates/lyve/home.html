@@ -154,10 +154,27 @@
 <!-- CSRF token'ı meta ile ekliyoruz -->
 <meta name="csrf-token" content="{{ csrf_token }}">
 
-<!-- Chatbox -->
+<!-- Chat Toggle Button -->
+<button id="chat-toggle" style="
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  font-size: 28px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  z-index: 10000;
+">💬</button>
+
+<!-- Chat Box -->
 <div id="chat-box" style="
   position: fixed; 
-  bottom: 20px; 
+  bottom: 90px; 
   right: 20px; 
   width: 320px; 
   height: 450px; 
@@ -165,7 +182,7 @@
   border-radius: 16px; 
   padding: 10px; 
   box-shadow: 0 4px 20px rgba(0,0,0,0.15); 
-  display: flex; 
+  display: none; /* Başlangıçta gizli */
   flex-direction: column; 
   overflow: hidden;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -182,14 +199,28 @@
 </div>
 
 <script>
-  const csrftoken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+  const csrftoken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+  
+  const chatToggle = document.getElementById('chat-toggle');
+  const chatBox = document.getElementById('chat-box');
+
+  chatToggle.addEventListener('click', function() {
+    if (chatBox.style.display === 'none') {
+      chatBox.style.display = 'flex';
+    } else {
+      chatBox.style.display = 'none';
+    }
+  });
+
 
   document.getElementById('user-input').addEventListener('keypress', function (e) {
     if (e.key === 'Enter') {
       const input = e.target.value;
       if (input.trim() === '') return;
 
-      e.target.value = ''; // Inputu hemen temizle
+      e.target.value = ''; 
 
       const messageBox = document.getElementById('messages');
       messageBox.innerHTML += '<div><b>You:</b> ' + input + '</div>';
@@ -198,7 +229,7 @@
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRFToken': csrftoken
+          ...(csrftoken && { 'X-CSRFToken': csrftoken })
         },
         body: JSON.stringify({ question: input })
       })
@@ -214,5 +245,6 @@
     }
   });
 </script>
+
 
 {% endblock %}
