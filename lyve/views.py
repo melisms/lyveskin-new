@@ -72,21 +72,22 @@ def skincareroutine(request):
 @csrf_exempt
 def ask_ollama(request):
     if request.method == 'POST':
-        body = json.loads(request.body)
-        question = body.get('question', '')
+        try:
+            body = json.loads(request.body)
+            question = body.get('question', '')
 
-        ollama_response = requests.post(
-            "http://localhost:11434/api/generate",
-            json={
-                "model": "mistral",
-                "prompt": question,
-                "stream": False  # Burada streaming yok, direkt cevap
-            }
-        )
+            ollama_response = requests.post(
+                "http://localhost:11434/api/generate",
+                json={
+                    "model": "mistral",
+                    "prompt": question,
+                    "stream": False
+                }
+            )
+            response_json = ollama_response.json()
+            answer = response_json.get('response', 'Cevap alınamadı.')
 
-        response_json = ollama_response.json()
-        answer = response_json.get('response', 'Cevap bulunamadı.')
-
-        return JsonResponse({'answer': answer})
-    else:
-        return JsonResponse({'error': 'POST isteği gerekli.'})
+            return JsonResponse({'answer': answer})
+        except Exception as e:
+            return JsonResponse({'answer': f'[Server Error] {str(e)}'})
+    return JsonResponse({'error': 'POST method required'})

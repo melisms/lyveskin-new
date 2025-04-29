@@ -156,40 +156,48 @@
         </div>
       </div>
     </main>
+
+    <!-- CSRF token'ı meta tag ile sayfaya koyuyoruz -->
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    
     <div id="chat-box" style="position: fixed; bottom: 20px; right: 20px; width: 300px; height: 400px; background: white; border: 1px solid gray; border-radius: 10px; padding: 10px; overflow-y: auto; box-shadow: 0 0 10px rgba(0,0,0,0.2); z-index: 9999;">
       <div id="messages" style="height: 90%; overflow-y: auto;"></div>
       <input id="user-input" type="text" placeholder="Sorunuzu yazın..." style="width: 100%; padding: 5px; margin-top: 5px;">
-  </div>
-
-  <script>
-  document.getElementById('user-input').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
+    </div>
+    
+    <script>
+      const csrftoken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    
+      document.getElementById('user-input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
           const input = e.target.value;
           if (input.trim() === '') return;
-
+    
           const messageBox = document.getElementById('messages');
           messageBox.innerHTML += '<div><b>Sen:</b> ' + input + '</div>';
-
+    
           fetch('/ask/', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-                  'X-CSRFToken': '{{ csrf_token }}'
-              },
-              body: JSON.stringify({ question: input })
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              
+            },
+            body: JSON.stringify({ question: input })
           })
           .then(response => response.json())
           .then(data => {
-              messageBox.innerHTML += '<div><b>Asistan:</b> ' + data.answer + '</div>';
-              e.target.value = '';
-              messageBox.scrollTop = messageBox.scrollHeight;
+            messageBox.innerHTML += '<div><b>Asistan:</b> ' + data.answer + '</div>';
+            e.target.value = '';
+            messageBox.scrollTop = messageBox.scrollHeight;
           })
           .catch(error => {
-              messageBox.innerHTML += '<div><b>Hata:</b> ' + error + '</div>';
-              e.target.value = '';
-              messageBox.scrollTop = messageBox.scrollHeight;
+            messageBox.innerHTML += '<div><b>Hata:</b> ' + error + '</div>';
+            e.target.value = '';
+            messageBox.scrollTop = messageBox.scrollHeight;
           });
-      }
-  });
-  </script>
-{% endblock %}
+        }
+      });
+    </script>
+    
+    {% endblock %}
+    
