@@ -30,6 +30,15 @@ services:
     ports:
       - "6379:6379"
 
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - app
+      
   ollama:
     image: ollama/ollama
     ports:
