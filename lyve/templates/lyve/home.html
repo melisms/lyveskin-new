@@ -169,35 +169,37 @@
       const csrftoken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     
       document.getElementById('user-input').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-          const input = e.target.value;
-          if (input.trim() === '') return;
-    
-          const messageBox = document.getElementById('messages');
-          messageBox.innerHTML += '<div><b>Sen:</b> ' + input + '</div>';
-    
-          fetch('/ask/', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              
-            },
-            body: JSON.stringify({ question: input })
-          })
-          .then(response => response.json())
-          .then(data => {
-            messageBox.innerHTML += '<div><b>Asistan:</b> ' + data.answer + '</div>';
-            e.target.value = '';
-            messageBox.scrollTop = messageBox.scrollHeight;
-          })
-          .catch(error => {
-            messageBox.innerHTML += '<div><b>Hata:</b> ' + error + '</div>';
-            e.target.value = '';
-            messageBox.scrollTop = messageBox.scrollHeight;
-          });
-        }
-      });
+  if (e.key === 'Enter') {
+    const input = e.target.value;
+    if (input.trim() === '') return;
+
+    e.target.value = '';  // <<<< Input burada hemen temizlenmeli!
+
+    const messageBox = document.getElementById('messages');
+    messageBox.innerHTML += '<div><b>Sen:</b> ' + input + '</div>';
+
+    fetch('/ask/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken
+      },
+      body: JSON.stringify({ question: input })
+    })
+    .then(response => response.json())
+    .then(data => {
+      messageBox.innerHTML += '<div><b>Asistan:</b> ' + data.answer + '</div>';
+      messageBox.scrollTop = messageBox.scrollHeight;
+    })
+    .catch(error => {
+      messageBox.innerHTML += '<div><b>Hata:</b> ' + error + '</div>';
+      messageBox.scrollTop = messageBox.scrollHeight;
+    });
+  }
+});
+
     </script>
+    
     
     {% endblock %}
     

@@ -14,7 +14,7 @@ services:
     depends_on:
       - db
       - redis
-      - ollama  # Ollama'yı da beklemesini söylüyoruz
+      - ollama  
 
   db:
     image: postgres:15
@@ -33,9 +33,9 @@ services:
   ollama:
     image: ollama/ollama
     ports:
-      - "11434:11434"  # Ollama'nın varsayılan portu
+      - "11434:11434" 
     volumes:
-      - ollama-data:/root/.ollama  # Ollama'nın model verileri için kalıcı depolama
+      - ollama-data:/root/.ollama
 
 volumes:
   ollama-data:
