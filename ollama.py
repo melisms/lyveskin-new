@@ -1,30 +1,30 @@
 import requests
 
-def ollama_soru_sor(soru):
+def ask_ollama(question):
     url = "http://localhost:11434/api/generate"
     data = {
         "model": "mistral",
-        "prompt": soru,
+        "prompt": question,
         "stream": False
     }
 
     try:
         response = requests.post(url, json=data)
-        response.raise_for_status()  # HTTP hatası varsa çıkar
-        response_json = response.json()  # JSON hatası varsa try yakalar
-        return response_json.get("response", "Cevap bulunamadı.")
+        response.raise_for_status()  # Raise an error for HTTP errors
+        response_json = response.json()  # Catch JSON errors
+        return response_json.get("response", "No answer found.")
     except requests.exceptions.RequestException as e:
-        return f"[İSTEK HATASI] {str(e)}"
+        return f"[REQUEST ERROR] {str(e)}"
     except ValueError:
-        return "[JSONDecodeError] Geçersiz JSON cevabı alındı."
+        return "[JSONDecodeError] Invalid JSON response received."
     except Exception as e:
-        return f"[GENEL HATA] {str(e)}"
+        return f"[GENERAL ERROR] {str(e)}"
 
-# 🔁 Sonsuz döngü
+# 🔁 Infinite loop
 while True:
-    soru = input("Modele sorulacak cümleyi yazın (çıkmak için 'çık' yazın): ")
-    if soru.lower() == "çık":
-        print("Görüşmek üzere! 👋")
+    question = input("Enter a prompt for the model (type 'exit' to quit): ")
+    if question.lower() == "exit":
+        print("Goodbye! 👋")
         break
-    cevap = ollama_soru_sor(soru)
-    print("Modelin Cevabı:", cevap)
+    answer = ask_ollama(question)
+    print("Model's Answer:", answer)

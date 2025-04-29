@@ -69,6 +69,11 @@ def skincareroutine(request):
 
 
 
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+import requests
+import json
+
 @csrf_exempt
 def ask_ollama(request):
     if request.method == 'POST':
@@ -77,17 +82,23 @@ def ask_ollama(request):
             question = body.get('question', '')
 
             ollama_response = requests.post(
-                "http://ollama:11434/api/generate",
+                "http://host.docker.internal:11434/api/generate",
                 json={
                     "model": "mistral",
                     "prompt": question,
                     "stream": False
                 }
             )
+            ollama_response.raise_for_status()  # Raise an error for HTTP errors
             response_json = ollama_response.json()
-            answer = response_json.get('response', 'Cevap alınamadı.')
+            answer = response_json.get('response', 'No answer found.')
 
             return JsonResponse({'answer': answer})
+        except requests.exceptions.RequestException as e:
+            return JsonResponse({'answer': f'[Request Error] {str(e)}'})
+        except ValueError:
+            return JsonResponse({'answer': '[JSONDecodeError] Invalid JSON response received.'})
         except Exception as e:
             return JsonResponse({'answer': f'[Server Error] {str(e)}'})
-    return JsonResponse({'error': 'POST method required'})
+    else:
+        return JsonResponse({'error': 'POST method required'})
