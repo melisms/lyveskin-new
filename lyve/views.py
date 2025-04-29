@@ -77,7 +77,7 @@ def ask_ollama(request):
             question = body.get('question', '')
 
             ollama_response = requests.post(
-                "http://localhost:11434/api/generate",
+                "http://ollama:11434/api/generate",
                 json={
                     "model": "mistral",
                     "prompt": question,
