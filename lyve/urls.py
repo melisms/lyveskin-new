@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path
 from django.urls import path, include
 from . import views
-from .views import test_mail
+
 
 
 
@@ -18,7 +18,7 @@ urlpatterns = [
     path('skincareroutine',views.skincareroutine, name='skincareroutine'),
     path('ingredient/<str:letter>/', views.ingredients_view, name='ingredients'),
     path('ask/', views.ask_ollama, name='ask_ollama'),
-    path('test-mail/', test_mail, name='test_mail'),
+
 ]
 
 
