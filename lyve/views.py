@@ -67,13 +67,6 @@ def skintype(request):
 def skincareroutine(request):
         return render(request, "lyve/skincareroutine.html")
 
-
-
-from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
-import requests
-import json
-
 @csrf_exempt
 def ask_ollama(request):
     if request.method == 'POST':
