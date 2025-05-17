@@ -9,7 +9,7 @@ from item.models import Item
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
-from utils import send_welcome_email
+from .utils import send_welcome_email
 
 def register(request):
     if request.method == 'POST':
