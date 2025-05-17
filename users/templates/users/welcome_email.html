@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      color: #333333;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    .header {
+      text-align: center;
+      padding-bottom: 20px;
+      font-size: 24px;
+      font-weight: bold;
+      color: #007BFF;
+    }
+    .content {
+      font-size: 16px;
+    }
+    .footer {
+      margin-top: 30px;
+      font-size: 12px;
+      color: #777;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      Welcome to LyveSkin!
+    </div>
+    <div class="content">
+      <p>Hi {{ username }},</p>
+      <p>Thank you for registering with <strong>LyveSkin</strong>. We're thrilled to have you on board!</p>
+      <p>Feel free to explore your profile and enjoy all the features we offer.</p>
+      <p>Best regards,<br>The LyveSkin Team</p>
+    </div>
+    <div class="footer">
+      <p>If you did not register, please ignore this email.</p>
+    </div>
+  </div>
+</body>
+</html>

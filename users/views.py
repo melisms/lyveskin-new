@@ -9,13 +9,16 @@ from item.models import Item
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
+from utils import send_welcome_email
 
 def register(request):
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
         if form.is_valid():
             form.save()
+            email = form.cleaned_data.get('email')
             username = form.cleaned_data.get('username')
+            send_welcome_email(username, email)
             messages.success(request, f'Your account has been created! Welcome {username}')
             return redirect('login')
     else:
