@@ -89,11 +89,11 @@ WSGI_APPLICATION = 'skinc.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'app_db',
-        'USER': 'postgres',
-        'PASSWORD': 'password',
-        'HOST': 'db',
-        'PORT': '5432',
+        'NAME': os.environ.get('PGDATABASE', 'app_db'),
+        'USER': os.environ.get('PGUSER', 'postgres'),
+        'PASSWORD': os.environ.get('PGPASSWORD', 'password'),
+        'HOST': os.environ.get('PGHOST', 'db'),
+        'PORT': os.environ.get('PGPORT', '5432'),
     }
 }
 
