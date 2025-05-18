@@ -8,7 +8,7 @@
                     {% if post.author.userprofile.profile_picture %}
                         <img class="mr-3 rounded-circle" src="{{ post.author.userprofile.profile_picture.url }}" alt="Profile Image" width="50" height="50">
                     {% else %}
-                        <img class="mr-3 rounded-circle" src="{% static 'media/profile_picture/default_profile.png' %}" alt="Default Profile Image" width="50" height="50">
+                        <img class="mr-3 rounded-circle" src="{% static 'default_profile.png' %}" alt="Default Profile Image" width="50" height="50">
                     {% endif %}
                     <a class="mr-2" href="{% url 'profile' post.author.id %}">{{ post.author }}</a>
                     <small class="text-muted">{{ post.date_posted|date:"d F, Y" }}</small>
