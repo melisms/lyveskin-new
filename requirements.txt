@@ -12,4 +12,5 @@ soupsieve==2.7
 sqlparse==0.5.3
 typing_extensions==4.13.2
 gunicorn==21.2.0
+dj-database-url==2.3.0
 requests
