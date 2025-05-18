@@ -2,6 +2,21 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
+
+<style>
+    .custom-settings-button {
+        background-color: #40826D;
+        border-radius: 10px;
+        padding: 6px 16px;
+        width: 90px;
+        transition: background-color 0.3s ease-in-out;
+    }
+
+    .custom-settings-button:hover {
+        background-color: #1e3b31; /* slightly darker green for hover */
+    }
+</style>
+
 <div class="container mx-auto p-8">
     <h1 class="text-3xl font-bold mb-8 text-center">Welcome, {{ user_profile.username|capfirst }}</h1>
 
@@ -23,13 +38,15 @@
             {% endif %}
         </div>
 
+        {% if user_profile.user == request.user %}
         <!-- Settings Button -->
-        <div class="flex justify-center">
-            <a href="{% url 'settings_page' %}" class="bg-green-500 text-black px-8 py-3 rounded-lg hover:bg-green-600 transition">
+        <div class="flex justify-center" style="margin-top: 10px;">
+            <a href="{% url 'settings_page' %}"
+            class="nav-item nav-link text-white text-sm font-medium custom-settings-button">
                 Settings
             </a>
         </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
-
