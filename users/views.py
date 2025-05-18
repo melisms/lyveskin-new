@@ -27,7 +27,13 @@ def register(request):
 @login_required
 def profile(request, id):
     user = get_object_or_404(User, id=id)
-    return render(request, 'users/profile.html', {'user_profile': user})
+    
+    try:
+        user_profile = user.userprofile
+    except ObjectDoesNotExist:
+        user_profile = UserProfile.objects.create(user=user)
+
+    return render(request, 'users/profile.html', {'user_profile': user_profile})
 
 
 from django.contrib.auth import logout
@@ -40,33 +46,46 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 
 
+@login_required
 def update_settings(request):
+    user = request.user
+
+    try:
+        profile = user.userprofile
+    except ObjectDoesNotExist:
+        profile = UserProfile.objects.create(user=user)
+
     if request.method == 'POST':
-        user = request.user
+        form_type = request.POST.get('form_type')
 
-        if request.FILES.get('profile_picture'):
-            user.profile_picture = request.FILES['profile_picture']
+        # PROFİL RESMİ GÜNCELLEME
+        if form_type == 'profile_picture' and request.FILES.get('profile_picture'):
+            profile.profile_picture = request.FILES['profile_picture']
+            profile.save()
+            messages.success(request, 'Profil fotoğrafınız güncellendi.')
+            return redirect('profile', user.id)
 
-        current_password = request.POST.get('current_password')
-        new_password = request.POST.get('new_password')
-        confirm_password = request.POST.get('confirm_password')
+        # ŞİFRE GÜNCELLEME
+        elif form_type == 'change_password':
+            current_password = request.POST.get('current_password')
+            new_password = request.POST.get('new_password')
+            confirm_password = request.POST.get('confirm_password')
 
-        if new_password and confirm_password and current_password:
-            if new_password == confirm_password:
-                if user.check_password(current_password):
-                    user.set_password(new_password)
-                    user.save()
-                    messages.success(request, 'Şifreniz başarıyla değiştirildi.')
-                    return redirect('login')
+            if new_password and confirm_password and current_password:
+                if new_password == confirm_password:
+                    if user.check_password(current_password):
+                        user.set_password(new_password)
+                        user.save()
+                        update_session_auth_hash(request, user)  # login açık kalsın
+                        messages.success(request, 'Şifreniz başarıyla değiştirildi.')
+                        return redirect('settings_page')
+                    else:
+                        messages.error(request, 'Mevcut şifreniz yanlış.')
                 else:
-                    messages.error(request, 'Mevcut şifreniz yanlış.')
-            else:
-                messages.error(request, 'Yeni şifreler eşleşmiyor.')
+                    messages.error(request, 'Yeni şifreler birbiriyle eşleşmiyor.')
 
-        user.save()
-        return redirect('profile', user.id)
-    else:
-        return redirect('profile', request.user.id)
+    return redirect('settings_page')
+
 
 def settings_page(request):
     user = request.user
