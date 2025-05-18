@@ -85,17 +85,22 @@ WSGI_APPLICATION = 'skinc.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('PGDATABASE', 'app_db'),
-        'USER': os.environ.get('PGUSER', 'postgres'),
-        'PASSWORD': os.environ.get('PGPASSWORD', 'password'),
-        'HOST': os.environ.get('PGHOST', 'db'),
-        'PORT': os.environ.get('PGPORT', '5432'),
+DATABASE_URL = os.getenv("DATABASE_URL")
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.parse(DATABASE_URL)
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get('app_db'),
+            'USER': os.environ.get('postgres'),
+            'PASSWORD': os.environ.get('password'),
+            'HOST': os.environ.get('db'),
+            'PORT': os.environ.get('5432'),
+        }
+    }
 
 
 # Password validation
