@@ -24,7 +24,7 @@
             <div class="media-body">
                 <div class="article-metadata">
                     <img class="mr-3 rounded-circle" src="{% if comment.author.userprofile.profile_picture %}{{ comment.author.userprofile.profile_picture.url }}{% else %}{% static 'default_profile.png' %}{% endif %}" alt="Profile Image" width="50" height="50">
-                    <a class="mr-2" href="{% url 'profile' user.id %}">{{ comment.author }}</a>
+                    <a class="mr-2" href="{% url 'profile' comment.author.id %}">{{ comment.author }}</a>
                     <small class="text-muted">{{ comment.date_posted|date:"F d, Y" }}</small>
                 </div>
                 <p class="article-content">{{ comment.content }}</p>
