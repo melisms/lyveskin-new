@@ -62,7 +62,7 @@ def update_settings(request):
         if form_type == 'profile_picture' and request.FILES.get('profile_picture'):
             profile.profile_picture = request.FILES['profile_picture']
             profile.save()
-            messages.success(request, 'Profil fotoğrafınız güncellendi.')
+            messages.success(request, 'Your profile photo has been updated.')
             return redirect('profile', user.id)
 
         # ŞİFRE GÜNCELLEME
@@ -76,13 +76,13 @@ def update_settings(request):
                     if user.check_password(current_password):
                         user.set_password(new_password)
                         user.save()
-                        update_session_auth_hash(request, user)  # login açık kalsın
-                        messages.success(request, 'Şifreniz başarıyla değiştirildi.')
+                        update_session_auth_hash(request, user)  
+                        messages.success(request, 'Your password has been changed successfully.')
                         return redirect('settings_page')
                     else:
-                        messages.error(request, 'Mevcut şifreniz yanlış.')
+                        messages.error(request, 'Your current password is incorrect.')
                 else:
-                    messages.error(request, 'Yeni şifreler birbiriyle eşleşmiyor.')
+                    messages.error(request, 'The new passwords do not match.')
 
     return redirect('settings_page')
 
@@ -96,7 +96,7 @@ def settings_page(request):
         profile = UserProfile.objects.create(user=user)
 
     if request.method == 'POST':
-        # Eğer şifre değiştirme isteniyorsa
+
         if 'current_password' in request.POST:
             password_form = PasswordChangeForm(user=user, data=request.POST)
             if password_form.is_valid():
@@ -104,7 +104,7 @@ def settings_page(request):
                 update_session_auth_hash(request, user)
                 return redirect('settings_page')
 
-        # Eğer profil resmi güncelleniyorsa
+
         if 'profile_picture' in request.FILES:
             profile.profile_picture = request.FILES['profile_picture']
             profile.save()
