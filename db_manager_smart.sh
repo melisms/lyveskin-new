@@ -1,4 +1,10 @@
 #!/bin/bash
+trap ctrl_c INT
+
+ctrl_c() {
+    echo -e "\n\n⚠️  Script interrupted. Exiting..."
+    exit 1
+}
 
 echo "📦 Smart PostgreSQL Manager Script"
 echo "----------------------------------"
