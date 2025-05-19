@@ -51,8 +51,8 @@ LyveSkin is a web application designed to provide a user-friendly platform for s
 4. **Apply migrations and create a superuser**:
 
     ```bash
-    docker-compose exec web python manage.py migrate
-    docker-compose exec web python manage.py createsuperuser
+    docker-compose exec app python manage.py migrate
+    docker-compose exec app python manage.py createsuperuser
     ```
 
 5. **Access the app**:
@@ -83,8 +83,8 @@ lyveskin-new/
 
 - Run tests:  
   ```bash
-  docker-compose exec web python manage.py test
-  docker-compose exec web python manage.py collectstatic
+  docker-compose exec app python manage.py test
+  docker-compose exec app python manage.py collectstatic
   ```
 
 ## Contributing
