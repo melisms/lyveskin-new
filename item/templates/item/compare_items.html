@@ -2,23 +2,38 @@
 
 {% block content %}
 <div class="form-container" style="width: 80%">
-    <form method="post">
+    <form method="post" id="categoryForm">
         {% csrf_token %}
-        <div style="text-align: center; margin-right: 150px">
-        {{ form.category.label_tag }} {{ form.category }}
+        <div class="mb-4 text-center">
+            <label class="form-label">{{ form.category.label }}</label>
+            {{ form.category }}
         </div>
-        <div class="form-items row">
-            <div>
-                <div class="form-item" style="margin-left: 200px">{{ form.item1.label_tag }} {{ form.item1 }}</div>
 
+        <div class="row justify-content-center mb-4">
+            <div class="col-md-4 text-center">
+                <label class="form-label">{{ form.item1.label }}</label>
+                {{ form.item1 }}
             </div>
-            <div>
-                <div class="form-item" style="margin-left: 100px">{{ form.item2.label_tag }} {{ form.item2 }}</div>
+            <div class="col-md-4 text-center">
+                <label class="form-label">{{ form.item2.label }}</label>
+                {{ form.item2 }}
             </div>
         </div>
-        <div style="text-align: center; margin-right: 180px">
-        <button type="submit">Compare Items</button>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-success mt-3">Compare Items</button>
         </div>
     </form>
 </div>
+
+<script>
+    // Find the category select element
+    const categorySelect = document.getElementById("id_category");  // Django automatically sets id like 'id_FIELDNAME'
+    const form = document.getElementById("categoryForm");
+
+    // Listen for changes
+    categorySelect.addEventListener('change', function() {
+        form.submit(); // Auto-submit the form
+    });
+</script>
 {% endblock %}

@@ -1,6 +1,52 @@
 {% extends 'lyve/base.html' %}
 {% load crispy_forms_tags %}
 
-{% block content%}
-    <h1 class ="text-2xl pl-4">Welcome {{ user.username|capfirst }}</h1>
+{% block content %}
+
+<style>
+    .custom-settings-button {
+        background-color: #40826D;
+        border-radius: 10px;
+        padding: 6px 16px;
+        width: 90px;
+        transition: background-color 0.3s ease-in-out;
+    }
+
+    .custom-settings-button:hover {
+        background-color: #1e3b31; /* slightly darker green for hover */
+    }
+</style>
+
+<div class="container mx-auto p-8">
+    <h1 class="text-3xl font-bold mb-8 text-center">Welcome, {{ user_profile.username|capfirst }}</h1>
+
+    <div class="flex flex-col items-center space-y-10">
+        <!-- Profile Picture -->
+        <div class="flex justify-center">
+            {% if user_profile.profile_picture %}
+                <img id="profileImage" 
+                     src="{{ user_profile.profile_picture.url }}" 
+                     alt="Profile Picture" 
+                     class="rounded-full border-2 border-gray-300"
+                     style="width: 150px; height: 150px; object-fit: cover;">
+            {% else %}
+                <img id="profileImage" 
+                     src="https://via.placeholder.com/150" 
+                     alt="Default Profile Picture" 
+                     class="rounded-full border-2 border-gray-300"
+                     style="width: 150px; height: 150px; object-fit: cover;">
+            {% endif %}
+        </div>
+
+        {% if user_profile.user == request.user %}
+        <!-- Settings Button -->
+        <div class="flex justify-center" style="margin-top: 10px;">
+            <a href="{% url 'settings_page' %}"
+            class="nav-item nav-link text-white text-sm font-medium custom-settings-button">
+                Settings
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

@@ -1,6 +1,11 @@
 from django.contrib import admin
+from django.urls import path
 from django.urls import path, include
 from . import views
+
+
+
+
 
 urlpatterns = [
     path('about/', views.about, name='about'),
@@ -12,4 +17,8 @@ urlpatterns = [
     path('skintype/',views.skintype, name='skintype'),
     path('skincareroutine',views.skincareroutine, name='skincareroutine'),
     path('ingredient/<str:letter>/', views.ingredients_view, name='ingredients'),
+    path('ask/', views.ask_ollama, name='ask_ollama'),
+
 ]
+
+

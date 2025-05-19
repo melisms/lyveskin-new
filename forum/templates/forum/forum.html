@@ -1,15 +1,21 @@
 {% extends "forum/baseforum.html" %}
+{% load static %}
 {% block content %}
     {% for post in posts %}
         <article class="media content-section">
-          <div class="media-body">
-            <div class="article-metadata">
-              <a class="mr-2" href="#">{{ post.author }}</a>
-              <small class="text-muted">{{ post.date_posted|date:"d F, Y" }}</small>
+            <div class="media-body">
+                <div class="article-metadata">
+                    {% if post.author.userprofile.profile_picture %}
+                        <img class="mr-3 rounded-circle" src="{{ post.author.userprofile.profile_picture.url }}" alt="Profile Image" width="50" height="50">
+                    {% else %}
+                        <img class="mr-3 rounded-circle" src="{% static 'default_profile.png' %}" alt="Default Profile Image" width="50" height="50">
+                    {% endif %}
+                    <a class="mr-2" href="{% url 'profile' post.author.id %}">{{ post.author }}</a>
+                    <small class="text-muted">{{ post.date_posted|date:"d F, Y" }}</small>
+                </div>
+                <h2><a class="article-title" href="{% url 'forum:post-detail' post.pk %}">{{ post.title }}</a></h2>
+                <p class="article-content">{{ post.content }}</p>
             </div>
-            <h2><a class="article-title" href="{% url 'forum:post-detail' post.pk %}">{{ post.title }}</a></h2>
-            <p class="article-content">{{ post.content }}</p>
-          </div>
         </article>
     {% endfor %}
     {% if is_paginated %}

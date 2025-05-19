@@ -1,0 +1,16 @@
+beautifulsoup4==4.13.4
+crispy-bootstrap4==2024.10
+Django==5.2
+django-bootstrap4==25.1
+django-crispy-forms==2.4
+packaging==24.2
+pillow==11.2.1
+psutil==6.1.0
+Pygments==2.18.0
+psycopg2-binary==2.9.6
+soupsieve==2.7
+sqlparse==0.5.3
+typing_extensions==4.13.2
+gunicorn==21.2.0
+dj-database-url
+requests

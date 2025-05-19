@@ -14,6 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from users import views as user_views
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -30,5 +31,10 @@ urlpatterns = [
     path("logout/", user_views.logout_view, name="logout"),
     path('', include(('lyve.urls', 'lyve'), namespace='lyve')),
     path('forum/', include(('forum.urls', 'forum'), namespace='forum')),
-    path('profile/', user_views.profile, name='profile'),
+    path('profile/<int:id>/', user_views.profile, name='profile'),
+    path('settings/update/', user_views.update_settings, name='update_settings'),
+    path('settings/', user_views.settings_page, name='settings_page'),
+
+
+
     ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

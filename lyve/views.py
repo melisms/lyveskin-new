@@ -1,6 +1,11 @@
 from django.shortcuts import render
 from item.models import Category, Item, Ingredient
 
+import requests
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+
 
 def home(request):
     return render(request, "lyve/home.html")
@@ -61,3 +66,32 @@ def skintype(request):
 
 def skincareroutine(request):
         return render(request, "lyve/skincareroutine.html")
+
+@csrf_exempt
+def ask_ollama(request):
+    if request.method == 'POST':
+        try:
+            body = json.loads(request.body)
+            question = body.get('question', '')
+
+            ollama_response = requests.post(
+                "http://host.docker.internal:11434/api/generate",
+                json={
+                    "model": "mistral",
+                    "prompt": question,
+                    "stream": False
+                }
+            )
+            ollama_response.raise_for_status()  # Raise an error for HTTP errors
+            response_json = ollama_response.json()
+            answer = response_json.get('response', 'No answer found.')
+
+            return JsonResponse({'answer': answer})
+        except requests.exceptions.RequestException as e:
+            return JsonResponse({'answer': f'[Request Error] {str(e)}'})
+        except ValueError:
+            return JsonResponse({'answer': '[JSONDecodeError] Invalid JSON response received.'})
+        except Exception as e:
+            return JsonResponse({'answer': f'[Server Error] {str(e)}'})
+    else:
+        return JsonResponse({'error': 'POST method required'})

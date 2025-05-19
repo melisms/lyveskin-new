@@ -21,6 +21,9 @@
         <title>Lyveskin</title>
     {% endif %}
 
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+    <link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}">
+
 </head>
 <body style="display: flex; flex-direction: column; min-height: 100vh;">
     <header class="site-header">
@@ -40,7 +43,7 @@
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
               {% if user.is_authenticated %}
-                <a class="nav-item nav-link" href="{% url 'profile' %}">Profile</a>
+                <a class="nav-item nav-link" href="{% url 'profile' user.id %}">Profile</a>
                 <a class="nav-item nav-link" href="{% url 'logout' %}">Logout</a>
                 <a class="nav-item nav-link" href="{% url 'item:new' %}" style="background-color: #274f42; border-radius: 10px">Add Product</a>
               {% else %}
@@ -80,10 +83,10 @@
                         <div class="col-lg-2 col-md-6">
                             <h5 class="text-white mb-3">Quick links</h5>
                             <ul class="list-unstyled text-muted">
-                                <li><a href="#" class="text-darkgreen">Home</a></li>
-                                <li><a href="about/" class="text-darkgreen">About</a></li>
+                                <li><a href="/" class="text-darkgreen">Home</a></li>
+                                <li><a href="/about" class="text-darkgreen">About</a></li>
                                 <li><a href="#" class="text-darkgreen">Get started</a></li>
-                                <li><a href="#" class="text-darkgreen">FAQ</a></li>
+                                <li><a href="/forum" class="text-darkgreen">FAQ</a></li>
                             </ul>
                         </div>
                         <div class="col-lg-4 col-md-6">
@@ -109,4 +112,3 @@
 
 </body>
 </html>
-
