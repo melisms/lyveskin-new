@@ -11,6 +11,6 @@ psycopg2-binary==2.9.6
 soupsieve==2.7
 sqlparse==0.5.3
 typing_extensions==4.13.2
-gunicorn==21.2.0
+gunicorn==23.0.0
 dj-database-url
 requests
