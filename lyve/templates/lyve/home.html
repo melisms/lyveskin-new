@@ -223,8 +223,12 @@
       e.target.value = ''; 
 
       const messageBox = document.getElementById('messages');
-      messageBox.innerHTML += '<div><b>You:</b> ' + input + '</div>';
-
+      const userMessage = document.createElement('div');
+      userMessage.innerHTML = '<b>You:</b> ';
+      const userText = document.createElement('span');
+      userText.textContent = input;
+      userMessage.appendChild(userText);
+      messageBox.appendChild(userMessage);
       fetch('/ask/', {
         method: 'POST',
         headers: {
@@ -235,11 +239,21 @@
       })
       .then(response => response.json())
       .then(data => {
-        messageBox.innerHTML += '<div><b>Assistant:</b> ' + data.answer + '</div>';
+        const assistantMessage = document.createElement('div');
+        assistantMessage.innerHTML = '<b>Assistant:</b> ';
+        const assistantText = document.createElement('span');
+        assistantText.textContent = data.answer;
+        assistantMessage.appendChild(assistantText);
+        messageBox.appendChild(assistantMessage);
         messageBox.scrollTop = messageBox.scrollHeight;
       })
       .catch(error => {
-        messageBox.innerHTML += '<div><b>Fault:</b> ' + error + '</div>';
+        const errorMessage = document.createElement('div');
+        errorMessage.innerHTML = '<b>Fault:</b> ';
+        const errorText = document.createElement('span');
+        errorText.textContent = error;
+        errorMessage.appendChild(errorText);
+        messageBox.appendChild(errorMessage);
         messageBox.scrollTop = messageBox.scrollHeight;
       });
     }
