@@ -5,7 +5,7 @@ import requests
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
-
+import logging
 
 def home(request):
     return render(request, "lyve/home.html")
@@ -88,10 +88,14 @@ def ask_ollama(request):
 
             return JsonResponse({'answer': answer})
         except requests.exceptions.RequestException as e:
-            return JsonResponse({'answer': f'[Request Error] {str(e)}'})
-        except ValueError:
+            print(f"RequestException occurred: {e}")
+            return JsonResponse({'answer': '[Request Error] An error occurred while processing your request.'})
+        except ValueError as e:
+            print(f"ValueError occurred: {e}")
             return JsonResponse({'answer': '[JSONDecodeError] Invalid JSON response received.'})
         except Exception as e:
-            return JsonResponse({'answer': f'[Server Error] {str(e)}'})
+            logger = logging.getLogger(__name__)
+            logger.error("An unexpected error occurred in ask_ollama", exc_info=True)
+            return JsonResponse({'answer': 'An internal error has occurred.'})
     else:
         return JsonResponse({'error': 'POST method required'})
