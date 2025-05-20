@@ -1,11 +1,13 @@
 from django.shortcuts import render
 from item.models import Category, Item, Ingredient
-
+from django.contrib.auth.models import User
 import requests
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 import logging
+import difflib
+from django.contrib.auth import get_user_model
 
 def home(request):
     return render(request, "lyve/home.html")
@@ -112,6 +114,26 @@ def ask_ollama(request):
                     'redirect': f"/items/{matched_item.id}/"
                 })
                 
+            User = get_user_model()
+            words = question.lower().split()
+            if "profile" in words:
+                possible_names = [w for w in words if w != "profile"]
+
+                if possible_names:
+                    users = User.objects.all()
+                    usernames = [user.username.lower() for user in users]
+
+                    # Try fuzzy matching for each possible name
+                    for name in possible_names:
+                        matches = difflib.get_close_matches(name, usernames, n=1, cutoff=0.7)
+                        if matches:
+                            matched_username = matches[0]
+                            user = User.objects.get(username__iexact=matched_username)
+                            return JsonResponse({
+                                "answer": f"Redirecting to {user.username}'s profile page.",
+                                "redirect": f"/profile/{user.id}/"
+                            })
+
             ollama_response = requests.post(
                 "http://host.docker.internal:11434/api/generate",
                 json={
