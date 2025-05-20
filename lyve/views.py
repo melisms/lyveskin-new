@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 import logging
+from item.models import Item
 
 def home(request):
     return render(request, "lyve/home.html")
@@ -73,7 +74,44 @@ def ask_ollama(request):
         try:
             body = json.loads(request.body)
             question = body.get('question', '')
-
+            
+            routes = {
+                "about": "/about/",
+                "home": "/",
+                "compare": "/items/compare/",
+                "ingredient": "/ingredient/",
+                "ingredients": "/ingredient/",
+                "forum": "/forum/",
+                "skin type": "/skintype/",
+                "skintype": "/skintype/",
+                "skincare routine": "/skincareroutine/",
+                "routine": "/skincareroutine/",
+                "item": "/item/browse/",
+                "items": "/item/browse/",
+                "products": "/item/browse/",
+                "product": "/item/browse/",
+            }
+            
+            for keyword, route in routes.items():
+                if keyword in question:
+                    return JsonResponse({
+                        'answer': f"You can visit {keyword.title()} page.",
+                        'redirect': route
+                    })
+                    
+            if "profile" in question and request.user.is_authenticated:
+                return JsonResponse({
+                    "answer": "Redirecting to your profile page.",
+                    "redirect": f"/profile/{request.user.id}/"
+                })
+                
+            # matched_item = Item.objects.filter(name__icontains=question).first()
+            # if matched_item in question and matched_item:
+            #     return JsonResponse({
+            #         'answer': f"You can visit {matched_item.name} page.",
+            #         'redirect': f"/item/{matched_item.id}/"
+            #     })
+                
             ollama_response = requests.post(
                 "http://host.docker.internal:11434/api/generate",
                 json={

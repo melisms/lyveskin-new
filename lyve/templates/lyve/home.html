@@ -246,6 +246,12 @@
         assistantMessage.appendChild(assistantText);
         messageBox.appendChild(assistantMessage);
         messageBox.scrollTop = messageBox.scrollHeight;
+
+        if (data.redirect) {
+          setTimeout(() => {
+            window.location.href = data.redirect;
+          }, 2000); // wait 2 seconds before redirect
+        }
       })
       .catch(error => {
         const errorMessage = document.createElement('div');
