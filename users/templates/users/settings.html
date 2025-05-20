@@ -25,6 +25,29 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
 
+        <!-- Username Change -->
+<div class="bg-white p-6 rounded shadow">
+    <h2 class="text-xl font-semibold mb-4">Change Username</h2>
+
+    <form method="POST" action="{% url 'update_settings' %}">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="change_username">
+
+        <div class="mb-4">
+            <label class="block mb-2 font-semibold" for="username">New Username</label>
+            <input type="text" id="username" name="username"
+                   value="{{ user.username }}"
+                   class="border rounded w-full py-2 px-3" required>
+        </div>
+
+        <button type="submit"
+                class="nav-item nav-link text-white text-sm font-medium custom-settings-button">
+            Change Username
+        </button>
+    </form>
+</div>
+
+
 <!-- Profile Picture Update -->
 <div class="bg-white p-6 rounded shadow">
     <h2 class="text-xl font-semibold mb-4">Profile Picture</h2>
