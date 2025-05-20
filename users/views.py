@@ -50,6 +50,27 @@ from django.contrib import messages
 def update_settings(request):
     user = request.user
 
+    if request.method == 'POST':
+        form_type = request.POST.get('form_type')
+
+        if form_type == 'change_username':
+            new_username = request.POST.get('username')
+            if new_username and new_username != user.username:
+                user.username = new_username
+                user.save()
+                messages.success(request, "Username updated.")
+            else:
+                messages.warning(request, "Please enter a new and different username.")
+
+        elif form_type == 'change_email':
+            new_email = request.POST.get('email')
+            if new_email and new_email != user.email:
+                user.email = new_email
+                user.save()
+                messages.success(request, "Email updated.")
+            else:
+                messages.warning(request, "Please enter a new and different email.")
+
     try:
         profile = user.userprofile
     except ObjectDoesNotExist:

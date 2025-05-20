@@ -13,40 +13,46 @@
     }
 
     .custom-settings-button:hover {
-        background-color: #1e3b31; /* slightly darker green for hover */
+        background-color: #1e3b31;
+    }
+
+    .profile-label {
+        font-weight: bold;
+        margin-right: 6px;
+    }
+
+    .profile-info {
+        font-size: 1rem;
+        margin-bottom: 6px;
     }
 </style>
 
-<div class="container mx-auto p-8">
-    <h1 class="text-3xl font-bold mb-8 text-center">Welcome, {{ user_profile.username|capfirst }}</h1>
+<div class="container mx-auto p-8 flex flex-col items-center">
+    <h1 class="text-3xl font-bold mb-8 text-center">Welcome {{ user_profile.user.username|capfirst }}</h1>
 
-    <div class="flex flex-col items-center space-y-10">
-        <!-- Profile Picture -->
-        <div class="flex justify-center">
-            {% if user_profile.profile_picture %}
-                <img id="profileImage" 
-                     src="{{ user_profile.profile_picture.url }}" 
-                     alt="Profile Picture" 
-                     class="rounded-full border-2 border-gray-300"
-                     style="width: 150px; height: 150px; object-fit: cover;">
-            {% else %}
-                <img id="profileImage" 
-                     src="https://via.placeholder.com/150" 
-                     alt="Default Profile Picture" 
-                     class="rounded-full border-2 border-gray-300"
-                     style="width: 150px; height: 150px; object-fit: cover;">
-            {% endif %}
-        </div>
-
-        {% if user_profile.user == request.user %}
-        <!-- Settings Button -->
-        <div class="flex justify-center" style="margin-top: 10px;">
-            <a href="{% url 'settings_page' %}"
-            class="nav-item nav-link text-white text-sm font-medium custom-settings-button">
-                Settings
-            </a>
-        </div>
-        {% endif %}
+    <!-- Profile Picture -->
+    <div class="flex justify-center mb-6">
+        <img id="profileImage"
+             src="{% if user_profile.profile_picture %}{{ user_profile.profile_picture.url }}{% else %}https://via.placeholder.com/150{% endif %}"
+             alt="Profile Picture"
+             class="rounded-full border-2 border-gray-300"
+             style="width: 150px; height: 150px; object-fit: cover;">
     </div>
+
+    <!-- User Info -->
+    <div class="text-center mb-6">
+        <p class="profile-info"><span class="profile-label">Name:</span> {{ user_profile.user.first_name|default:"-" }}</p>
+        <p class="profile-info"><span class="profile-label">Surname:</span> {{ user_profile.user.last_name|default:"-" }}</p>
+        <p class="profile-info"><span class="profile-label">Username:</span> {{ user_profile.user.username }}</p>
+        <p class="profile-info"><span class="profile-label">Email:</span> {{ user_profile.user.email|default:"-" }}</p>
+    </div>
+
+    <!-- Settings -->
+    {% if user_profile.user == request.user %}
+    <div>
+        <a href="{% url 'settings_page' %}" class="custom-settings-button text-white text-sm font-medium">Settings</a>
+    </div>
+    {% endif %}
 </div>
+
 {% endblock %}
