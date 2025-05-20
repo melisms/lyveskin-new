@@ -62,6 +62,39 @@
     </form>
   </div>
 </div>
+<!-- Change firstname -->
+<div class="bg-white p-4 rounded shadow mb-4">
+  <button class="accordion-button" onclick="togglePanel('firstnamePanel')">
+    Change Firstname
+    <span id="icon-firstnamePanel" class="rotate-0">&#8250;</span> <!-- › -->
+  </button>
+  <div id="firstnamePanel" class="accordion-content hidden">
+    <form method="POST" action="{% url 'update_settings' %}">
+      {% csrf_token %}
+      <input type="hidden" name="form_type" value="change_firstname">
+      <label for="first">New Firstname</label>
+      <input type="text" name="firstname" id="firstname" value="{{ user.first_name }}">
+      <button type="submit">Change Firstname</button>
+    </form>
+  </div>
+</div>
+
+<!-- Change lastname -->
+<div class="bg-white p-4 rounded shadow mb-4">
+  <button class="accordion-button" onclick="togglePanel('last_namePanel')">
+    Change Lastname
+    <span id="icon-last_namePanel" class="rotate-0">&#8250;</span> <!-- › -->
+  </button>
+  <div id="last_namePanel" class="accordion-content hidden">
+    <form method="POST" action="{% url 'update_settings' %}">
+      {% csrf_token %}
+      <input type="hidden" name="form_type" value="change_lastname">
+      <label for="first">New Lastname</label>
+      <input type="text" name="last_name" id="last_name" value="{{ user.last_name }}">
+      <button type="submit">Change Lastname</button>
+    </form>
+  </div>
+</div>
 
 
 <!-- Change Email -->

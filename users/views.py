@@ -71,6 +71,8 @@ def update_settings(request):
             else:
                 messages.warning(request, "Please enter a new and different email.")
 
+                
+
     try:
         profile = user.userprofile
     except ObjectDoesNotExist:
