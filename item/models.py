@@ -47,16 +47,9 @@ class Item(models.Model):
         if total_count == 0:
             return {'score': 100, 'safe': 0, 'risky': 0}
 
-        risky_percentage = (risky_count / total_count) * 100
+        score = (safe_count / total_count) * 100
 
-        if risky_percentage == 0:
-            score = 100
-        elif risky_percentage <= 20:
-            score = 80
-        elif risky_percentage <= 50:
-            score = 60
-        else:
-            score = 40
+        score = round(score)
 
         return {
             'score': score,

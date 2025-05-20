@@ -47,17 +47,8 @@
             return 100; // No ingredients, perfect score
         }
 
-        var riskyPercentage = (riskyCount / totalCount) * 100;
-
-        if (riskyPercentage === 0) {
-            return 100; // No risky ingredients
-        } else if (riskyPercentage <= 20) {
-            return 80; // Low risk
-        } else if (riskyPercentage <= 50) {
-            return 60; // Moderate risk
-        } else {
-            return 40; // High risk
-        }
+        var healthScore = (safeCount / totalCount) * 100;
+        return Math.round(healthScore);
     }
 
     var item1HealthScore = calculateHealthScore(item1SafeCount, item1RiskyCount);
