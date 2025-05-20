@@ -6,7 +6,6 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 import logging
-from item.models import Item
 
 def home(request):
     return render(request, "lyve/home.html")
@@ -76,7 +75,6 @@ def ask_ollama(request):
             question = body.get('question', '')
             
             routes = {
-                "about": "/about/",
                 "home": "/",
                 "compare": "/items/compare/",
                 "ingredient": "/ingredient/",
@@ -86,10 +84,10 @@ def ask_ollama(request):
                 "skintype": "/skintype/",
                 "skincare routine": "/skincareroutine/",
                 "routine": "/skincareroutine/",
-                "item": "/item/browse/",
-                "items": "/item/browse/",
-                "products": "/item/browse/",
-                "product": "/item/browse/",
+                "item": "/items/browse/",
+                "items": "/items/browse/",
+                "products": "/items/browse/",
+                "product": "/items/browse/",
             }
             
             for keyword, route in routes.items():
@@ -105,12 +103,12 @@ def ask_ollama(request):
                     "redirect": f"/profile/{request.user.id}/"
                 })
                 
-            # matched_item = Item.objects.filter(name__icontains=question).first()
-            # if matched_item in question and matched_item:
-            #     return JsonResponse({
-            #         'answer': f"You can visit {matched_item.name} page.",
-            #         'redirect': f"/item/{matched_item.id}/"
-            #     })
+            matched_item = Item.objects.filter(name__icontains=question).first()
+            if matched_item:
+                return JsonResponse({
+                    'answer': f"You can visit {matched_item.name} page.",
+                    'redirect': f"/items/{matched_item.id}/"
+                })
                 
             ollama_response = requests.post(
                 "http://host.docker.internal:11434/api/generate",
