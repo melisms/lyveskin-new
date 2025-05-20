@@ -85,6 +85,8 @@ def ask_ollama(request):
                 "skin type": "/skintype/",
                 "skintype": "/skintype/",
                 "skincare routine": "/skincareroutine/",
+                "labeling system": "/labeling/",
+                "labeling": "/labeling/",
                 "routine": "/skincareroutine/",
                 "items": "/items/browse/",
                 "item": "/items/browse/",
