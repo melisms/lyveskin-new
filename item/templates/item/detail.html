@@ -6,7 +6,6 @@
         background-color: #40826D;
         border-radius: 10px;
         padding: 6px 16px;
-        width: 25%;
         transition: background-color 0.3s ease-in-out;
     }
 
@@ -28,8 +27,28 @@
         </p>
         <p class="mb-6 text-3xl"><strong>Skintype:</strong> {{ item.skintype }}</p>
         <h3 class="mb-6 text-3xl">Health Score: {{ health_score }}/100</h3>
-        <button class="custom-add-routine-button text-white text-sm font-medium">Add Routine</button>
-        <a href="{% url 'item:edit_item' item.id %}" class="btn btn-primary">Edit</a>
+        <div style="display: flex; gap: 12px; align-items: center; margin-top: 16px;">
+            {% if item in request.user.userprofile.favorites.all %}
+                <form method="POST" action="{% url 'item:remove_from_favorites' item.pk %}" style="margin: 0;">
+                    {% csrf_token %}
+                    <button class="custom-add-routine-button text-white text-sm font-medium" type="submit">
+                        Added
+                    </button>
+                </form>
+            {% else %}
+                <form method="POST" action="{% url 'item:add_to_favorites' item.pk %}" style="margin: 0;">
+                    {% csrf_token %}
+                    <button type="submit" class="custom-add-routine-button text-white text-sm font-medium">
+                        Add Routine
+                    </button>
+                </form>
+            {% endif %}
+
+            <a href="{% url 'item:edit_item' item.id %}" class="btn btn-primary" style="height: 36px; display: flex; align-items: center; padding: 0 16px;">
+                Edit
+            </a>
+        </div>
+
     </div>
 </div>
 {% endblock %}

@@ -21,6 +21,30 @@ def detail(request, pk):
         'risky_count': health_data['risky'],
     })
 @login_required
+def add_to_favorites(request, pk):
+    item = get_object_or_404(Item, pk=pk)
+    profile = request.user.userprofile
+
+    if item in profile.favorites.all():
+        messages.info(request, 'This item is already in your routine.')
+    else:
+        profile.favorites.add(item)
+        messages.success(request, 'Item added to your routine!')
+
+    return redirect('item:detail', pk=pk)
+
+def remove_from_favorites(request, pk):
+    item = get_object_or_404(Item, pk=pk)
+    profile = request.user.userprofile
+
+    if item in profile.favorites.all():
+        profile.favorites.remove(item)
+        messages.success(request, 'Item removed from your routine!')
+    else:
+        messages.info(request, 'This item is not in your routine.')
+
+    return redirect('item:detail', pk=pk)
+
 def create_item(request):
     if request.method == 'POST':
         form = NewItemForm(request.POST, request.FILES)
