@@ -65,7 +65,7 @@
 <!-- Change firstname -->
 <div class="bg-white p-4 rounded shadow mb-4">
   <button class="accordion-button" onclick="togglePanel('firstnamePanel')">
-    Change Firstname
+    Identity
     <span id="icon-firstnamePanel" class="rotate-0">&#8250;</span> <!-- › -->
   </button>
   <div id="firstnamePanel" class="accordion-content hidden">
@@ -74,20 +74,7 @@
       <input type="hidden" name="form_type" value="change_firstname">
       <label for="first">New Firstname</label>
       <input type="text" name="firstname" id="firstname" value="{{ user.first_name }}">
-      <button type="submit">Change Firstname</button>
-    </form>
-  </div>
-</div>
-
-<!-- Change lastname -->
-<div class="bg-white p-4 rounded shadow mb-4">
-  <button class="accordion-button" onclick="togglePanel('last_namePanel')">
-    Change Lastname
-    <span id="icon-last_namePanel" class="rotate-0">&#8250;</span> <!-- › -->
-  </button>
-  <div id="last_namePanel" class="accordion-content hidden">
-    <form method="POST" action="{% url 'update_settings' %}">
-      {% csrf_token %}
+      <button type="submit">Change Firstname</button><br><br>
       <input type="hidden" name="form_type" value="change_lastname">
       <label for="first">New Lastname</label>
       <input type="text" name="last_name" id="last_name" value="{{ user.last_name }}">
@@ -96,35 +83,32 @@
   </div>
 </div>
 
-
 <!-- Change Email -->
 <div class="bg-white p-4 rounded shadow mb-4">
-    <button type="button" class="w-full flex justify-between items-center text-left text-xl font-semibold"
-            onclick="togglePanel('emailPanel', this)">
+    <button class="accordion-button" onclick="togglePanel('emailPanel')">
         Change Email
-        <span id="icon-emailPanel" class="transition-transform">›</span>
+        <span id="icon-emailPanel" class="rotate-0">&#8250;</span>
     </button>
-    <div id="emailPanel" class="hidden mt-4">
+    <div id="emailPanel" class="accordion-content hidden">
         <form method="POST" action="{% url 'update_settings' %}">
             {% csrf_token %}
             <input type="hidden" name="form_type" value="change_email">
-            <label class="block mb-2 font-semibold" for="email">New Email</label>
+            <label for="email">New Email</label>
             <input type="email" id="email" name="email"
-                   value="{{ user.email }}"
-                   class="border rounded w-full py-2 px-3 mb-4" required>
-            <button type="submit" class="custom-settings-button text-white">Change Email</button>
+                   value="{{ user.email }}">
+            <button type="submit">Change Email</button>
         </form>
     </div>
 </div>
 
 <!-- Profile Picture -->
 <div class="bg-white p-4 rounded shadow mb-4">
-    <button type="button" class="w-full flex justify-between items-center text-left text-xl font-semibold"
-            onclick="togglePanel('picturePanel', this)">
+    <button  class="accordion-button"
+            onclick="togglePanel('picturePanel')">
         Profile Picture
-        <span id="icon-picturePanel" class="transition-transform">›</span>
+        <span id="icon-picturePanel" class="rotate-0">&#8250;</span>
     </button>
-    <div id="picturePanel" class="hidden mt-4">
+    <div id="picturePanel" class="accordion-content hidden">
         <div class="flex flex-col items-center">
             <img id="profileImage" 
                  src="{% if user_profile.profile_picture.url %}{{ user_profile.profile_picture.url }}{% else %}https://via.placeholder.com/120{% endif %}"
@@ -135,7 +119,7 @@
                 <input type="hidden" name="form_type" value="profile_picture">
                 <input type="file" name="profile_picture" accept="image/*" onchange="previewImage(event)"
                        class="block w-full text-sm text-gray-500 mb-4">
-                <button type="submit" class="custom-settings-button text-white">Update Photo</button>
+                <button type="submit">Update Photo</button>
             </form>
         </div>
     </div>
@@ -143,22 +127,22 @@
 
 <!-- Change Password -->
 <div class="bg-white p-4 rounded shadow mb-4">
-    <button type="button" class="w-full flex justify-between items-center text-left text-xl font-semibold"
+    <button type="button" class="accordion-button"
             onclick="togglePanel('passwordPanel', this)">
         Change Password
-        <span id="icon-passwordPanel" class="transition-transform">›</span>
+        <span id="icon-passwordPanel" class="rotate-0">&#8250;</span>
     </button>
     <div id="passwordPanel" class="hidden mt-4">
         <form method="POST" action="{% url 'update_settings' %}">
             {% csrf_token %}
             <input type="hidden" name="form_type" value="change_password">
             <label class="block mb-2 font-semibold" for="current_password">Current Password</label>
-            <input type="password" id="current_password" name="current_password" class="border rounded w-full py-2 px-3 mb-4" required>
+            <input type="password" id="current_password" name="current_password" ><br><br>
             <label class="block mb-2 font-semibold" for="new_password">New Password</label>
-            <input type="password" id="new_password" name="new_password" class="border rounded w-full py-2 px-3 mb-4" required>
+            <input type="password" id="new_password" name="new_password" ><br><br>
             <label class="block mb-2 font-semibold" for="confirm_password">Confirm New Password</label>
-            <input type="password" id="confirm_password" name="confirm_password" class="border rounded w-full py-2 px-3 mb-4" required>
-            <button type="submit" class="custom-settings-button text-white">Change Password</button>
+            <input type="password" id="confirm_password" name="confirm_password" >
+            <button type="submit" >Change Password</button>
         </form>
     </div>
 </div>
