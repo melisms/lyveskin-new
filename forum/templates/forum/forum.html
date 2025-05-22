@@ -10,7 +10,7 @@
                     {% else %}
                         <img class="mr-3 rounded-circle" src="{% static 'default_profile.png' %}" alt="Default Profile Image" width="50" height="50">
                     {% endif %}
-                    <a class="mr-2" href="{% url 'profile' post.author.id %}">{{ post.author }}</a>
+                    <a class="mr-2" style="color:#40826D;" onmouseover="this.style.color='#9FE2BF';" onmouseout="this.style.color='#40826D';" href="{% url 'profile' post.author.id %}">{{ post.author }}</a>
                     <small class="text-muted">{{ post.date_posted|date:"d F, Y" }}</small>
                 </div>
                 <h2><a class="article-title" href="{% url 'forum:post-detail' post.pk %}">{{ post.title }}</a></h2>
