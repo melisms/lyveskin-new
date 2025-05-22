@@ -168,3 +168,5 @@ EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_API_KEY')
 if not EMAIL_HOST_PASSWORD:
     raise ValueError("SENDGRID_API_KEY is not set in environment variables.")
 DEFAULT_FROM_EMAIL = 'codesblue@outlook.com'
+SITE_URL = 'http://localhost:8000'
+# SITE_URL = 'https://evident-massive-camel.ngrok-free.app'

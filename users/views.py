@@ -9,21 +9,41 @@ from item.models import Item
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
-from .utils import send_welcome_email
+from .utils import send_welcome_email, verify_email
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_decode
 
 def register(request):
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()
             email = form.cleaned_data.get('email')
             username = form.cleaned_data.get('username')
             send_welcome_email(username, email)
-            messages.success(request, f'Your account has been created! Welcome {username}')
+            verify_email(user)
+            messages.success(request, f'Your account has been created! Please check your email to verify it.')
             return redirect('login')
     else:
         form = UserRegisterForm()
     return render(request, 'users/register.html', {'form':form})
+
+def verify_email_confirm(request, uidb64, token):
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user and default_token_generator.check_token(user, token):
+        profile, created = UserProfile.objects.get_or_create(user=user)
+        profile.email_verified = True
+        profile.save()
+        messages.success(request, "Your email has been verified!")
+        return redirect('login')
+    else:
+        messages.error(request, "Verification link is invalid or expired.")
+        return redirect('login')
 @login_required
 def profile(request, id):
     user = get_object_or_404(User, id=id)
@@ -33,8 +53,15 @@ def profile(request, id):
     except ObjectDoesNotExist:
         user_profile = UserProfile.objects.create(user=user)
 
-    return render(request, 'users/profile.html', {'user_profile': user_profile})
+    email_verified = getattr(user_profile, 'email_verified', False)
+    return render(request, 'users/profile.html', {'user_profile': user_profile, 'email_verified': email_verified})
 
+def resend_verification_email(request):
+    user = request.user
+    if not user.userprofile.email_verified:
+        verify_email(user)
+        messages.success(request, 'Verification email has been resent.')
+    return redirect('settings_page')
 
 from django.contrib.auth import logout
 
@@ -71,8 +98,6 @@ def update_settings(request):
             else:
                 messages.warning(request, "Please enter a new and different email.")
 
-                
-
     try:
         profile = user.userprofile
     except ObjectDoesNotExist:
@@ -81,14 +106,12 @@ def update_settings(request):
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
 
-   
         if form_type == 'profile_picture' and request.FILES.get('profile_picture'):
             profile.profile_picture = request.FILES['profile_picture']
             profile.save()
             messages.success(request, 'Your profile photo has been updated.')
             return redirect('profile', user.id)
 
-  
         elif form_type == 'change_password':
             current_password = request.POST.get('current_password')
             new_password = request.POST.get('new_password')
@@ -127,7 +150,6 @@ def update_settings(request):
             else:
                 messages.warning(request, "Please enter a new and different username.")
 
-     
         elif form_type == 'change_firstname':
             new_firstname = request.POST.get('firstname')
             if new_firstname and new_firstname != user.first_name:
@@ -185,9 +207,6 @@ def update_settings(request):
 
     return redirect('settings_page')
 
- 
-
-
 @login_required
 def settings_page(request):
     user = request.user
@@ -196,7 +215,11 @@ def settings_page(request):
         profile = user.userprofile
     except ObjectDoesNotExist:
         profile = UserProfile.objects.create(user=user)
+    
+    email_verified = getattr(profile, 'email_verified', False)
 
     return render(request, 'users/settings.html', {
         'user_profile': profile,
+        'email_verified': email_verified,
+        'user': user,
     })
