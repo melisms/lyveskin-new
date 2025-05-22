@@ -56,9 +56,9 @@
     <form method="POST" action="{% url 'update_settings' %}">
       {% csrf_token %}
       <input type="hidden" name="form_type" value="change_username">
-      <label for="username">New Username</label>
-      <input type="text" name="username" id="username" value="{{ user.username }}">
-      <button type="submit">Change Username</button>
+      <label for="username">Username</label>
+      <input type="text" name="username" id="username" value="{{ user.username }}"required>
+      <button type="submit" class="bg-blue-600 text-black py-1 px-4 rounded hover:bg-blue-700">Change Username</button>
     </form>
   </div>
 </div>
@@ -69,17 +69,26 @@
     <span id="icon-firstnamePanel" class="rotate-0">&#8250;</span> <!-- › -->
   </button>
   <div id="firstnamePanel" class="accordion-content hidden">
-    <form method="POST" action="{% url 'update_settings' %}">
-      {% csrf_token %}
-      <input type="hidden" name="form_type" value="change_firstname">
-      <label for="first">New Firstname</label>
-      <input type="text" name="firstname" id="firstname" value="{{ user.first_name }}">
-      <button type="submit">Change Firstname</button><br><br>
-      <input type="hidden" name="form_type" value="change_lastname">
-      <label for="first">New Lastname</label>
-      <input type="text" name="last_name" id="last_name" value="{{ user.last_name }}">
-      <button type="submit">Change Lastname</button>
-    </form>
+    <!-- Firstname Form -->
+<form method="POST" action="{% url 'update_settings' %}">
+  {% csrf_token %}
+  <input type="hidden" name="form_type" value="change_firstname">
+ <label for="firstname">Firstname</label>
+<input type="text" name="firstname" id="firstname" value="{{ user.first_name }}"required>
+  <button type="submit" class="bg-blue-600 text-black py-1 px-4 rounded hover:bg-blue-700">Change Firstname</button>
+
+</form>
+<br>
+
+<!-- Lastname Form -->
+<form method="POST" action="{% url 'update_settings' %}">
+  {% csrf_token %}
+  <input type="hidden" name="form_type" value="change_lastname">
+  <label for="last_name">Lastname</label>
+  <input type="text" name="last_name" id="last_name" value="{{ user.last_name }}"required>
+  <button type="submit" class="bg-blue-600 text-black py-1 px-4 rounded hover:bg-blue-700">Change Lastname</button>
+</form>
+
   </div>
 </div>
 
@@ -92,11 +101,11 @@
     <div id="emailPanel" class="accordion-content hidden">
         <form method="POST" action="{% url 'update_settings' %}">
             {% csrf_token %}
-            <input type="hidden" name="form_type" value="change_email">
+            <input type="hidden" name="form_type" value="change_email"required>
             <label for="email">New Email</label>
             <input type="email" id="email" name="email"
                    value="{{ user.email }}">
-            <button type="submit">Change Email</button>
+            <button type="submit" class="bg-blue-600 text-black py-1 px-4 rounded hover:bg-blue-700">Change Email</button>
         </form>
     </div>
 </div>
@@ -116,10 +125,10 @@
                  style="width: 150px; height: 150px; object-fit: cover;">
             <form method="POST" enctype="multipart/form-data" action="{% url 'update_settings' %}">
                 {% csrf_token %}
-                <input type="hidden" name="form_type" value="profile_picture">
+                <input type="hidden" name="form_type" value="profile_picture"required>
                 <input type="file" name="profile_picture" accept="image/*" onchange="previewImage(event)"
                        class="block w-full text-sm text-gray-500 mb-4">
-                <button type="submit">Update Photo</button>
+                <button type="submit" class="bg-blue-600 text-black py-1 px-4 rounded hover:bg-blue-700">Update Photo</button>
             </form>
         </div>
     </div>
@@ -135,14 +144,14 @@
     <div id="passwordPanel" class="hidden mt-4">
         <form method="POST" action="{% url 'update_settings' %}">
             {% csrf_token %}
-            <input type="hidden" name="form_type" value="change_password">
+            <input type="hidden" name="form_type" value="change_password"required>
             <label class="block mb-2 font-semibold" for="current_password">Current Password</label>
             <input type="password" id="current_password" name="current_password" ><br><br>
             <label class="block mb-2 font-semibold" for="new_password">New Password</label>
             <input type="password" id="new_password" name="new_password" ><br><br>
             <label class="block mb-2 font-semibold" for="confirm_password">Confirm New Password</label>
             <input type="password" id="confirm_password" name="confirm_password" >
-            <button type="submit" >Change Password</button>
+            <button type="submit" class="bg-blue-600 text-black py-1 px-4 rounded hover:bg-blue-700">Change Password</button>
         </form>
     </div>
 </div>
@@ -163,20 +172,22 @@
 
 <script>
   function togglePanel(panelId) {
-    const panel = document.getElementById(panelId);
-    const icon = document.getElementById('icon-' + panelId);
+  // Tüm panelleri kapat
+  document.querySelectorAll('.accordion-content').forEach(panel => panel.classList.add('hidden'));
+  document.querySelectorAll('span[id^="icon-"]').forEach(icon => {
+    icon.classList.remove('rotate-90');
+    icon.classList.add('rotate-0');
+  });
 
-    if (panel.classList.contains('hidden')) {
-      panel.classList.remove('hidden');
-      icon.classList.remove('rotate-0');
-      icon.classList.add('rotate-90');
-    } else {
-      panel.classList.add('hidden');
-      icon.classList.remove('rotate-90');
-      icon.classList.add('rotate-0');
-    }
-  }
+  // Sadece tıklananı aç
+  const panel = document.getElementById(panelId);
+  const icon = document.getElementById('icon-' + panelId);
+  panel.classList.remove('hidden');
+  icon.classList.remove('rotate-0');
+  icon.classList.add('rotate-90');
+}
 </script>
+
 
 
 
