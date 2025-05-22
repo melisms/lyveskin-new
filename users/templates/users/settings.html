@@ -106,13 +106,13 @@
             <input type="email" id="email" name="email"
                    value="{{ user.email }}">
             <button type="submit" class="bg-blue-600 text-black py-1 px-4 rounded hover:bg-blue-700">Change Email</button>
-            {% if email_verified %}
-            {% else %}
-            <div class="mt-4">
-                <a href="{% url 'users:resend_verification_email' %}" class="text-blue-600 hover:underline">
-                    Resend verification email
-                </a>
-            </div>
+            {% if not email_verified %}
+              <small class="text-xs text-gray-500 ml-2">
+                  Not verified —
+                  <a href="{% url 'users:resend_verification_email' %}" class="text-blue-500 hover:underline">
+                      resend
+                  </a>
+              </small>
             {% endif %}
         </form>
     </div>
