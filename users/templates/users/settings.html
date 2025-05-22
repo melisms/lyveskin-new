@@ -49,7 +49,7 @@
 <!-- Change Username -->
 <div class="bg-white p-4 rounded shadow mb-4">
   <button class="accordion-button" onclick="togglePanel('usernamePanel')">
-    Change Username
+    Change Username ✎
     <span id="icon-usernamePanel" class="rotate-0">&#8250;</span> <!-- › -->
   </button>
   <div id="usernamePanel" class="accordion-content hidden">
@@ -65,7 +65,7 @@
 <!-- Change firstname -->
 <div class="bg-white p-4 rounded shadow mb-4">
   <button class="accordion-button" onclick="togglePanel('firstnamePanel')">
-    Identity
+    Identity ✎
     <span id="icon-firstnamePanel" class="rotate-0">&#8250;</span> <!-- › -->
   </button>
   <div id="firstnamePanel" class="accordion-content hidden">
@@ -94,7 +94,7 @@
 <!-- Change Email -->
 <div class="bg-white p-4 rounded shadow mb-4">
     <button class="accordion-button" onclick="togglePanel('emailPanel')">
-        Change Email
+        Change Email ✎
         <span id="icon-emailPanel" class="rotate-0">&#8250;</span>
     </button>
     <div id="emailPanel" class="accordion-content hidden">
@@ -105,6 +105,14 @@
             <input type="email" id="email" name="email"
                    value="{{ user.email }}">
             <button type="submit" class="bg-blue-600 text-black py-1 px-4 rounded hover:bg-blue-700">Change Email</button>
+            {% if not email_verified %}
+              <small class="text-xs text-gray-500 ml-2">
+                  Not verified —
+                  <a href="{% url 'users:resend_verification_email' %}" class="text-blue-500 hover:underline">
+                      resend
+                  </a>
+              </small>
+            {% endif %}
         </form>
     </div>
 </div>
@@ -113,7 +121,7 @@
 <div class="bg-white p-4 rounded shadow mb-4">
     <button  class="accordion-button"
             onclick="togglePanel('picturePanel')">
-        Profile Picture
+        Profile Picture ✎
         <span id="icon-picturePanel" class="rotate-0">&#8250;</span>
     </button>
     <div id="picturePanel" class="accordion-content hidden">
@@ -137,7 +145,7 @@
 <div class="bg-white p-4 rounded shadow mb-4">
     <button type="button" class="accordion-button"
             onclick="togglePanel('passwordPanel', this)">
-        Change Password
+        Change Password ✎
         <span id="icon-passwordPanel" class="rotate-0">&#8250;</span>
     </button>
     <div id="passwordPanel" class="hidden mt-4">

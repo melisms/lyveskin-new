@@ -34,7 +34,7 @@ urlpatterns = [
     path('profile/<int:id>/', user_views.profile, name='profile'),
     path('settings/update/', user_views.update_settings, name='update_settings'),
     path('settings/', user_views.settings_page, name='settings_page'),
-
+    path('users/', include(('users.urls', 'users'), namespace='users')),
 
 
     ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

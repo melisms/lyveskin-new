@@ -60,7 +60,14 @@
         <p class="profile-info"><span class="profile-label">Name:</span> {{ user_profile.user.first_name|default:"-" }}</p>
         <p class="profile-info"><span class="profile-label">Surname:</span> {{ user_profile.user.last_name|default:"-" }}</p>
         <p class="profile-info"><span class="profile-label">Username:</span> {{ user_profile.user.username }}</p>
-        <p class="profile-info"><span class="profile-label">Email:</span> {{ user_profile.user.email|default:"-" }}</p>
+        <p class="profile-info">
+            <span class="profile-label">Email:</span> {{ user_profile.user.email|default:"-" }}
+            <span
+                style="color: {% if email_verified %}green{% else %}red{% endif %}; font-weight: bold; margin-left: 8px;"
+                title="{% if email_verified %}Email verified{% else %}Email not verified{% endif %}">
+                {% if email_verified %}&#x2705;{% else %}&#x274C;{% endif %}
+            </span>
+        </p>
     </div>
 <br><br><br><br><br>
     <!-- Settings -->
