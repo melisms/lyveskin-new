@@ -22,7 +22,15 @@
         <p class="mb-6 text-3xl">{{ item.description }}</p>
         <p class="mb-6 text-3xl"><b>Ingredients:</b>
             {% for ingredient in ingredients %}
-                {{ ingredient.name }}{% if not forloop.last %}, {% endif %}
+                <span style="
+                    {% if ingredient.safety == 'S' %}
+                        color: green; font-weight: bold;
+                    {% elif ingredient.safety == 'R' %}
+                        color: darkred; font-weight: bold;
+                    {% else %}
+                        color: black;
+                    {% endif %}
+                ">{{ ingredient.name }}</span>{% if not forloop.last %}, {% endif %}
             {% endfor %}
         </p>
         <p class="mb-6 text-3xl"><strong>Skintype:</strong> {{ item.skintype }}</p>
