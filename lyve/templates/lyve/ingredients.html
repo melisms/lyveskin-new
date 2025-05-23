@@ -10,7 +10,7 @@
         <!-- Alphabet Navigation -->
         <div class="flex justify-center mb-4">
             {% for char in '123456ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}
-                <a href="{% url 'lyve:ingredients' letter=char %}" class="text-black" style="color: black; font-weight: bold; border-radius: 50%; background-color: #ffffff;align-items: center;justify-content: center;margin-left: 0.28rem; margin-right: 0.28rem;padding-left: 0.5rem; padding-right: 0.5rem; border: 0.1px solid black; font-size: 18px; padding-top: 0.25rem; padding-bottom: 0.25rem;">{{ char }}</a>
+                <a href="{% url 'lyve:ingredients' letter=char %}" class="text-black" style="color: black; font-weight: bold; border-radius: 50%; background-color: #ffffff;align-items: center;justify-content: center;margin-left: 0.28rem; margin-right: 0.28rem;padding-left: 0.5rem; padding-right: 0.5rem; border: 0.1px solid black; font-size: 18px; padding-top: 0.25rem; padding-bottom: 0.25rem; text-decoration: none;" onmouseover="this.style.backgroundColor='#9FE2BF';" onmouseout="this.style.backgroundColor='white';">{{ char }}</a>
             {% endfor %}
         </div>
 
