@@ -52,7 +52,9 @@ def create_item(request):
             item = form.save()
             for ingredient in item.ingredients.all():
                 if not ingredient.safety or ingredient.safety == 'N':
-                    ingredient.safety = detect_safety(ingredient.name)
+                    safety, note = detect_safety(ingredient.name)
+                    ingredient.safety = safety
+                    ingredient.note = note
                     ingredient.save()
             return redirect('item:detail', pk=item.pk)
     else:
@@ -130,6 +132,12 @@ def edit_item(request, item_id):
         form = NewItemForm(request.POST, request.FILES, instance=item)
         if form.is_valid():
             form.save()
+            for ingredient in item.ingredients.all():
+                if not ingredient.safety or ingredient.safety == 'N':
+                    safety, note = detect_safety(ingredient.name)
+                    ingredient.safety = safety
+                    ingredient.note = note
+                    ingredient.save()
             messages.success(request, 'Item updated successfully!')
             return redirect('item:detail', pk=item.id)  # Redirect back to item detail after update
     else:

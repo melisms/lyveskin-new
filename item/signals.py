@@ -39,7 +39,9 @@ def format_and_check_ingredients(sender, instance, action, reverse, model, pk_se
             if ingredient.name != formatted_name:
                 new_ingredient, created = Ingredient.objects.get_or_create(name=formatted_name)
                 if created or not new_ingredient.safety or new_ingredient.safety == 'N':
-                    new_ingredient.safety = detect_safety(formatted_name)
+                    safety, note = detect_safety(formatted_name)
+                    new_ingredient.safety = safety
+                    new_ingredient.note = note
                     new_ingredient.save()
                 instance.ingredients.remove(ingredient)
                 instance.ingredients.add(new_ingredient)
@@ -47,7 +49,9 @@ def format_and_check_ingredients(sender, instance, action, reverse, model, pk_se
                 formatted_names.add(formatted_name)
             else:
                 if not ingredient.safety or ingredient.safety == 'N':
-                    ingredient.safety = detect_safety(formatted_name)
+                    safety, note = detect_safety(formatted_name)
+                    ingredient.safety = safety
+                    ingredient.note = note
                     ingredient.save()
                     logger.debug("Updated safety for existing ingredient: %s", formatted_name)
                 formatted_names.add(formatted_name)
