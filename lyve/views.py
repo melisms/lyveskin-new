@@ -95,25 +95,25 @@ def ask_ollama(request):
                         'redirect': f"/items/{matched_item.id}/"
                     })
             
-            routes = {
-                "home": "/",
-                "compare": "/items/compare/",
-                "ingredients": "/ingredient/",
-                "ingredient": "/ingredient/",
-                "forum": "/forum/",
-                "skin type": "/skintype/",
-                "skintype": "/skintype/",
-                "skincare routine": "/skincareroutine/",
-                "labeling system": "/labeling/",
-                "labeling": "/labeling/",
-                "routine": "/skincareroutine/",
-                "items": "/items/browse/",
-                "item": "/items/browse/",
-                "add product": "/items/new/",
-                "add": "/items/new/",
-                "products": "/items/browse/",
-                "product": "/items/browse/",
-            }
+            # routes = {
+            #     "home": "/",
+            #     "compare": "/items/compare/",
+            #     "ingredients": "/ingredient/",
+            #     "ingredient": "/ingredient/",
+            #     "forum": "/forum/",
+            #     "skin type": "/skintype/",
+            #     "skintype": "/skintype/",
+            #     "skincare routine": "/skincareroutine/",
+            #     "labeling system": "/labeling/",
+            #     "labeling": "/labeling/",
+            #     "routine": "/skincareroutine/",
+            #     "items": "/items/browse/",
+            #     "item": "/items/browse/",
+            #     "add product": "/items/new/",
+            #     "add": "/items/new/",
+            #     "products": "/items/browse/",
+            #     "product": "/items/browse/",
+            # }
             
             category_keywords = {
                 "lip care": "Lip Care",
@@ -135,12 +135,21 @@ def ask_ollama(request):
                 if keyword in question:
                     items = Item.objects.filter(category__name__icontains=category_name)
                     if items.exists():
-                        item_names = [item.name for item in items[:10]]  # limit response to 10 items
+                        item_names = [item.name for item in items[:10]] 
                         answer = f"We have the following {category_name.lower()} products: " + ", ".join(item_names) + "."
                     else:
                         answer = f"Sorry, we don't currently have any {category_name.lower()} products listed."
                     return JsonResponse({'answer': answer})
-                        
+            
+            if any(word in question for word in ['items', 'products']) and len(words) >= 3:
+                general_items = Item.objects.all()
+                if general_items.exists():
+                    item_names = [item.name for item in general_items[:10]]
+                    answer = "Here are some of our products: " + ", ".join(item_names) + "."
+                else:
+                    answer = "Sorry, we don't have any products listed currently."
+                return JsonResponse({'answer': answer})    
+                    
             if "profile" in question and request.user.is_authenticated:
                 return JsonResponse({
                     "answer": "Redirecting to your profile page.",
@@ -156,7 +165,6 @@ def ask_ollama(request):
                     users = User.objects.all()
                     usernames = [user.username.lower() for user in users]
 
-                    # Try fuzzy matching for each possible name
                     for name in possible_names:
                         matches = difflib.get_close_matches(name, usernames, n=1, cutoff=0.7)
                         if matches:
