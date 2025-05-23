@@ -6,7 +6,7 @@ from django.db.models import Q
 from collections import Counter
 from .forms import ComparisonForm,NewItemForm
 from django.contrib import messages
-
+from .utils import detect_safety
 
 def detail(request, pk):
     item = get_object_or_404(Item, pk=pk)
@@ -50,7 +50,11 @@ def create_item(request):
         form = NewItemForm(request.POST, request.FILES)
         if form.is_valid():
             item = form.save()
-            return redirect('item:detail', pk=item.pk)  # Redirect to a detail view or another appropriate view
+            for ingredient in item.ingredients.all():
+                if not ingredient.safety or ingredient.safety == 'N':
+                    ingredient.safety = detect_safety(ingredient.name)
+                    ingredient.save()
+            return redirect('item:detail', pk=item.pk)
     else:
         form = NewItemForm()
     return render(request, 'item/form.html', {'form': form, 'title': 'Create New Item'})

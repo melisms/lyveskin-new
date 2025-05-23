@@ -134,17 +134,24 @@ def ask_ollama(request):
                             return JsonResponse({
                                 "answer": f"Redirecting to {user.username}'s profile page.",
                                 "redirect": f"/profile/{user.id}/"
-                            })
+                            })            
+            prompt = f"""
+            You are a helpful assistant for a skincare product website.
+            Answer the user's question concisely and clearly.
 
+            Question: {question}
+            Answer:
+            """
             ollama_response = requests.post(
                 "http://host.docker.internal:11434/api/generate",
                 json={
                     "model": "mistral",
-                    "prompt": question,
+                    "prompt": prompt,
                     "stream": False
-                }
+                },
+                timeout=10
             )
-            ollama_response.raise_for_status()  # Raise an error for HTTP errors
+            ollama_response.raise_for_status() 
             response_json = ollama_response.json()
             answer = response_json.get('response', 'No answer found.')
 
