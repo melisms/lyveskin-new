@@ -8,7 +8,7 @@
             <div class="col-md-3">
                 <form method="get" action="{% url 'item:browse' %}">
                     <input name="query" class="form-control mb-2" type="text" value="{{ query }}" placeholder="Find a product">
-                    <button class="btn btn-primary btn-block mb-2" style="background-color: #007B5F; border-color: #007B5F;">Search</button>
+                    <button class="btn btn-primary btn-block mb-2" style="background-color: #40826D; border-color: #40826D;" onmouseover="this.style.backgroundColor='#9FE2BF'; this.style.borderColor='#9FE2BF';" onmouseout="this.style.backgroundColor='#40826D'; this.style.borderColor='#40826D';">Search</button>
                 </form>
                 <hr>
                 <p class="font-weight-bold">Categories</p>
@@ -22,7 +22,7 @@
                             {% endif %}
                             <button type="submit"
                                     class="btn btn-block {% if category.id == category_id %} bg-secondary text-white {% else %} btn-light {% endif %}"
-                                    style="background-color: #F3F3F3; color: black; border-color: #F3F3F3;">
+                                    style="background-color: #F3F3F3; color: black; border-color: #F3F3F3;" onmouseover="this.style.backgroundColor='#6c757d'; this.style.borderColor='#6c757d';" onmouseout="this.style.backgroundColor='#F3F3F3'; this.style.borderColor='#F3F3F3';">
                                 {{ category.name }}
                             </button>
                         </form>
@@ -31,7 +31,7 @@
                 </ul>
                 <a href="{% url 'item:browse' %}"
                     class="btn btn-warning btn-block text-white"
-                    style="background-color: #007B5F; border-color: #007B5F;">
+                    style="background-color: #40826D; border-color: #40826D;" onmouseover="this.style.backgroundColor='#9FE2BF'; this.style.borderColor='#9FE2BF';" onmouseout="this.style.backgroundColor='#40826D'; this.style.borderColor='#40826D';">
                     Clear Filters
                 </a>             
             </div>
@@ -39,7 +39,7 @@
                 <div class="clearfix">
                     {% for item in items %}
                         <div class="item-container border rounded" style="display: inline-block; vertical-align: top; width: 22%; box-sizing: border-box; padding: 10px;">
-                            <a href="{% url 'item:detail' item.id %}" class="flex items-center p-6 bg-white rounded-xl mb-4" style="background-color: #fafafa;">
+                            <a href="{% url 'item:detail' item.id %}" class="flex items-center p-6 bg-white rounded-xl mb-4" style="background-color: #fafafa; text-decoration: none;">
                                 <div>
                                     {% if item.image %}
                                         <img src="{{ item.image.url }}" alt="ItemImage" class="rounded-t-xl" style="width: 165px; height: 165px;">
@@ -49,8 +49,8 @@
                                     {% endif %}
                                 </div>
                                 <div class="ml-4">
-                                    <h2 class="text-2xl" style="font-size: 18px"><b>{{ item.brands }}</b></h2>
-                                    <h3 class="text-xl" style="font-size: 16px; max-width: 182px; overflow: hidden; text-overflow: ellipsis;">{{ item.name }}</h3>
+                                    <h2 class="text-2xl" style="font-size: 18px" onmouseover="this.style.color='#9FE2BF';" onmouseout="this.style.color='#444444';"><b>{{ item.brands }}</b></h2>
+                                    <h3 class="text-xl" style="font-size: 16px; max-width: 182px; overflow: hidden; text-overflow: ellipsis;" onmouseover="this.style.color='#9FE2BF';" onmouseout="this.style.color='#444444';">{{ item.name }}</h3>
                                 </div>
                             </a>
                         </div>
