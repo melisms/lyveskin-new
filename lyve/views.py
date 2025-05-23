@@ -74,7 +74,26 @@ def ask_ollama(request):
     if request.method == 'POST':
         try:
             body = json.loads(request.body)
-            question = body.get('question', '')
+            question = body.get('question', '').lower()
+            words = question.split()
+            
+            if len(words) >= 2:
+                items = Item.objects.all()
+                matched_items = []
+
+                for item in items:
+                    item_name_words = item.name.lower().split()
+                    matched_word_count = sum(1 for w in item_name_words if w in words)
+
+                    if matched_word_count >= 2:
+                        matched_items.append(item)
+
+                if matched_items:
+                    matched_item = matched_items[0]  
+                    return JsonResponse({
+                        'answer': f"You can visit {matched_item.name} page.",
+                        'redirect': f"/items/{matched_item.id}/"
+                    })
             
             routes = {
                 "home": "/",
@@ -96,24 +115,36 @@ def ask_ollama(request):
                 "product": "/items/browse/",
             }
             
-            for keyword, route in routes.items():
-                if keyword in question:
-                    return JsonResponse({
-                        'answer': f"You can visit {keyword.title()} page.",
-                        'redirect': route
-                    })
+            category_keywords = {
+                "lip care": "Lip Care",
+                "tonic": "Tonic",
+                "cleanser": "Cleanser",
+                "moisturizer": "Moisturizer",
+                "serum": "Serum",
+                "sunscreen": "Sunscreen",
+            }
+            
+            # for keyword, route in routes.items():
+            #     if keyword in question:
+            #         return JsonResponse({
+            #             'answer': f"You can visit {keyword.title()} page.",
+            #             'redirect': route
+            #         })
                     
+            for keyword, category_name in category_keywords.items():
+                if keyword in question:
+                    items = Item.objects.filter(category__name__icontains=category_name)
+                    if items.exists():
+                        item_names = [item.name for item in items[:10]]  # limit response to 10 items
+                        answer = f"We have the following {category_name.lower()} products: " + ", ".join(item_names) + "."
+                    else:
+                        answer = f"Sorry, we don't currently have any {category_name.lower()} products listed."
+                    return JsonResponse({'answer': answer})
+                        
             if "profile" in question and request.user.is_authenticated:
                 return JsonResponse({
                     "answer": "Redirecting to your profile page.",
                     "redirect": f"/profile/{request.user.id}/"
-                })
-                
-            matched_item = Item.objects.filter(name__icontains=question).first()
-            if matched_item:
-                return JsonResponse({
-                    'answer': f"You can visit {matched_item.name} page.",
-                    'redirect': f"/items/{matched_item.id}/"
                 })
                 
             User = get_user_model()
