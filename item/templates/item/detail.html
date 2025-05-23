@@ -43,10 +43,11 @@
                     </button>
                 </form>
             {% endif %}
-
+            {% if request.user.is_superuser %}
             <a href="{% url 'item:edit_item' item.id %}" class="btn btn-primary" style="height: 36px; display: flex; align-items: center; padding: 0 16px;">
                 Edit
             </a>
+            {% endif %}
         </div>
 
     </div>
