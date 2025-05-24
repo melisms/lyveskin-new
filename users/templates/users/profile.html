@@ -4,22 +4,33 @@
 {% block content %}
 
 <style>
-    .custom-settings-button {
-        background-color: #40826D;
-        border-radius: 10px;
-        padding: 6px 16px;
-        width: 90px;
-        transition: background-color 0.3s ease-in-out;
-    }
+.page-title {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    text-align: center;
+}
 
-    .custom-settings-button:hover {
-        background-color: #1e3b31;
-    }
-
-
-    .profile-label {
+.custom-settings-button {
+    background-color: #40826D;
+    color: white;
     font-weight: 600;
-    color: #6b7280; /* Tailwind: text-gray-500 */
+    font-size: 0.9rem;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.custom-settings-button:hover {
+    background-color: #1e3b31;
+}
+
+.profile-label {
+    font-weight: 600;
+    color: #6b7280;
     text-transform: uppercase;
     font-size: 0.85rem;
 }
@@ -28,103 +39,152 @@
     font-weight: 500;
     margin-bottom: 10px;
 }
-.hidden {
+
+.modal {
   display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 999;
+  justify-content: center;
+  align-items: center;
+}
+.modal.active {
+  display: flex;
+}
+.modal-content {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  text-align: center;
 }
 
+.modal-close-button {
+    background-color: #dc3545;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 1rem;
+}
+.modal-close-button:hover {
+    background-color: #b02a37;
+}
 
+.profile-pic {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 2rem;
+}
 </style>
 
-<div class="container mx-auto p-8 flex flex-col items-center">
-    <h1 class="text-3xl font-bold mb-8 text-center">
-  Welcome
-  {% if user_profile.user.first_name or user_profile.user.last_name %}
-    {{ user_profile.user.first_name|capfirst }} {{ user_profile.user.last_name|capfirst }}
-  {% else %}
-    {{ user_profile.user.username|capfirst }}
-  {% endif %}
-</h1>
+<div class="container">
+    <h1 class="page-title">
+        Welcome
+        {% if user_profile.user.first_name or user_profile.user.last_name %}
+            {{ user_profile.user.first_name|capfirst }} {{ user_profile.user.last_name|capfirst }}
+        {% else %}
+            {{ user_profile.user.username|capfirst }}
+        {% endif %}
+    </h1>
 
+    <img
+        id="profileImage"
+        src="{% if user_profile.profile_picture %}{{ user_profile.profile_picture.url }}{% else %}https://via.placeholder.com/150{% endif %}"
+        alt="{{ user_profile.user.username }}'s profile picture"
+        class="profile-pic"
+    />
 
+    <button class="custom-settings-button" id="openRoutine">🧴 My Routine</button>
 
-    <!-- Profile Picture -->
-    <div class="relative -mt-20 mb-6">
-        <img
-  id="profileImage"
-  src="{% if user_profile.profile_picture %}{{ user_profile.profile_picture.url }}{% else %}https://via.placeholder.com/150{% endif %}"
-  alt="{{ user_profile.user.username }}'s profile picture"
-  class="mr-3 rounded-circle"
-  style="width: 150px; height: 150px; object-fit: cover;"/>
-<br><br><br>
+    <div id="routineModal" class="modal">
+      <div class="modal-content">
+        <h2>🧼 My Routine</h2>
 
+        {% if user_profile.favorites.all.count %}
+          <ul>
+            {% for item in user_profile.favorites.all %}
+              <li>{{ item.name }}</li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p style="color: gray;">You don't have any items in your routine yet.</p>
+        {% endif %}
+
+        <button class="modal-close-button" id="closeRoutine">Close</button>
+      </div>
     </div>
-    <!-- My Routine Button -->
-<button onclick="toggleModal()" class="custom-settings-button text-white text-sm font-semibold py-2 px-4 rounded shadow mt-6">
-  🧴 My Routine
-</button>
 
-<!-- Modal -->
-<div id="routineModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-  <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
-    <h2 class="text-xl font-bold mb-4 text-center">🧼 My Routine</h2>
-    {% if user_profile.favorites.all %}
-      <ul class="space-y-2">
-        {% for item in user_profile.favorites.all %}
-          <li class="border p-2 rounded text-center">{{ item.name }}</li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <p class="text-center text-gray-500">No items in your routine yet.</p>
-    {% endif %}
-
-    <div class="flex justify-center mt-6">
-      <button onclick="toggleModal()" class="bg-red-600 text-white px-4 py-2 rounded">Close</button>
-    </div>
-  </div>
-</div>
-
-
-    <!-- User Info -->
-    <div class=" mb-6">
+    <div>
         <p class="profile-info"><span class="profile-label">Name:</span> {{ user_profile.user.first_name|default:"-" }}</p>
         <p class="profile-info"><span class="profile-label">Surname:</span> {{ user_profile.user.last_name|default:"-" }}</p>
         <p class="profile-info"><span class="profile-label">Username:</span> {{ user_profile.user.username }}</p>
         <p class="profile-info"><span class="profile-label">Email:</span> {{ user_profile.user.email|default:"-" }}</p>
     </div>
-<br><br><br><br><br>
-    <!-- Settings -->
-    {% if user_profile.user == request.user %}
-    <div>
-        <a href="{% url 'settings_page' %}" class="custom-settings-button text-white text-sm font-semibold py-2 px-4 rounded shadow">
-  ⚙️ Settings
-        
-</a>
 
-    </div>
+    {% if user_profile.user == request.user %}
+        <div>
+            <a href="{% url 'settings_page' %}" class="custom-settings-button">⚙️ Settings</a>
+        </div>
     {% endif %}
 </div>
 
 <script>
   function toggleModal() {
     const modal = document.getElementById("routineModal");
-    modal.classList.toggle("hidden");
+    if (!modal) {
+      console.error('routineModal not found!');
+      return;
+    }
+
+    if (modal.classList.contains('active')) {
+      modal.classList.remove('active');
+    } else {
+      modal.classList.add('active');
+    }
   }
 
-  document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape') {
-      document.getElementById("routineModal").classList.add("hidden");
-    }
-  });
-
-  window.addEventListener('click', function(event) {
+  document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById("routineModal");
-    const modalContent = modal.querySelector('.modal-content');
-    if (!modal.classList.contains("hidden") && !modalContent.contains(event.target)) {
-      modal.classList.add("hidden");
+    if (!modal) {
+      console.error('routineModal element not found!');
+      return;
     }
+
+    const modalContent = modal.querySelector('.modal-content');
+    const openBtn = document.getElementById('openRoutine');
+    const closeBtn = document.getElementById('closeRoutine');
+
+    if (openBtn) {
+      openBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleModal();
+      });
+    }
+
+    if (closeBtn) {
+      closeBtn.addEventListener('click', toggleModal);
+    }
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && modal.classList.contains('active')) {
+        modal.classList.remove('active');
+      }
+    });
+
+    window.addEventListener('click', function (event) {
+      if (modal.classList.contains('active') && !modalContent.contains(event.target) && !openBtn.contains(event.target)) {
+        modal.classList.remove('active');
+      }
+    });
   });
 </script>
-
-
 
 {% endblock %}

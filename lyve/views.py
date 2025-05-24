@@ -68,6 +68,8 @@ def skintype(request):
 
 def skincareroutine(request):
         return render(request, "lyve/skincareroutine.html")
+def test(request):
+        return render(request, "users/test.html")
 
 @csrf_exempt
 def ask_ollama(request):

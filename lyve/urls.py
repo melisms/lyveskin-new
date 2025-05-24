@@ -18,6 +18,7 @@ urlpatterns = [
     path('skincareroutine/',views.skincareroutine, name='skincareroutine'),
     path('ingredient/<str:letter>/', views.ingredients_view, name='ingredients'),
     path('ask/', views.ask_ollama, name='ask_ollama'),
+    path('test/', views.test ,name='test'),
 
 ]
 
