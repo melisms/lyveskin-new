@@ -28,6 +28,10 @@
     font-weight: 500;
     margin-bottom: 10px;
 }
+.hidden {
+  display: none;
+}
+
 
 </style>
 
@@ -44,7 +48,7 @@
 
 
     <!-- Profile Picture -->
-    <div cclass="relative -mt-20 mb-6">
+    <div class="relative -mt-20 mb-6">
         <img
   id="profileImage"
   src="{% if user_profile.profile_picture %}{{ user_profile.profile_picture.url }}{% else %}https://via.placeholder.com/150{% endif %}"
@@ -54,22 +58,38 @@
 <br><br><br>
 
     </div>
+    <!-- My Routine Button -->
+<button onclick="toggleModal()" class="custom-settings-button text-white text-sm font-semibold py-2 px-4 rounded shadow mt-6">
+  🧴 My Routine
+</button>
+
+<!-- Modal -->
+<div id="routineModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+    <h2 class="text-xl font-bold mb-4 text-center">🧼 My Routine</h2>
+    {% if user_profile.favorites.all %}
+      <ul class="space-y-2">
+        {% for item in user_profile.favorites.all %}
+          <li class="border p-2 rounded text-center">{{ item.name }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-center text-gray-500">No items in your routine yet.</p>
+    {% endif %}
+
+    <div class="flex justify-center mt-6">
+      <button onclick="toggleModal()" class="bg-red-600 text-white px-4 py-2 rounded">Close</button>
+    </div>
+  </div>
+</div>
+
 
     <!-- User Info -->
     <div class=" mb-6">
         <p class="profile-info"><span class="profile-label">Name:</span> {{ user_profile.user.first_name|default:"-" }}</p>
         <p class="profile-info"><span class="profile-label">Surname:</span> {{ user_profile.user.last_name|default:"-" }}</p>
         <p class="profile-info"><span class="profile-label">Username:</span> {{ user_profile.user.username }}</p>
-        <p class="profile-info">
-            <span class="profile-label">Email:</span> {% if email_verified or user_profile.user == request.user %}{{ user_profile.user.email}}{% else %}-{% endif %}
-            {% if user_profile.user == request.user %}
-            <span
-                style="color: {% if email_verified %}green{% else %}red{% endif %}; font-weight: bold; margin-left: 8px;"
-                title="{% if email_verified %}Email verified{% else %}Email not verified{% endif %}">
-                {% if email_verified %}&#x2705;{% else %}&#x274C;{% endif %}
-            </span>
-            {% endif %}
-        </p>
+        <p class="profile-info"><span class="profile-label">Email:</span> {{ user_profile.user.email|default:"-" }}</p>
     </div>
 <br><br><br><br><br>
     <!-- Settings -->
@@ -83,5 +103,28 @@
     </div>
     {% endif %}
 </div>
+
+<script>
+  function toggleModal() {
+    const modal = document.getElementById("routineModal");
+    modal.classList.toggle("hidden");
+  }
+
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+      document.getElementById("routineModal").classList.add("hidden");
+    }
+  });
+
+  window.addEventListener('click', function(event) {
+    const modal = document.getElementById("routineModal");
+    const modalContent = modal.querySelector('.modal-content');
+    if (!modal.classList.contains("hidden") && !modalContent.contains(event.target)) {
+      modal.classList.add("hidden");
+    }
+  });
+</script>
+
+
 
 {% endblock %}
