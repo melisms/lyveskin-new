@@ -103,23 +103,29 @@
 
     <button class="custom-settings-button" id="openRoutine">🧴 My Routine</button>
 
-    <div id="routineModal" class="modal">
-      <div class="modal-content">
-        <h2>🧼 My Routine</h2>
+   <div id="routineModal" class="modal">
+  <div class="modal-content">
+    <h2>🧼 My Routine</h2>
 
-        {% if user_profile.favorites.all.count %}
-          <ul>
-            {% for item in user_profile.favorites.all %}
-              <li>{{ item.name }}</li>
-            {% endfor %}
-          </ul>
-        {% else %}
-          <p style="color: gray;">You don't have any items in your routine yet.</p>
-        {% endif %}
+    {% if user_profile.favorites.all.count %}
+      <ul style="padding: 0; list-style: none;">
+        {% for item in user_profile.favorites.all %}
+          <li style="display: flex; align-items: center; margin-bottom: 12px; gap: 12px;">
+            <img src="{{ item.image.url }}" alt="{{ item.name }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
+            <a href="{% url 'item:detail' item.pk %}" style="font-weight: 600; text-decoration: none; color: #333;">
+              {{ item.name }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p style="color: gray;">You don't have any items in your routine yet.</p>
+    {% endif %}
 
-        <button class="modal-close-button" id="closeRoutine">Close</button>
-      </div>
-    </div>
+    <button class="modal-close-button" id="closeRoutine">Close</button>
+  </div>
+</div>
+
 
     <div>
         <p class="profile-info"><span class="profile-label">Name:</span> {{ user_profile.user.first_name|default:"-" }}</p>
