@@ -1,49 +1,204 @@
 {% extends "forum/baseforum.html" %}
 {% load static %}
 {% block content %}
-  <article class="media content-section">
-    <div class="media-body">
-      <div class="article-metadata">
-        <img class="mr-3 rounded-circle" src="{% if object.author.userprofile.profile_picture %}{{ object.author.userprofile.profile_picture.url }}{% else %}{% static 'default_profile.png' %}{% endif %}" alt="Profile Image" width="50" height="50">
-        <a class="mr-2" href="{% url 'profile' object.author.id %}">{{ object.author }}</a>
-        <small class="text-muted">{{ object.date_posted|date:"F d, Y" }}</small>
-        {% if object.author == user %}
-          <div>
-            <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{% url 'forum:post-update' object.id %}">Update</a>
-            <a class="btn btn-danger btn-sm mt-1 mb-1" href="{% url 'forum:post-delete' object.id %}">Delete</a>
-          </div>
-        {% endif %}
-      </div>
-      <h2 class="article-title">{{ object.title }}</h2>
-      <p class="article-content">{{ object.content }}</p>
-    </div>
-  </article>
-<section class="comment-section">
-    {% for comment in comments %}
-        <article class="media content-section">
-            <div class="media-body">
-                <div class="article-metadata">
-                    <img class="mr-3 rounded-circle" src="{% if comment.author.userprofile.profile_picture %}{{ comment.author.userprofile.profile_picture.url }}{% else %}{% static 'default_profile.png' %}{% endif %}" alt="Profile Image" width="50" height="50">
-                    <a class="mr-2" href="{% url 'profile' comment.author.id %}">{{ comment.author }}</a>
-                    <small class="text-muted">{{ comment.date_posted|date:"F d, Y" }}</small>
-                </div>
-                <p class="article-content">{{ comment.content }}</p>
-            </div>
-        </article>
-    {% endfor %}
-</section>
+<style>
+  /* Container for the main post */
+  .post-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(64, 130, 109, 0.12);
+    padding: 1.75rem 2rem;
+    margin-bottom: 2rem;
+  }
+  .post-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    gap: 1rem;
+  }
+  .profile-pic {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+  }
+  .author-info {
+    display: flex;
+    flex-direction: column;
+  }
+  .author-link {
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: #40826D;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  .author-link:hover {
+    color: #9FE2BF;
+  }
+  .post-date {
+    color: #777;
+    font-size: 0.9rem;
+  }
+  .post-actions {
+    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .btn {
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 0.35rem 0.9rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s ease;
+    text-align: center;
+    display: inline-block;
+    text-decoration: none;
+  }
+  .btn-secondary {
+    background-color: #708D81;
+    color: #fff;
+  }
+  .btn-secondary:hover {
+    background-color: #5a705f;
+  }
+  .btn-danger {
+    background-color: #d9534f;
+    color: #fff;
+  }
+  .btn-danger:hover {
+    background-color: #b63b38;
+  }
+  .post-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #2C3E50;
+  }
+  .post-content {
+    font-size: 1.15rem;
+    line-height: 1.6;
+    color: #444;
+  }
 
+  /* Comment section */
+  .comment-section {
+    margin-top: 3rem;
+  }
+  .comment-card {
+    background: #f8f9f9;
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 2px 10px rgba(64, 130, 109, 0.08);
+  }
+  .comment-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.7rem;
+  }
+  .comment-profile-pic {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .comment-author {
+    font-weight: 600;
+    color: #40826D;
+    text-decoration: none;
+    font-size: 1rem;
+  }
+  .comment-author:hover {
+    color: #9FE2BF;
+  }
+  .comment-date {
+    color: #999;
+    font-size: 0.8rem;
+  }
+  .comment-content {
+    font-size: 1rem;
+    color: #333;
+    line-height: 1.5;
+  }
+
+  /* Comment form */
+  .comment-form {
+    margin-top: 3rem;
+    background: #fff;
+    padding: 1.75rem 2rem;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(64, 130, 109, 0.1);
+  }
+  .comment-form h3 {
+    margin-bottom: 1rem;
+    color: #2C3E50;
+  }
+  .comment-form button {
+    background-color: #40826D;
+    color: white;
+    border-radius: 8px;
+    border: none;
+    padding: 0.5rem 1.25rem;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  .comment-form button:hover {
+    background-color: #2f644f;
+  }
+</style>
+
+<article class="post-card">
+  <div class="post-header">
+    <img class="profile-pic" src="{% if object.author.userprofile.profile_picture %}{{ object.author.userprofile.profile_picture.url }}{% else %}{% static 'default_profile.png' %}{% endif %}" alt="Profile Image">
+    <div class="author-info">
+      <a class="author-link" href="{% url 'profile' object.author.id %}" style="text-decoration: none;">{{ object.author }}</a>
+      <small class="post-date">{{ object.date_posted|date:"F d, Y" }}</small>
+    </div>
+    {% if object.author == user %}
+      <div class="post-actions">
+        <a href="{% url 'forum:post-update' object.id %}" class="btn btn-secondary">Update</a>
+        <a href="{% url 'forum:post-delete' object.id %}" class="btn btn-danger">Delete</a>
+      </div>
+    {% endif %}
+  </div>
+  <h2 class="post-title">{{ object.title }}</h2>
+  <p class="post-content">{{ object.content }}</p>
+</article>
+
+<section class="comment-section">
+  {% for comment in comments %}
+    <article class="comment-card">
+      <div class="comment-header">
+        <img class="comment-profile-pic" src="{% if comment.author.userprofile.profile_picture %}{{ comment.author.userprofile.profile_picture.url }}{% else %}{% static 'default_profile.png' %}{% endif %}" alt="Profile Image">
+        <a class="comment-author" href="{% url 'profile' comment.author.id %}" style="text-decoration: none;">{{ comment.author }}</a>
+        <small class="comment-date">{{ comment.date_posted|date:"F d, Y" }}</small>
+      </div>
+      <p class="comment-content">{{ comment.content }}</p>
+    </article>
+  {% empty %}
+    <p>No comments yet.</p>
+  {% endfor %}
+</section>
 
 {% if user.is_authenticated %}
-<section class="comment-form">
+  <section class="comment-form">
     <h3>Add a Comment</h3>
     <form method="post" action="{% url 'forum:add-comment' object.pk %}">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Add Comment</button>
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Add Comment</button>
     </form>
-</section>
+  </section>
 {% else %}
-<p>You need to <a href="{% url 'login' %}">login</a> to add a comment.</p>
+  <p>You need to <a href="{% url 'login' %}">login</a> to add a comment.</p>
 {% endif %}
+
 {% endblock content %}
