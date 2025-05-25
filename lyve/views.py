@@ -11,7 +11,6 @@ from django.core.cache import cache
 from django.views.decorators.cache import cache_page
 cache_time = 60 * 10
 
-@cache_page(cache_time)
 def home(request):
     return render(request, "lyve/home.html")
 @cache_page(cache_time)
@@ -198,7 +197,7 @@ def ask_ollama(request):
                     "prompt": prompt,
                     "stream": False
                 },
-                timeout=10
+              
             )
             ollama_response.raise_for_status() 
             response_json = ollama_response.json()
