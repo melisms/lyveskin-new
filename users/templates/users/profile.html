@@ -38,6 +38,7 @@
     font-size: 1.1rem;
     font-weight: 500;
     margin-bottom: 10px;
+
 }
 
 .modal {
@@ -85,61 +86,66 @@
 </style>
 
 <div class="container">
-    <h1 class="page-title">
-        Welcome
-        {% if user_profile.user.first_name or user_profile.user.last_name %}
-            {{ user_profile.user.first_name|capfirst }} {{ user_profile.user.last_name|capfirst }}
-        {% else %}
-            {{ user_profile.user.username|capfirst }}
-        {% endif %}
-    </h1>
+  <h1 class="page-title">
+    Welcome
+    {% if user_profile.user.first_name or user_profile.user.last_name %}
+      {{ user_profile.user.first_name|capfirst }} {{ user_profile.user.last_name|capfirst }}
+    {% else %}
+      {{ user_profile.user.username|capfirst }}
+    {% endif %}
+  </h1>
 
+  <!-- Profil Bilgileri ve Fotoğraf Yan Yana -->
+  <div class="d-flex align-items-center mb-4" style="gap: 30px;">
     <img
-        id="profileImage"
-        src="{% if user_profile.profile_picture %}{{ user_profile.profile_picture.url }}{% else %}https://via.placeholder.com/150{% endif %}"
-        alt="{{ user_profile.user.username }}'s profile picture"
-        class="profile-pic"
+      id="profileImage"
+      src="{% if user_profile.profile_picture %}{{ user_profile.profile_picture.url }}{% else %}https://via.placeholder.com/150{% endif %}"
+      alt="{{ user_profile.user.username }}'s profile picture"
+      class="profile-pic"
     />
 
-    <button class="custom-settings-button" id="openRoutine">🧴 My Routine</button>
-
-   <div id="routineModal" class="modal">
-  <div class="modal-content">
-    <h2>🧼 My Routine</h2>
-
-    {% if user_profile.favorites.all.count %}
-      <ul style="padding: 0; list-style: none;">
-        {% for item in user_profile.favorites.all %}
-          <li style="display: flex; align-items: center; margin-bottom: 12px; gap: 12px;">
-            <img src="{{ item.image.url }}" alt="{{ item.name }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
-            <a href="{% url 'item:detail' item.pk %}" style="font-weight: 600; text-decoration: none; color: #333;">
-              {{ item.name }}
-            </a>
-          </li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <p style="color: gray;">You don't have any items in your routine yet.</p>
-    {% endif %}
-
-    <button class="modal-close-button" id="closeRoutine">Close</button>
-  </div>
-</div>
-
-
     <div>
-        <p class="profile-info"><span class="profile-label">Name:</span> {{ user_profile.user.first_name|default:"-" }}</p>
-        <p class="profile-info"><span class="profile-label">Surname:</span> {{ user_profile.user.last_name|default:"-" }}</p>
-        <p class="profile-info"><span class="profile-label">Username:</span> {{ user_profile.user.username }}</p>
-        <p class="profile-info"><span class="profile-label">Email:</span> {{ user_profile.user.email|default:"-" }}</p>
+      <p class="profile-info"><span class="profile-label">Name:</span> {{ user_profile.user.first_name|default:"-" }}</p>
+      <p class="profile-info"><span class="profile-label">Surname:</span> {{ user_profile.user.last_name|default:"-" }}</p>
+      <p class="profile-info"><span class="profile-label">Username:</span> {{ user_profile.user.username }}</p>
+      <p class="profile-info"><span class="profile-label">Email:</span> {{ user_profile.user.email|default:"-" }}</p>
     </div>
+  </div>
 
-    {% if user_profile.user == request.user %}
-        <div>
-            <a href="{% url 'settings_page' %}" class="custom-settings-button">⚙️ Settings</a>
-        </div>
-    {% endif %}
+
+  <button class="custom-settings-button" id="openRoutine">🧴 My Routine</button>
+
+ 
+  <div id="routineModal" class="modal">
+    <div class="modal-content">
+      <h2>🧼 My Routine</h2>
+
+      {% if user_profile.favorites.all.count %}
+        <ul style="list-style: none; padding: 0;">
+          {% for item in user_profile.favorites.all %}
+            <li style="margin-bottom: 10px;">
+              <img src="{{ item.image.url }}" alt="{{ item.name }}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; margin-right: 8px;">
+              <a href="{% url 'item:detail' item.pk %}" style="text-decoration: none; color: #333; font-weight: 600;">
+                {{ item.name }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p style="color: gray;">You don't have any items in your routine yet.</p>
+      {% endif %}
+
+      <button class="modal-close-button" id="closeRoutine">Close</button>
+    </div>
+  </div>
+<br><br><br><br><br><br><br>
+  {% if user_profile.user == request.user %}
+    <div class="mt-4">
+      <a href="{% url 'settings_page' %}" class="custom-settings-button">⚙️ Settings</a>
+    </div>
+  {% endif %}
 </div>
+
 
 <script>
   function toggleModal() {
