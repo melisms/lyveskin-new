@@ -4,28 +4,106 @@
 {% block content %}
 
 <style>
+.profile-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
 .page-title {
-    font-size: 2rem;
+    font-size: 2.2rem;
     font-weight: bold;
     margin-bottom: 2rem;
     text-align: center;
+    color: #333;
 }
 
-.custom-settings-button {
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 30px;
+}
+
+.profile-header-info {
+    flex-grow: 1;
+}
+
+.user-stats {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.stat-box {
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    flex: 1;
+    transition: transform 0.2s;
+}
+
+.stat-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #40826D;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: #666;
+    text-transform: uppercase;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.btn-profile {
     background-color: #40826D;
     color: white;
     font-weight: 600;
-    font-size: 0.9rem;
-    padding: 8px 16px;
+    font-size: 0.95rem;
+    padding: 10px 20px;
     border: none;
     border-radius: 10px;
     cursor: pointer;
-    margin-top: 1.5rem;
-    transition: background-color 0.3s ease-in-out;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.custom-settings-button:hover {
-    background-color: #1e3b31;
+.btn-profile:hover {
+    background-color: #2c5c4a;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(64, 130, 109, 0.3);
+}
+
+.btn-profile-secondary {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.btn-profile-secondary:hover {
+    background-color: #e0e0e0;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .profile-label {
@@ -34,116 +112,275 @@
     text-transform: uppercase;
     font-size: 0.85rem;
 }
+
 .profile-info {
     font-size: 1.1rem;
     font-weight: 500;
-    margin-bottom: 10px;
-
+    margin-bottom: 15px;
 }
 
 .modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  z-index: 999;
-  justify-content: center;
-  align-items: center;
-}
-.modal.active {
-  display: flex;
-}
-.modal-content {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 400px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-  text-align: center;
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 999;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(3px);
 }
 
-.modal-close-button {
-    background-color: #dc3545;
-    color: white;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    margin-top: 1rem;
+.modal.active {
+    display: flex;
 }
-.modal-close-button:hover {
-    background-color: #b02a37;
+
+.modal-content {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 450px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+    position: relative;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #40826D;
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #999;
+    transition: color 0.2s;
+}
+
+.modal-close:hover {
+    color: #333;
+}
+
+.routine-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.routine-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    transition: background-color 0.2s;
+    border: 1px solid #eee;
+}
+
+.routine-item:hover {
+    background-color: #f9f9f9;
+}
+
+.routine-image {
+    width: 45px;
+    height: 45px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-right: 10px;
+}
+
+.routine-info {
+    flex-grow: 1;
+    text-align: left;
+}
+
+.routine-name {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 3px;
+    font-size: 0.95rem;
+}
+
+.routine-category {
+    color: #666;
+    font-size: 0.8rem;
+}
+
+.modal-footer {
+    margin-top: 20px;
+    text-align: right;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+}
+
+.modal-button {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+
+.modal-button-primary {
+    background-color: #40826D;
+    color: white;
+}
+
+.modal-button-primary:hover {
+    background-color: #2c5c4a;
+}
+
+.modal-button-secondary {
+    background-color: #f0f0f0;
+    color: #333;
+    margin-right: 10px;
+}
+
+.modal-button-secondary:hover {
+    background-color: #e0e0e0;
 }
 
 .profile-pic {
-    width: 150px;
-    height: 150px;
+    width: 180px;
+    height: 180px;
     object-fit: cover;
     border-radius: 50%;
-    margin-bottom: 2rem;
+    border: 5px solid #f0f0f0;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.empty-routine {
+    text-align: center;
+    padding: 30px 0;
+    color: #888;
+}
+
+.empty-routine-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: #ccc;
 }
 </style>
 
 <div class="container">
-  <h1 class="page-title">
-    Welcome
-    {% if user_profile.user.first_name or user_profile.user.last_name %}
-      {{ user_profile.user.first_name|capfirst }} {{ user_profile.user.last_name|capfirst }}
-    {% else %}
-      {{ user_profile.user.username|capfirst }}
-    {% endif %}
-  </h1>
-
-  <!-- Profil Bilgileri ve Fotoğraf Yan Yana -->
-  <div class="d-flex align-items-center mb-4" style="gap: 30px;">
-    <img
-      id="profileImage"
-      src="{% if user_profile.profile_picture %}{{ user_profile.profile_picture.url }}{% else %}https://via.placeholder.com/150{% endif %}"
-      alt="{{ user_profile.user.username }}'s profile picture"
-      class="profile-pic"
-    />
-
-    <div>
-      <p class="profile-info"><span class="profile-label">Name:</span> {{ user_profile.user.first_name|default:"-" }}</p>
-      <p class="profile-info"><span class="profile-label">Surname:</span> {{ user_profile.user.last_name|default:"-" }}</p>
-      <p class="profile-info"><span class="profile-label">Username:</span> {{ user_profile.user.username }}</p>
-      <p class="profile-info"><span class="profile-label">Email:</span> {{ user_profile.user.email|default:"-" }}</p>
-    </div>
-  </div>
-
-
-  <button class="custom-settings-button" id="openRoutine">🧴 My Routine</button>
-
- 
-  <div id="routineModal" class="modal">
-    <div class="modal-content">
-      <h2>🧼 My Routine</h2>
-
-      {% if user_profile.favorites.all.count %}
-        <ul style="list-style: none; padding: 0;">
-          {% for item in user_profile.favorites.all %}
-            <li style="margin-bottom: 10px;">
-              <img src="{{ item.image.url }}" alt="{{ item.name }}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; margin-right: 8px;">
-              <a href="{% url 'item:detail' item.pk %}" style="text-decoration: none; color: #333; font-weight: 600;">
-                {{ item.name }}
-              </a>
-            </li>
-          {% endfor %}
-        </ul>
+  <div class="profile-container">
+    <h1 class="page-title">
+      {% if user_profile.user.first_name or user_profile.user.last_name %}
+        {{ user_profile.user.first_name|capfirst }} {{ user_profile.user.last_name|capfirst }}'s Profile
       {% else %}
-        <p style="color: gray;">You don't have any items in your routine yet.</p>
+        {{ user_profile.user.username|capfirst }}'s Profile
       {% endif %}
+    </h1>
 
-      <button class="modal-close-button" id="closeRoutine">Close</button>
+    <!-- Profile Header with Photo and Info -->
+    <div class="profile-header">
+      <img
+        id="profileImage"
+        src="{% if user_profile.profile_picture %}{{ user_profile.profile_picture.url }}{% else %}https://via.placeholder.com/180{% endif %}"
+        alt="{{ user_profile.user.username }}'s profile picture"
+        class="profile-pic"
+      />
+
+      <div class="profile-header-info">
+        <p class="profile-info"><span class="profile-label">Name:</span> {{ user_profile.user.first_name|default:"-" }}</p>
+        <p class="profile-info"><span class="profile-label">Surname:</span> {{ user_profile.user.last_name|default:"-" }}</p>
+        <p class="profile-info"><span class="profile-label">Username:</span> {{ user_profile.user.username }}</p>
+        <p class="profile-info"><span class="profile-label">Email:</span> {{ user_profile.user.email|default:"-" }}</p>
+        
+        <!-- User Stats -->
+        <div class="user-stats">
+          <div class="stat-box">
+            <div class="stat-number">{{ user_profile.favorites.all.count }}</div>
+            <div class="stat-label">Routine Items</div>
+          </div>
+          
+          <div class="stat-box">
+            <div class="stat-number">{{ user_profile.user.post_set.all.count|default:"0" }}</div>
+            <div class="stat-label">Forum Posts</div>
+          </div>
+          
+          <div class="stat-box">
+            <div class="stat-number">{{ user_profile.user.date_joined|date:"M Y" }}</div>
+            <div class="stat-label">Joined</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button class="btn-profile" id="openRoutine">
+        <i class="fas fa-flask"></i> My Skincare Routine
+      </button>
+      
+      {% if user_profile.user == request.user %}
+        <a href="{% url 'settings_page' %}" class="btn-profile">
+          <i class="fas fa-cog"></i> Account Settings
+        </a>
+      {% endif %}
+      
+      <a href="/forum" class="btn-profile btn-profile-secondary">
+        <i class="fas fa-comments"></i> Visit Forum
+      </a>
     </div>
   </div>
-<br><br><br><br><br><br><br>
-  {% if user_profile.user == request.user %}
-    <div class="mt-4">
-      <a href="{% url 'settings_page' %}" class="custom-settings-button">⚙️ Settings</a>
+</div>
+
+<!-- Skincare Routine Modal -->
+<div id="routineModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title"><i class="fas fa-flask"></i> My Skincare Routine</h2>
+      <button class="modal-close" id="closeRoutine">&times;</button>
     </div>
-  {% endif %}
+
+    {% if user_profile.favorites.all.count %}
+      <ul class="routine-list">
+        {% for item in user_profile.favorites.all %}
+          <li class="routine-item">
+            <img src="{% if item.image %}{{ item.image.url }}{% else %}/static/images/product-placeholder.jpg{% endif %}" 
+                 alt="{{ item.name }}" 
+                 class="routine-image">
+            <div class="routine-info">
+              <div class="routine-name">{{ item.name }}</div>
+              <div class="routine-category">{{ item.category.name|default:"Product" }}</div>
+            </div>
+            <a href="{% url 'item:detail' item.pk %}" class="btn-profile" style="padding: 5px 8px; font-size: 0.75rem; min-width: auto;">
+              <i class="fas fa-eye"></i>
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="empty-routine">
+        <div class="empty-routine-icon"><i class="fas fa-flask"></i></div>
+        <p>You don't have any items in your routine yet.</p>
+        <a href="/items/browse" class="btn-profile" style="display: inline-flex; margin-top: 15px;">
+          <i class="fas fa-search"></i> Browse Products
+        </a>
+      </div>
+    {% endif %}
+
+    <div class="modal-footer">
+      <button class="modal-button modal-button-secondary" id="closeRoutineFooter">Close</button>
+      <a href="/items/browse" class="modal-button modal-button-primary">Find Products</a>
+    </div>
+  </div>
 </div>
 
 
@@ -156,9 +393,40 @@
     }
 
     if (modal.classList.contains('active')) {
-      modal.classList.remove('active');
+      closeModal();
     } else {
+      // Calculate optimal size for modal content based on window height
+      const modalContent = modal.querySelector('.modal-content');
+      if (modalContent) {
+        const windowHeight = window.innerHeight;
+        const maxHeight = Math.min(500, windowHeight * 0.75); // Don't let it get too big
+        modalContent.style.maxHeight = maxHeight + 'px';
+      }
+      
       modal.classList.add('active');
+      
+      // Allow scrolling within modal but prevent body scrolling
+      document.body.style.overflow = 'hidden';
+      
+      // Position modal content at a comfortable height
+      if (window.innerWidth < 768) { // Mobile view
+        if (modalContent) {
+          modalContent.scrollTop = 0; // Reset scroll position
+        }
+      }
+    }
+  }
+
+  function closeModal() {
+    const modal = document.getElementById("routineModal");
+    if (modal) {
+      // Add a subtle fade-out effect
+      modal.style.opacity = '0';
+      setTimeout(() => {
+        modal.classList.remove('active');
+        modal.style.opacity = '1';
+        document.body.style.overflow = 'auto'; // Re-enable page scrolling
+      }, 150);
     }
   }
 
@@ -172,6 +440,7 @@
     const modalContent = modal.querySelector('.modal-content');
     const openBtn = document.getElementById('openRoutine');
     const closeBtn = document.getElementById('closeRoutine');
+    const closeFooterBtn = document.getElementById('closeRoutineFooter');
 
     if (openBtn) {
       openBtn.addEventListener('click', function(e) {
@@ -182,18 +451,33 @@
     }
 
     if (closeBtn) {
-      closeBtn.addEventListener('click', toggleModal);
+      closeBtn.addEventListener('click', closeModal);
     }
+
+    if (closeFooterBtn) {
+      closeFooterBtn.addEventListener('click', closeModal);
+    }
+
+    // Apply hover effects for routine items
+    const routineItems = document.querySelectorAll('.routine-item');
+    routineItems.forEach(item => {
+      item.addEventListener('mouseenter', function() {
+        this.style.backgroundColor = '#f0f0f0';
+      });
+      item.addEventListener('mouseleave', function() {
+        this.style.backgroundColor = '';
+      });
+    });
 
     document.addEventListener('keydown', function (event) {
       if (event.key === 'Escape' && modal.classList.contains('active')) {
-        modal.classList.remove('active');
+        closeModal();
       }
     });
 
     window.addEventListener('click', function (event) {
       if (modal.classList.contains('active') && !modalContent.contains(event.target) && !openBtn.contains(event.target)) {
-        modal.classList.remove('active');
+        closeModal();
       }
     });
   });
