@@ -51,8 +51,8 @@ def create_item(request):
         if form.is_valid():
             item = form.save()
             for ingredient in item.ingredients.all():
-                if not ingredient.safety or ingredient.safety == 'N':
-                    safety, note = detect_safety(ingredient.name)
+                safety, note = detect_safety(ingredient.name)
+                if ingredient.safety != safety or ingredient.note != note:
                     ingredient.safety = safety
                     ingredient.note = note
                     ingredient.save()
@@ -133,8 +133,8 @@ def edit_item(request, item_id):
         if form.is_valid():
             form.save()
             for ingredient in item.ingredients.all():
-                if not ingredient.safety or ingredient.safety == 'N':
-                    safety, note = detect_safety(ingredient.name)
+                safety, note = detect_safety(ingredient.name)
+                if ingredient.safety != safety or ingredient.note != note:
                     ingredient.safety = safety
                     ingredient.note = note
                     ingredient.save()
