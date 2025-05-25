@@ -183,12 +183,38 @@ def ask_ollama(request):
             if any(word in question for word in ['items', 'products']) and len(words) >= 3:
                 general_items = Item.objects.all()
                 if general_items.exists():
-                    item_names = [item.name for item in general_items[:10]]
-                    answer = "Here are some of our products: " + ", ".join(item_names) + "."
+                    products_data = []
+                    for item in general_items[:10]:
+                        # Resim URL'sini al
+                        image_url = None
+                        if hasattr(item, 'image'):
+                            if item.image and hasattr(item.image, 'url'):
+                                image_url = item.image.url
+                            elif isinstance(item.image, str):
+                                image_url = item.image
+                        
+                        if not image_url:
+                            image_url = '/static/images/product-placeholder.jpg'
+                            
+                        product_info = {
+                            'id': item.id,
+                            'name': item.name,
+                            'image': image_url,
+                            'url': f"/items/{item.id}/"
+                        }
+                        products_data.append(product_info)
+                    
+                    answer = "Here are some of our products:"
+                    return JsonResponse({
+                        'answer': answer,
+                        'product_results': True,
+                        'category': 'Our Products',
+                        'products': products_data
+                    })
                 else:
                     answer = "Sorry, we don't have any products listed currently."
-                cache.set(cache_key, answer, timeout=600)
-                return JsonResponse({'answer': answer})    
+                    cache.set(cache_key, answer, timeout=600)
+                    return JsonResponse({'answer': answer})    
                     
             if "profile" in question and request.user.is_authenticated:
                 return JsonResponse({
