@@ -31,6 +31,23 @@
   .accordion-content {
     margin-top: 10px;
   }
+
+  .custom-settings-button {
+    background-color: #40826D;
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    transition: background-color 0.3s ease-in-out;
+}
+
+  .custom-settings-button:hover {
+      background-color: #1e3b31;
+  }
 </style>
 
 
@@ -58,7 +75,7 @@
       <input type="hidden" name="form_type" value="change_username">
       <label for="username">Username</label>
       <input type="text" name="username" id="username" value="{{ user.username }}"required>
-      <button type="submit" class="bg-blue-600 text-black py-1 px-4 rounded hover:bg-blue-700">Change Username</button>
+      <button type="submit" class="custom-settings-button">Change Username</button>
     </form>
   </div>
 </div>
@@ -82,7 +99,7 @@
       <input type="text" name="last_name" id="last_name" value="{{ user.last_name }}" required>
 
       <!-- Submit button -->
-      <button type="submit" class="bg-blue-600 text-black py-1 px-4 mt-2 rounded hover:bg-blue-700">
+      <button type="submit" class="custom-settings-button">
         Change Your Name
       </button>
     </form>
@@ -102,7 +119,7 @@
             <label for="email">New Email</label>
             <input type="email" id="email" name="email"
                    value="{{ user.email }}">
-            <button type="submit" class="bg-blue-600 text-black py-1 px-4 rounded hover:bg-blue-700">Change Email</button>
+            <button type="submit" class="custom-settings-button">Change Email</button>
             {% if not email_verified %}
               <small class="text-xs text-gray-500 ml-2">
                   Not verified —
@@ -133,7 +150,7 @@
                 <input type="hidden" name="form_type" value="profile_picture"required>
                 <input type="file" name="profile_picture" accept="image/*" onchange="previewImage(event)"
                        class="block w-full text-sm text-gray-500 mb-4">
-                <button type="submit" class="bg-blue-600 text-black py-1 px-4 rounded hover:bg-blue-700">Update Photo</button>
+                <button type="submit" class="custom-settings-button">Update Photo</button>
             </form>
         </div>
     </div>
@@ -156,7 +173,7 @@
             <input type="password" id="new_password" name="new_password" ><br><br>
             <label class="block mb-2 font-semibold" for="confirm_password">Confirm New Password</label>
             <input type="password" id="confirm_password" name="confirm_password" >
-            <button type="submit" class="bg-blue-600 text-black py-1 px-4 rounded hover:bg-blue-700">Change Password</button>
+            <button type="submit" class="custom-settings-button">Change Password</button>
         </form>
     </div>
 </div>
