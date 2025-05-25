@@ -48,7 +48,7 @@ class PostListView(ListView):
             current_page_ids = cached_post_ids
 
         preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(current_page_ids)])
-        queryset = Post.objects.filter(pk__in=current_page_ids).order_by(preserved)
+        queryset = Post.objects.filter(pk__in=current_page_ids).select_related('author').order_by(preserved)
         return queryset
 
     def get_context_data(self, **kwargs):
