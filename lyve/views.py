@@ -147,15 +147,15 @@ def ask_ollama(request):
                     if items.exists():
                         products_data = []
                         for item in items[:10]:
-                            # Get item details
+              
                             image_url = None
-                            # Check if item has image field
+                            
                             if hasattr(item, 'image'):
                                 if item.image and hasattr(item.image, 'url'):
                                     image_url = item.image.url
                                 elif isinstance(item.image, str):
                                     image_url = item.image
-                            # Fallback to static image
+                    
                             if not image_url:
                                 image_url = '/static/images/product-placeholder.jpg'
                                 
@@ -168,7 +168,7 @@ def ask_ollama(request):
                             products_data.append(product_info)
                         
                         answer = f"We have the following {category_name.lower()} products:"
-                        # Return with data for rendering
+                   
                         return JsonResponse({
                             'answer': answer,
                             'product_results': True,
