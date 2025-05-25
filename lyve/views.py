@@ -145,12 +145,40 @@ def ask_ollama(request):
                 if keyword in question:
                     items = Item.objects.filter(category__name__icontains=category_name)
                     if items.exists():
-                        item_names = [item.name for item in items[:10]] 
-                        answer = f"We have the following {category_name.lower()} products: " + ", ".join(item_names) + "."
+                        products_data = []
+                        for item in items[:10]:
+                            # Get item details
+                            image_url = None
+                            # Check if item has image field
+                            if hasattr(item, 'image'):
+                                if item.image and hasattr(item.image, 'url'):
+                                    image_url = item.image.url
+                                elif isinstance(item.image, str):
+                                    image_url = item.image
+                            # Fallback to static image
+                            if not image_url:
+                                image_url = '/static/images/product-placeholder.jpg'
+                                
+                            product_info = {
+                                'id': item.id,
+                                'name': item.name,
+                                'image': image_url,
+                                'url': f"/items/{item.id}/"
+                            }
+                            products_data.append(product_info)
+                        
+                        answer = f"We have the following {category_name.lower()} products:"
+                        # Return with data for rendering
+                        return JsonResponse({
+                            'answer': answer,
+                            'product_results': True,
+                            'category': category_name,
+                            'products': products_data
+                        })
                     else:
                         answer = f"Sorry, we don't currently have any {category_name.lower()} products listed."
-                    cache.set(cache_key, answer, timeout=600)
-                    return JsonResponse({'answer': answer})
+                        cache.set(cache_key, answer, timeout=600)
+                        return JsonResponse({'answer': answer})
             
             if any(word in question for word in ['items', 'products']) and len(words) >= 3:
                 general_items = Item.objects.all()
