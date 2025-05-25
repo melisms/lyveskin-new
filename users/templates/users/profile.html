@@ -339,6 +339,7 @@
       </a>
     </div>
   </div>
+<<<<<<< HEAD
 </div>
 
 <!-- Skincare Routine Modal -->
@@ -381,6 +382,12 @@
       <a href="/items/browse" class="modal-button modal-button-primary">Find Products</a>
     </div>
   </div>
+=======
+<br><br><br><br><br><br><br>
+  {% if user_profile.user == request.user %}
+    <a href="{% url 'settings_page' %}" class="custom-settings-button" style="text-decoration: none;" onmouseover="this.style.color='white';">⚙️ Settings</a>
+  {% endif %}
+>>>>>>> 666c43d59e35b3df05ff67016e46e7f4d6010b76
 </div>
 
 
