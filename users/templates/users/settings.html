@@ -36,7 +36,7 @@
 
 
 <div class="container mx-auto p-4">
-     <h1 class="text-3xl font-bold mb-8 ">Welcome {{ user_profile.user.first_name|capfirst }}  {{ user_profile.user.last_name|capfirst }}</h1>
+    <h1 class="text-3xl font-bold mb-8 ">Welcome {{ user_profile.user.first_name|capfirst }}  {{ user_profile.user.last_name|capfirst }}</h1>
     <div class="flex justify-center mt-10">
         <a href="{% url 'settings_page' %}" class="bg-gray-700 text-white py-2 px-6 rounded-lg hover:bg-gray-800 transition">
             Settings
@@ -74,8 +74,8 @@
       <input type="hidden" name="form_type" value="change_fullname">
 
       <!-- Firstname -->
-      <label for="firstname">Firstname</label>
-      <input type="text" name="firstname" id="firstname" value="{{ user.first_name }}" required>
+      <label for="first_name">Firstname</label>
+      <input type="text" name="first_name" id="first_name" value="{{ user.first_name }}" required>
 <br>
       <!-- Lastname -->
       <label for="last_name">Lastname</label>

@@ -5,7 +5,7 @@
 {% block content %}
     <div class="mt-4 px-4 py-8 bg-gray-100 rounded-xl">
         <h2 class="mb-12 text-2xl text-center">Ingredients</h2>
-        <p class="text-center">Here are the ingredients. Risky and chemical ingredients showed by &#129514;. Neutral ingredients showed by &#128528;. Safe and natural ingredients showed by &#127807;. <br>To learn more, you can check out <a href="/labeling" style="color: #40826D">labeling system</a></p>
+        <p class="text-center">Here are the ingredients. Risky and chemical ingredients showed by &#127812;. Neutral ingredients showed by &#128528;. Safe and natural ingredients showed by &#127807;. <br>To learn more, you can check out <a href="/labeling" style="color: #40826D">labeling system</a></p>
 
         <!-- Alphabet Navigation -->
         <div class="flex justify-center mb-4">
@@ -23,7 +23,7 @@
                             {% if ingredient.safety == 'S' %}
                                 &#127807;
                             {% elif ingredient.safety == 'R' %}
-                                &#129514;
+                                &#127812;
                             {% else %}
                                 &#128528;
                             {% endif %}

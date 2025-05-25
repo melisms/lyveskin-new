@@ -6,8 +6,10 @@ from django.db.models import Q
 from collections import Counter
 from .forms import ComparisonForm,NewItemForm
 from django.contrib import messages
-from .utils import detect_safety
+from .utils import detect_safety, clear_cache_for_detail, clear_cache_for_browse, clear_cache_for_comparison
+from django.views.decorators.cache import cache_page
 
+@cache_page(60 * 10)
 def detail(request, pk):
     item = get_object_or_404(Item, pk=pk)
     ingredients = item.ingredients.all()
@@ -51,16 +53,19 @@ def create_item(request):
         if form.is_valid():
             item = form.save()
             for ingredient in item.ingredients.all():
-                if not ingredient.safety or ingredient.safety == 'N':
-                    safety, note = detect_safety(ingredient.name)
+                safety, note = detect_safety(ingredient.name)
+                if ingredient.safety != safety or ingredient.note != note:
                     ingredient.safety = safety
                     ingredient.note = note
                     ingredient.save()
+            clear_cache_for_detail(request, item.pk)
+            clear_cache_for_browse(request)
+            messages.success(request, 'Item added successfully.')
             return redirect('item:detail', pk=item.pk)
     else:
         form = NewItemForm()
     return render(request, 'item/form.html', {'form': form, 'title': 'Create New Item'})
-
+@cache_page(60 * 5)
 def browse(request):
     query = request.GET.get('query','')
     category_id = request.GET.get('category', 0)
@@ -84,7 +89,7 @@ def compare_items(request):
             category = form.cleaned_data['category']
             item1 = form.cleaned_data['item1']
             item2 = form.cleaned_data['item2']
-
+            clear_cache_for_comparison(request, item1.id, item2.id)
             # Get the ingredients for each item and count the safety levels
             item1_ingredients = item1.ingredients.all()
             item2_ingredients = item2.ingredients.all()
@@ -102,7 +107,7 @@ def compare_items(request):
     else:
         form = ComparisonForm()
     return render(request, 'item/compare_items.html', {'form': form})
-
+@cache_page(60 * 5)
 def comparison_page(request, item_id1, item_id2):
     # Retrieve the items from the database
     item1 = get_object_or_404(Item, pk=item_id1)
@@ -133,11 +138,13 @@ def edit_item(request, item_id):
         if form.is_valid():
             form.save()
             for ingredient in item.ingredients.all():
-                if not ingredient.safety or ingredient.safety == 'N':
-                    safety, note = detect_safety(ingredient.name)
+                safety, note = detect_safety(ingredient.name)
+                if ingredient.safety != safety or ingredient.note != note:
                     ingredient.safety = safety
                     ingredient.note = note
                     ingredient.save()
+            clear_cache_for_detail(request, item_id)
+            clear_cache_for_browse(request)
             messages.success(request, 'Item updated successfully!')
             return redirect('item:detail', pk=item.id)  # Redirect back to item detail after update
     else:
