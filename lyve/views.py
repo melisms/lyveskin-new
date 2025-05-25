@@ -7,16 +7,21 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 import logging
 import difflib
-from django.contrib.auth import get_user_model
+from django.core.cache import cache
+from django.views.decorators.cache import cache_page
+cache_time = 60 * 10
 
+@cache_page(cache_time)
 def home(request):
     return render(request, "lyve/home.html")
-
+@cache_page(cache_time)
 def about(request):
     return render(request, "lyve/about.html")
-
+@cache_page(cache_time)
 def labeling(request):
     return render(request, "lyve/labeling.html")
+
+@cache_page(cache_time)
 def products(request):
     items = Item.objects.all()
     categories = Category.objects.all()
@@ -31,24 +36,22 @@ def products(request):
     })
 
 from django.core.paginator import Paginator
-
-
+@cache_page(cache_time)
 def ingredients(request):
     ingredient_list = Ingredient.objects.all()
 
     # Paginate the ingredient list
-    paginator = Paginator(ingredient_list, 100)  # Show 5 ingredients per page
-
+    paginator = Paginator(ingredient_list, 100)  
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
     return render(request, "lyve/ingredients.html", {
         'page_obj': page_obj,
-        'is_paginated': page_obj.has_other_pages(),  # Pass if the list is paginated
-        'ingredients': page_obj.object_list,  # Pass the ingredients for the current page
+        'is_paginated': page_obj.has_other_pages(),  
+        'ingredients': page_obj.object_list,  
     })
 
-
+@cache_page(cache_time)
 def ingredients_view(request, letter=None):
     if letter:
         ingredients = Ingredient.objects.filter(name__istartswith=letter.upper())
@@ -57,20 +60,21 @@ def ingredients_view(request, letter=None):
 
     return render(request, 'lyve/ingredients.html',
             {'ingredients': ingredients, 'letter': letter
-             })
-
-
+            })
+@cache_page(cache_time)
 def compare(request):
     return render(request, "lyve/compare.html")
-
+@cache_page(cache_time)
 def skintype(request):
     return render(request, "lyve/skintype.html")
-
+@cache_page(cache_time)
 def skincareroutine(request):
         return render(request, "lyve/skincareroutine.html")
 def test(request):
         return render(request, "users/test.html")
-
+    
+from django.contrib.auth import get_user_model
+User = get_user_model()
 @csrf_exempt
 def ask_ollama(request):
     if request.method == 'POST':
@@ -78,6 +82,11 @@ def ask_ollama(request):
             body = json.loads(request.body)
             question = body.get('question', '').lower()
             words = question.split()
+            
+            cache_key = f"ollama_response:{question}"
+            cached_answer = cache.get(cache_key)
+            if cached_answer:
+                return JsonResponse({'answer': cached_answer})
             
             if len(words) >= 2:
                 items = Item.objects.all()
@@ -141,6 +150,7 @@ def ask_ollama(request):
                         answer = f"We have the following {category_name.lower()} products: " + ", ".join(item_names) + "."
                     else:
                         answer = f"Sorry, we don't currently have any {category_name.lower()} products listed."
+                    cache.set(cache_key, answer, timeout=600)
                     return JsonResponse({'answer': answer})
             
             if any(word in question for word in ['items', 'products']) and len(words) >= 3:
@@ -150,6 +160,7 @@ def ask_ollama(request):
                     answer = "Here are some of our products: " + ", ".join(item_names) + "."
                 else:
                     answer = "Sorry, we don't have any products listed currently."
+                cache.set(cache_key, answer, timeout=600)
                 return JsonResponse({'answer': answer})    
                     
             if "profile" in question and request.user.is_authenticated:
@@ -157,9 +168,6 @@ def ask_ollama(request):
                     "answer": "Redirecting to your profile page.",
                     "redirect": f"/profile/{request.user.id}/"
                 })
-                
-            User = get_user_model()
-            words = question.lower().split()
             if "profile" in words:
                 possible_names = [w for w in words if w != "profile"]
 
@@ -195,6 +203,7 @@ def ask_ollama(request):
             ollama_response.raise_for_status() 
             response_json = ollama_response.json()
             answer = response_json.get('response', 'No answer found.')
+            cache.set(cache_key, answer, timeout=600)
 
             return JsonResponse({'answer': answer})
         except requests.exceptions.RequestException as e:

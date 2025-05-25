@@ -50,3 +50,36 @@ def detect_safety(name):
     except Exception as e:
         print(f"AI call failed: {e}")
     return 'N', 'Could not determine safety, defaulting to Neutral.'
+
+from django.test import RequestFactory
+from django.utils.cache import get_cache_key
+from django.core.cache import cache
+from django.urls import reverse
+def clear_cache_for_detail(request, pk):
+    rf = RequestFactory()
+    path = reverse('item:detail', kwargs={'pk': pk})
+    fake_request = rf.get(path)
+    fake_request.user = request.user 
+    key = get_cache_key(fake_request)
+    if key:
+        cache.delete(key)
+
+def clear_cache_for_browse(request):
+    rf = RequestFactory()
+    path = reverse('item:browse')
+    fake_request = rf.get(path)
+    fake_request.user = request.user
+    key = get_cache_key(fake_request)
+    if key:
+        cache.delete(key)
+
+def clear_cache_for_comparison(request, item_id1, item_id2):
+    rf = RequestFactory()
+    path = reverse('item:comparison_page', kwargs={'item_id1': item_id1, 'item_id2': item_id2})
+    fake_request = rf.get(path)
+    fake_request.user = getattr(request, 'user', None)
+    key = get_cache_key(fake_request, method='GET')
+    if key:
+        cache.delete(key)
+        return True
+    return False

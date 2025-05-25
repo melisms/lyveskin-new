@@ -14,3 +14,5 @@ typing_extensions==4.13.2
 gunicorn==23.0.0
 dj-database-url
 requests
+redis
+django-redis
