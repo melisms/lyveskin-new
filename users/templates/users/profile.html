@@ -140,9 +140,7 @@
   </div>
 <br><br><br><br><br><br><br>
   {% if user_profile.user == request.user %}
-    <div class="mt-4">
-      <a href="{% url 'settings_page' %}" class="custom-settings-button">⚙️ Settings</a>
-    </div>
+    <a href="{% url 'settings_page' %}" class="custom-settings-button" style="text-decoration: none;" onmouseover="this.style.color='white';">⚙️ Settings</a>
   {% endif %}
 </div>
 
