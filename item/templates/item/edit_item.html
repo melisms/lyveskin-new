@@ -3,94 +3,178 @@
 {% block title %}Edit {{ item.name }}{% endblock %}
 
 {% block content %}
-<div class="container" style="align-items: flex-start; display: flex; margin: 20px">
-    <div style="flex: 1; margin-right: 20px">
-        <img src="{{ item.image.url }}" alt="{{ item.name }}" class="image" style="max-width: 100%; border-radius: 0.75rem;">
-    </div>
+<style>
+  .edit-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 2rem;
+    margin: 20px;
+    flex-wrap: wrap;
+  }
 
-    <div style="flex: 2; overflow-wrap: break-word;">
-        <h1 class="mb-6 text-3xl"><b>Edit Item Details</b></h1>
+  .image-wrapper {
+    flex: 1 1 100%;
+    max-width: 300px;
+  }
 
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="mb-4">
-                <label class="form-label">Brand</label>
-                {{ form.brands }}
-            </div>
+  .image-wrapper img {
+    width: 100%;
+    border-radius: 0.75rem;
+    object-fit: contain;
+  }
 
-            <div class="mb-4">
-                <label class="form-label">Name</label>
-                {{ form.name }}
-            </div>
+  .form-wrapper {
+    flex: 2 1 100%;
+    min-width: 300px;
+  }
 
-            <div class="mb-4">
-                <label class="form-label">Description</label>
-                {{ form.description }}
-            </div>
+  h1 {
+    font-size: 1.875rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+  }
 
-            <div class="mb-4">
-                <label class="form-label">Ingredients (separated by commas)</label>
-                {{ form.ingredients_text }}
-            </div>
+  .form-group {
+    margin-bottom: 1rem;
+  }
 
-            <div class="mb-4">
-                <label class="form-label">Skin Type</label>
-                {{ form.skintype }}
-            </div>
+  label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
 
-            <div class="mb-4">
-                <label class="form-label">Category</label>
-                {{ form.category }}
-            </div>
+  input[type="text"],
+  textarea,
+  select,
+  input[type="file"] {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 0.375rem;
+    box-sizing: border-box;
+  }
 
-            <div class="mb-4">
-                <label class="form-label">Image</label>
-                {{ form.image }}
-            </div>
+  button.btn-primary {
+    background-color: #40826D;
+    border: none;
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.5rem;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  button.btn-primary:hover,
+  button.btn-primary:focus {
+    background-color: #1e3b31;
+    outline: none;
+  }
 
-            <div class="text-center mt-4">
-                <button type="submit" class="btn btn-primary">Update Item</button>
-                <a href="{% url 'item:detail' item.pk %}" class="btn btn-secondary" style="margin-left: 10px;">Cancel</a>
-            </div>
-        </form>
-    </div>
+  a.btn-secondary {
+    display: inline-block;
+    margin-left: 1rem;
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.5rem;
+    border: 1px solid #6c757d;
+    background-color: #f8f9fa;
+    color: #6c757d;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  a.btn-secondary:hover,
+  a.btn-secondary:focus {
+    background-color: #e2e6ea;
+    outline: none;
+  }
+
+  .button-row {
+    margin-top: 1.5rem;
+    text-align: center;
+  }
+
+  @media (min-width: 768px) {
+    .image-wrapper {
+      flex: 1 1 35%;
+      max-width: none;
+    }
+    .form-wrapper {
+      flex: 2 1 60%;
+    }
+    .button-row {
+      text-align: left;
+    }
+  }
+</style>
+
+<div class="edit-container">
+  <div class="image-wrapper">
+    <img src="{{ item.image.url }}" alt="{{ item.name }}" id="imagePreview" />
+  </div>
+
+  <div class="form-wrapper">
+    <h1>Edit Item Details</h1>
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="id_brands">Brand</label>
+        {{ form.brands }}
+      </div>
+
+      <div class="form-group">
+        <label for="id_name">Name</label>
+        {{ form.name }}
+      </div>
+
+      <div class="form-group">
+        <label for="id_description">Description</label>
+        {{ form.description }}
+      </div>
+
+      <div class="form-group">
+        <label for="id_ingredients_text">Ingredients (separated by commas)</label>
+        {{ form.ingredients_text }}
+      </div>
+
+      <div class="form-group">
+        <label for="id_skintype">Skin Type</label>
+        {{ form.skintype }}
+      </div>
+
+      <div class="form-group">
+        <label for="id_category">Category</label>
+        {{ form.category }}
+      </div>
+
+      <div class="form-group">
+        <label for="id_image">Image</label>
+        {{ form.image }}
+      </div>
+
+      <div class="button-row">
+        <button type="submit" class="btn-primary">Update Item</button>
+        <a href="{% url 'item:detail' item.pk %}" class="btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
 </div>
-{% endblock %}
 
 <script>
-    const imageInput = document.getElementById('id_image'); // Django uses id_image
-    const imagePreview = document.querySelector('.image');  // Your current img tag
+  document.addEventListener('DOMContentLoaded', () => {
+    const imageInput = document.getElementById('id_image');
+    const imagePreview = document.getElementById('imagePreview');
 
-    imageInput.addEventListener('change', function(event) {
+    if (imageInput && imagePreview) {
+      imageInput.addEventListener('change', (event) => {
         const file = event.target.files[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                imagePreview.src = e.target.result;
-            }
-            reader.readAsDataURL(file);
+          const reader = new FileReader();
+          reader.onload = e => imagePreview.src = e.target.result;
+          reader.readAsDataURL(file);
         }
-    });
+      });
+    }
+  });
 </script>
-<!-- Add any additional CSS styles here -->
-<style>
-    .container {
-        display: flex;
-        align-items: flex-start;
-        margin: 20px;
-    }
-
-    .image {
-        max-width: 100%;
-        height: auto;
-        border-radius: 0.75rem;
-    }
-
-    .mb-4 {
-        margin-bottom: 1rem;
-    }
-
-    .text-3xl {
-        font-size: 1.875rem;
-    }
-</style>
+{% endblock %}
