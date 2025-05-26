@@ -14,7 +14,7 @@
     }
 </style>
 <div class="container" style="align-items: flex-start; display: flex; margin: 20px">
-    <img src="{{ item.image.url }}" alt="{{ item.name }}" class="image" style="max-width: 40%; margin-right: 20px">
+    <img src="{% if item.image %}{{ item.image.url }}{% else %}/media/no_image.jpg{% endif %}" alt="{{ item.name }}" class="image" style="max-width: 40%; margin-right: 20px">
     <div class="text" style="width: 80%; overflow-wrap: break-word;word-wrap: break-word;">
         <h1 class="mb-6 text-3xl"><b>{{ item.brands }}</b></h1>
         <p class="mb-6 text-3xl" style="overflow-wrap: break-word;word-wrap: break-word; color: #444444;
