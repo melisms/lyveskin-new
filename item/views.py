@@ -142,7 +142,7 @@ def comparison_page(request, item_id1, item_id2):
         'item2_safe_count': item2_safe_count,
         'item2_risky_count': item2_risky_count,
     })
-
+@login_required
 def edit_item(request, item_id):
     item = get_object_or_404(Item, pk=item_id)
 
@@ -164,3 +164,12 @@ def edit_item(request, item_id):
         form = NewItemForm(instance=item)
 
     return render(request, 'item/edit_item.html', {'form': form, 'item': item})
+@login_required
+def remove_item(request, pk):
+    item = get_object_or_404(Item, pk=pk)
+    if request.method == 'POST':
+        item.delete()
+        clear_cache_for_browse()
+        messages.success(request, 'Item deleted successfully!')
+        return redirect('item:browse')
+    return render(request, 'item/remove_item.html', {'item': item})

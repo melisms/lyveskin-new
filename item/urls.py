@@ -13,5 +13,5 @@ urlpatterns = [
     path('compare/', views.compare_items, name='compare_items'),
     path('comparison/<int:item_id1>/<int:item_id2>/', views.comparison_page, name='comparison_page'),
     path('compare/<int:category_id>/', views.compare_items, name='compare_items'),
-
+    path('<int:pk>/delete/', views.remove_item, name='remove_item'),
 ]
