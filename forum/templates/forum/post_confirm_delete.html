@@ -1,16 +1,84 @@
 {% extends "forum/baseforum.html" %}
 {% block content %}
-    <div class="content-section">
-        <form method="POST">
-            {% csrf_token %}
-            <fieldset class="form-group">
-                <legend class="border-bottom mb-4">Delete Post</legend>
-                <h2>Are you sure you want to delete the post "{{ object.title }}"</h2>
-            </fieldset>
-            <div class="form-group">
-                <button class="btn btn-outline-danger" type="submit">Yes, Delete</button>
-                <a class="btn btn-outline-secondary" href="{% url 'forum:post-detail' object.id %}">Cancel</a>
-            </div>
-        </form>
+<style>
+  .content-section {
+    max-width: 480px;
+    margin: 4rem auto;
+    background: #fff;
+    padding: 2.25rem 2.5rem;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(64, 130, 109, 0.15);
+    text-align: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  fieldset {
+    border: none;
+    margin-bottom: 2.5rem;
+  }
+  legend {
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: #DC3545; /* Bootstrap danger red */
+    border-bottom: 3px solid #f8d7da;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  h2 {
+    font-weight: 600;
+    font-size: 1.3rem;
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 2.5rem;
+  }
+  .btn {
+    font-weight: 600;
+    padding: 0.55rem 2.3rem;
+    font-size: 1.1rem;
+    border-radius: 12px;
+    border: 2.5px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 140px;
+  }
+  .btn-outline-danger {
+    color: #DC3545;
+    border-color: #DC3545;
+    background: transparent;
+  }
+  .btn-outline-danger:hover {
+    background-color: #DC3545;
+    color: white;
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+  }
+  .btn-outline-secondary {
+    color: #6c757d;
+    border-color: #6c757d;
+    background: transparent;
+    margin-left: 1rem;
+  }
+  .btn-outline-secondary:hover {
+    background-color: #6c757d;
+    color: white;
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
+  }
+  .form-group {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+  }
+</style>
+
+<div class="content-section">
+  <form method="POST">
+    {% csrf_token %}
+    <fieldset>
+      <legend>Delete Post</legend>
+      <h2>Are you sure you want to delete <br><em>"{{ object.title }}"</em>?</h2>
+    </fieldset>
+    <div class="form-group">
+      <button class="btn btn-outline-danger" type="submit">Yes, Delete</button>
+      <a class="btn btn-outline-secondary" href="{% url 'forum:post-detail' object.id %}">Cancel</a>
     </div>
+  </form>
+</div>
 {% endblock content %}

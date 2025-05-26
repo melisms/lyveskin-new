@@ -1,126 +1,204 @@
 {% extends 'lyve/base.html' %}
 {% block content %}
 
-<h1 style="text-align: center; margin-right: 380px">Comparison Results</h1>
-    <p style="text-align: center; margin-right: 380px; font-size: 20px"><b>Category:</b> {{ category }}</p>
-    <div class="container mt-6">
-        <div class="row">
-            <div>
-                <img src="{{ item1.image.url }}" alt="ItemImage" class="rounded-t-xl" style="width: 300px; height: auto; border: 1px solid black;">
-                <p style="width: 300px; overflow-wrap: break-word;word-wrap: break-word;"><b>{{ item1 }}</b></p>
-                <p><b><span style="color: green;">Safe</span> Ingredients:</b> {{ item1_safe_count }}</p>
-                <p><b><span style="color: darkred;">Risky</span> Ingredients:</b> {{ item1_risky_count }}</p>
-                <p class="mb-6 text-3xl" style="width: 300px; overflow-wrap: break-word;word-wrap: break-word;"><b>Ingredients:</b>
+<style>
+  .comparison-container {
+    max-width: 960px;
+    margin: 2rem auto;
+    padding: 1rem;
+  }
+  h1, p.category {
+    text-align: center;
+    color: #2c3e50;
+  }
+  p.category {
+    font-size: 1.25rem;
+    margin-top: 0.5rem;
+    font-weight: 600;
+  }
+  .items-row {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+  .item-card {
+    background: #f9fafb;
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(64, 130, 109, 0.12);
+    padding: 1.5rem;
+    flex: 1 1 320px;
+    max-width: 350px;
+    text-align: center;
+  }
+  .item-image {
+    max-width: 100%;
+    height: auto;
+    border: 1.5px solid #40826d;
+    border-radius: 14px 14px 0 0;
+    margin-bottom: 1rem;
+    object-fit: contain;
+  }
+  .item-name {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #244a3a;
+    margin-bottom: 1rem;
+    word-wrap: break-word;
+  }
+  .ingredient-stats b {
+    font-weight: 700;
+  }
+  .ingredient-stats span.safe {
+    color: #4caf50;
+  }
+  .ingredient-stats span.risky {
+    color: #f44336;
+  }
+  .ingredients-list {
+    margin-top: 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+  .ingredients-list span {
+    font-weight: 600;
+    margin-right: 0.25rem;
+  }
+  .ingredients-list span.safe {
+    color: #4caf50;
+  }
+  .ingredients-list span.risky {
+    color: #f44336;
+  }
+  .health-score {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #2c3e50;
+  }
+  canvas {
+    max-width: 280px;
+    margin: 0 auto;
+    display: block;
+  }
+  @media (max-width: 768px) {
+    .items-row {
+      flex-direction: column;
+      align-items: center;
+    }
+    .item-card {
+      max-width: 90%;
+    }
+  }
+</style>
+
+<div class="comparison-container">
+    <h1>Comparison Results</h1>
+    <p class="category"><b>Category:</b> {{ category }}</p>
+
+    <div class="items-row">
+        <!-- Item 1 -->
+        <div class="item-card">
+            <img src="{{ item1.image.url }}" alt="{{ item1 }}" class="item-image" />
+            <p class="item-name">{{ item1 }}</p>
+
+            <p class="ingredient-stats">
+                <b><span class="safe">Safe</span> Ingredients:</b> {{ item1_safe_count }}<br>
+                <b><span class="risky">Risky</span> Ingredients:</b> {{ item1_risky_count }}
+            </p>
+
+            <p class="ingredients-list">
+                <b>Ingredients:</b>
                 {% for ingredient in item1.ingredients.all %}
-                 <span style="{% if ingredient.safety == 'S' %} color: green; font-weight: bold; {% elif ingredient.safety == 'R' %} color: darkred; font-weight: bold; {% else %} color: black; {% endif %}">{{ ingredient.name }}</span>{% if not forloop.last %}, {% endif %}
+                    <span class="{% if ingredient.safety == 'S' %}safe{% elif ingredient.safety == 'R' %}risky{% endif %}">{{ ingredient.name }}</span>{% if not forloop.last %}, {% endif %}
                 {% endfor %}
-                </p>
-                <h3 id="healthScoreItem1" class="mb-6 text-3xl">Health Score: {{ item1_health_score }}/100</h3>
-                <canvas id="healthChart1" width="300" height="300"></canvas>
-            </div>
-            <div class="ml-6" style="margin-left: 100px">
-                <img src="{{ item2.image.url }}" alt="ItemImage" class="rounded-t-xl" style="width: 300px; height: auto;border: 1px solid black;">
-                <p style="width: 300px; overflow-wrap: break-word;word-wrap: break-word;"><b>{{ item2 }}</b></p>
-                <p><b><span style="color: green;">Safe</span> Ingredients:</b> {{ item2_safe_count }}</p>
-                <p><b><span style="color: darkred;">Risky</span> Ingredients:</b> {{ item2_risky_count }}</p>
-                <p class="mb-6 text-3xl" style="width: 300px; overflow-wrap: break-word;word-wrap: break-word;"><b>Ingredients:</b>
+            </p>
+
+            <h3 class="health-score" id="healthScoreItem1">Health Score: {{ item1_health_score }}/100</h3>
+            <canvas id="healthChart1" width="280" height="280"></canvas>
+        </div>
+
+        <!-- Item 2 -->
+        <div class="item-card">
+            <img src="{{ item2.image.url }}" alt="{{ item2 }}" class="item-image" />
+            <p class="item-name">{{ item2 }}</p>
+
+            <p class="ingredient-stats">
+                <b><span class="safe">Safe</span> Ingredients:</b> {{ item2_safe_count }}<br>
+                <b><span class="risky">Risky</span> Ingredients:</b> {{ item2_risky_count }}
+            </p>
+
+            <p class="ingredients-list">
+                <b>Ingredients:</b>
                 {% for ingredient in item2.ingredients.all %}
-                 <span style="{% if ingredient.safety == 'S' %} color: green; font-weight: bold; {% elif ingredient.safety == 'R' %} color: darkred; font-weight: bold; {% else %} color: black; {% endif %}">{{ ingredient.name }}</span>{% if not forloop.last %}, {% endif %}
+                    <span class="{% if ingredient.safety == 'S' %}safe{% elif ingredient.safety == 'R' %}risky{% endif %}">{{ ingredient.name }}</span>{% if not forloop.last %}, {% endif %}
                 {% endfor %}
-                </p>
-                <h3 id="healthScoreItem2" class="mb-6 text-3xl">Health Score: {{ item2_health_score }}/100</h3>
-                <canvas id="healthChart2" width="300" height="300"></canvas>
-            </div>
+            </p>
+
+            <h3 class="health-score" id="healthScoreItem2">Health Score: {{ item2_health_score }}/100</h3>
+            <canvas id="healthChart2" width="280" height="280"></canvas>
         </div>
     </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    var item1SafeCount = {{ item1_safe_count }};
-    var item1RiskyCount = {{ item1_risky_count }};
-    var item2SafeCount = {{ item2_safe_count }};
-    var item2RiskyCount = {{ item2_risky_count }};
+    const item1SafeCount = {{ item1_safe_count }};
+    const item1RiskyCount = {{ item1_risky_count }};
+    const item2SafeCount = {{ item2_safe_count }};
+    const item2RiskyCount = {{ item2_risky_count }};
 
     function calculateHealthScore(safeCount, riskyCount) {
-        var totalCount = safeCount + riskyCount;
-
-        if (totalCount === 0) {
-            return 100; // No ingredients, perfect score
-        }
-
-        var riskyPercentage = (riskyCount / totalCount) * 100;
-
-        if (riskyPercentage === 0) {
-            return 100; // No risky ingredients
-        } else if (riskyPercentage <= 20) {
-            return 80; // Low risk
-        } else if (riskyPercentage <= 50) {
-            return 60; // Moderate risk
-        } else {
-            return 40; // High risk
-        }
+        const totalCount = safeCount + riskyCount;
+        if (totalCount === 0) return 100;
+        return Math.round((safeCount / totalCount) * 100);
     }
 
-    var item1HealthScore = calculateHealthScore(item1SafeCount, item1RiskyCount);
-    var item2HealthScore = calculateHealthScore(item2SafeCount, item2RiskyCount);
-    document.getElementById('healthScoreItem1').innerText = "Health Score: " + item1HealthScore + "/100";
-    document.getElementById('healthScoreItem2').innerText = "Health Score: " + item2HealthScore + "/100";
-    // Chart for Item 1
-    var ctx1 = document.getElementById('healthChart1').getContext('2d');
-    var healthChart1 = new Chart(ctx1, {
+    const item1HealthScore = calculateHealthScore(item1SafeCount, item1RiskyCount);
+    const item2HealthScore = calculateHealthScore(item2SafeCount, item2RiskyCount);
+
+    document.getElementById('healthScoreItem1').innerText = `Health Score: ${item1HealthScore}/100`;
+    document.getElementById('healthScoreItem2').innerText = `Health Score: ${item2HealthScore}/100`;
+
+    // Chart config shared
+    const chartOptions = {
+        cutout: '70%',
+        plugins: { legend: { position: 'bottom' } }
+    };
+
+    // Item 1 Chart
+    const ctx1 = document.getElementById('healthChart1').getContext('2d');
+    new Chart(ctx1, {
         type: 'doughnut',
         data: {
             labels: ['Safe Ingredients', 'Risky Ingredients'],
             datasets: [{
                 label: 'Ingredient Safety',
-                data: [{{ item1_safe_count }}, {{ item1_risky_count }}],
+                data: [item1SafeCount, item1RiskyCount],
                 backgroundColor: ['#4CAF50', '#F44336'],
                 hoverOffset: 4
             }]
         },
-        options: {
-            cutout: '70%',
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                }
-            }
-        }
+        options: chartOptions
     });
 
-    // Chart for Item 2
-    var ctx2 = document.getElementById('healthChart2').getContext('2d');
-    var healthChart2 = new Chart(ctx2, {
+    // Item 2 Chart
+    const ctx2 = document.getElementById('healthChart2').getContext('2d');
+    new Chart(ctx2, {
         type: 'doughnut',
         data: {
             labels: ['Safe Ingredients', 'Risky Ingredients'],
             datasets: [{
                 label: 'Ingredient Safety',
-                data: [{{ item2_safe_count }}, {{ item2_risky_count }}],
+                data: [item2SafeCount, item2RiskyCount],
                 backgroundColor: ['#4CAF50', '#F44336'],
                 hoverOffset: 4
             }]
         },
-        options: {
-            cutout: '70%',
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                }
-            }
-        }
+        options: chartOptions
     });
 </script>
-{% endblock %}
 
-<style>
-    .ingredient-container {
-        display: flex;
-        flex-wrap: wrap;
-    }
-    .ingredient-item {
-        border: 1px solid black;
-        padding: 5px;
-        margin: 5px;
-        flex-grow: 1;
-    }
-</style>
+{% endblock %}

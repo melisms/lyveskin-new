@@ -1,16 +1,55 @@
 {% extends "forum/baseforum.html" %}
 {% load crispy_forms_tags %}
 {% block content %}
-    <div class="content-section">
-        <form method="POST">
-            {% csrf_token %}
-            <fieldset class="form-group">
-                <legend class="border-bottom mb-4">Blog Post</legend>
-                {{ form|crispy }}
-            </fieldset>
-            <div class="form-group">
-                <button class="btn btn-outline-info" type="submit">Post</button>
-            </div>
-        </form>
-    </div>
+<style>
+  .content-section {
+    max-width: 600px;
+    margin: 2.5rem auto;
+    background: #fff;
+    padding: 2rem 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(64, 130, 109, 0.15);
+  }
+  fieldset {
+    border: none;
+    margin-bottom: 2rem;
+  }
+  legend {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #40826D;
+    border-bottom: 2px solid #9FE2BF;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .btn-outline-info {
+    display: inline-block;
+    background-color: transparent;
+    border: 2px solid #40826D;
+    color: #40826D;
+    padding: 0.6rem 2.2rem;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.1rem;
+  }
+  .btn-outline-info:hover {
+    background-color: #40826D;
+    color: #fff;
+  }
+</style>
+
+<div class="content-section">
+    <form method="POST" novalidate>
+        {% csrf_token %}
+        <fieldset>
+            <legend>Forum Post</legend>
+            {{ form|crispy }}
+        </fieldset>
+        <div class="form-group">
+            <button class="btn btn-outline-info" type="submit">Post</button>
+        </div>
+    </form>
+</div>
 {% endblock content %}

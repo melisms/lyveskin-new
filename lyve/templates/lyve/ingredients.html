@@ -1,96 +1,332 @@
 {% extends 'lyve/base.html' %}
 
-{% block title %}Ingredients{% endblock %}
+{% block title %}Ingredients | Lyve Skin{% endblock %}
 
 {% block content %}
-    <div class="mt-4 px-4 py-8 bg-gray-100 rounded-xl">
-        <h2 class="mb-12 text-2xl text-center">Ingredients</h2>
-        <p class="text-center">Here are the ingredients. Risky and chemical ingredients showed by &#129514;. Neutral ingredients showed by &#128528;. Safe and natural ingredients showed by &#127807;. <br>To learn more, you can check out <a href="/labeling" style="color: #40826D">labeling system</a></p>
-
-        <!-- Alphabet Navigation -->
-        <div class="flex justify-center mb-4">
-            {% for char in '123456ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}
-                <a href="{% url 'lyve:ingredients' letter=char %}" class="text-black" style="color: black; font-weight: bold; border-radius: 50%; background-color: #ffffff;align-items: center;justify-content: center;margin-left: 0.28rem; margin-right: 0.28rem;padding-left: 0.5rem; padding-right: 0.5rem; border: 0.1px solid black; font-size: 18px; padding-top: 0.25rem; padding-bottom: 0.25rem;">{{ char }}</a>
-            {% endfor %}
-        </div>
-
-        <!-- Ingredients Display -->
-        <div class="ingredient-container" style="width: 100%; overflow: hidden">
-            {% for ingredient in ingredients %}
-                <div class="ingredient-item" style="width: 50%; float: left; box-sizing: border-box; padding: 0 15px; margin-bottom: 3px">
-                    <div class="p-6 bg-white rounded">
-                        <h6 class="text-2xl">{{ ingredient.name }}
-                            {% if ingredient.safety == 'S' %}
-                                &#127807;
-                            {% elif ingredient.safety == 'R' %}
-                                &#129514;
-                            {% else %}
-                                &#128528;
-                            {% endif %}
-                        </h6>
-                    </div>
-                </div>
-            {% empty %}
-                <p class="text-center">No ingredients found.</p>
-            {% endfor %}
-        </div>
-
-        <!-- Pagination Controls -->
-        <div class="pagination mt-4">
-            <span class="step-links">
-                {% if is_paginated %}
-                    {% if page_obj.has_previous %}
-                        <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
-                        <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.previous_page_number }}">Previous</a>
-                    {% endif %}
-                    {% for num in page_obj.paginator.page_range %}
-                        {% if page_obj.number == num %}
-                            <a class="btn btn-info mb-4" href="?page={{ num }}">{{ num }}</a>
-                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                            <a class="btn btn-outline-info mb-4" href="?page={{ num }}">{{ num }}</a>
-                        {% endif %}
-                    {% endfor %}
-                    {% if page_obj.has_next %}
-                        <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.next_page_number }}">Next</a>
-                        <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
-                    {% endif %}
-                {% endif %}
-            </span>
-        </div>
-    </div>
-{% endblock %}
-
 <style>
-    .ingredient-container {
-        width: 100%;
-        overflow: hidden;
+    :root {
+        --primary: #40826D;
+        --primary-light: #9FE2BF;
+        --primary-dark: #244A3A;
+        --safe: #4caf50;
+        --neutral: #f9a825;
+        --risky: #f43665;
     }
-
-    .ingredient-item {
-        width: 50%;
-        box-sizing: border-box;
-        float: left;
-        padding: 0 15px;
-        margin-bottom: 20px;
+    
+    .ingredients-header {
+        background-color: #f5f5f5;
+        padding: 2rem 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        text-align: center;
     }
-
-    .pagination {
-        margin-top: 20px;
+    
+    .ingredients-title {
+        font-size: 2rem;
+        font-weight: 600;
+        color: var(--primary);
+        margin-bottom: 0.75rem;
+    }
+    
+    .ingredients-subtitle {
+        font-size: 1rem;
+        color: #555;
+        max-width: 700px;
+        margin: 0 auto 1rem;
+    }
+    
+    .legend-container {
         display: flex;
         justify-content: center;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        margin: 1rem 0;
     }
-
-    .pagination .step-links {
+    
+    .legend-item {
         display: flex;
-        gap: 10px;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
     }
-
-    .pagination a {
+    
+    .legend-icon {
+        font-size: 1.2rem;
+    }
+    
+    .legend-safe { color: var(--safe); }
+    .legend-neutral { color: var(--neutral); }
+    .legend-risky { color: var(--risky); }
+    
+    .alphabet-nav {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.4rem;
+        margin: 1rem 0;
+        padding: 0.75rem;
+        background-color: #f5f5f5;
+        border-radius: 8px;
+    }
+    
+    .alpha-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 4px;
+        font-weight: 500;
+        font-size: 0.9rem;
+        color: #333;
         text-decoration: none;
-        color: #007bff;
+        background-color: white;
+        transition: all 0.2s ease;
     }
-
-    .pagination .current {
-        font-weight: bold;
+    
+    .alpha-link:hover {
+        background-color: var(--primary-light);
+        color: var(--primary-dark);
+    }
+    
+    .alpha-link.active {
+        background-color: var(--primary);
+        color: white;
+    }
+    
+    .ingredients-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.5rem;
+        margin: 1.5rem 0;
+    }
+    
+    .ingredient-card {
+        background-color: white;
+        border-radius: 6px;
+        border: 1px solid #eee;
+        padding: 1.25rem;
+        transition: background-color 0.2s ease;
+        min-height: 80px;
+        word-break: break-word;
+        overflow-wrap: break-word;
+}
+    
+    .ingredient-card:hover {
+        background-color: #f9f9f9;
+    }
+    
+    .ingredient-name {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        color: #333;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        line-height: 1.4;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        white-space: normal;
+    }
+    
+    .ingredient-name .icon {
+        font-size: 1.3rem;
+    }
+    
+    .ingredient-info {
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: 0.5rem;
+    }
+    
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        margin: 1.5rem 0;
+    }
+    
+    .pagination {
+        display: flex;
+        gap: 0.3rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    
+    .page-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 32px;
+        height: 32px;
+        padding: 0 0.6rem;
+        border-radius: 4px;
+        font-weight: 500;
+        font-size: 0.85rem;
+        text-decoration: none;
+        background-color: #f5f5f5;
+        color: #555;
+    }
+    
+    .page-btn:hover {
+        background-color: #e0e0e0;
+    }
+    
+    .page-btn.active {
+        background-color: var(--primary);
+        color: white;
+    }
+    
+    .page-btn.nav-btn {
+        font-weight: 600;
+        color: var(--primary);
+    }
+    
+    .badge {
+        display: inline-block;
+        padding: 0.15rem 0.4rem;
+        border-radius: 3px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: #333;
+        background-color: white;
+        border: 1px solid #ddd;
+    }
+    
+    .badge-safe,
+    .badge-neutral,
+    .badge-risky {
+        background-color: white;
+    }
+    
+    .labeling-btn {
+        background-color: white;
+        color: var(--primary);
+        border: 1px solid var(--primary);
+        padding: 0.4rem 0.8rem;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+    
+    .labeling-btn:hover {
+        background-color: var(--primary);
+        color: white;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 2rem 1rem;
+        color: #666;
+        font-size: 1rem;
+    }
+    
+    @media (max-width: 768px) {
+        .ingredients-title {
+            font-size: 1.75rem;
+        }
+        
+        .ingredients-grid {
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        }
     }
 </style>
+
+<div class="container mt-4 mb-5">
+    <!-- Header Section -->
+    <div class="ingredients-header">
+        <h1 class="ingredients-title">Ingredients</h1>
+        <p class="ingredients-subtitle">Browse our database of skincare ingredients and their safety ratings.</p>
+        
+        <!-- Ingredient Legend -->
+        <div class="legend-container">
+            <div class="legend-item">
+                <span class="legend-icon legend-safe">&#127807;</span>
+                <span>Safe</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-icon legend-neutral">&#128528;</span>
+                <span>Neutral</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-icon legend-risky">&#127812;</span>
+                <span>Risky</span>
+            </div>
+        </div>
+        
+        <div class="mt-3">
+            <a href="/labeling" class="labeling-btn">
+                <i class="fas fa-info-circle"></i> Labeling System
+            </a>
+        </div>
+    </div>
+    
+    <!-- Alphabet Navigation -->
+    <div class="alphabet-nav">
+        {% for char in '123456ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}
+            <a href="{% url 'lyve:ingredients' letter=char %}" class="alpha-link {% if request.GET.letter == char %}active{% endif %}">{{ char }}</a>
+        {% endfor %}
+    </div>
+    
+    <!-- Ingredients Display -->
+    <div class="ingredients-grid">
+        {% for ingredient in ingredients %}
+            <div class="ingredient-card">
+                <h3 class="ingredient-name">
+                    {{ ingredient.name }}
+                    {% if ingredient.safety == 'S' %}
+                        <span class="icon legend-safe">&#127807;</span>
+                    {% elif ingredient.safety == 'R' %}
+                        <span class="icon legend-risky">&#127812;</span>
+                    {% else %}
+                        <span class="icon legend-neutral">&#128528;</span>
+                    {% endif %}
+                </h3>
+                <div class="ingredient-info">
+                    <span class="badge badge-{% if ingredient.safety == 'S' %}safe{% elif ingredient.safety == 'R' %}risky{% else %}neutral{% endif %}">
+                        {% if ingredient.safety == 'S' %}Safe{% elif ingredient.safety == 'R' %}Risky{% else %}Neutral{% endif %}
+                    </span>
+                </div>
+            </div>
+        {% empty %}
+            <div class="empty-state">
+                <p>No ingredients found for this letter. Try another letter.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination Controls -->
+    {% if is_paginated %}
+    <div class="pagination-container">
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a class="page-btn nav-btn" href="?{% if request.GET.letter %}letter={{ request.GET.letter }}&{% endif %}page=1" title="First Page">
+                    <i class="fas fa-angle-double-left"></i>
+                </a>
+                <a class="page-btn nav-btn" href="?{% if request.GET.letter %}letter={{ request.GET.letter }}&{% endif %}page={{ page_obj.previous_page_number }}" title="Previous Page">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+            {% endif %}
+            
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <a class="page-btn active" href="?{% if request.GET.letter %}letter={{ request.GET.letter }}&{% endif %}page={{ num }}">{{ num }}</a>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a class="page-btn" href="?{% if request.GET.letter %}letter={{ request.GET.letter }}&{% endif %}page={{ num }}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+                <a class="page-btn nav-btn" href="?{% if request.GET.letter %}letter={{ request.GET.letter }}&{% endif %}page={{ page_obj.next_page_number }}" title="Next Page">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+                <a class="page-btn nav-btn" href="?{% if request.GET.letter %}letter={{ request.GET.letter }}&{% endif %}page={{ page_obj.paginator.num_pages }}" title="Last Page">
+                    <i class="fas fa-angle-double-right"></i>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

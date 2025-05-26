@@ -3,21 +3,102 @@
 {% load crispy_forms_tags %}
 
 {% block content%}
-    <div class="content-section">
-        <form method="POST">
-            {% csrf_token %}
-            <fieldset class="form-group">
-                <legend class="border-bottom mb-4">Join Today</legend>
-                {{ form|crispy }}
-            </fieldset>
-            <div class="form-group">
-                <button class="btn btn-outline-info" type="submit">Sign Up</button>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="auth-card">
+                <div class="auth-header">
+                    <h2 class="text-center mb-4">Create Your Account</h2>
+                </div>
+                <div class="auth-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <div class="form-group mt-4">
+                            <button class="auth-button" type="submit">
+                                <i class="fas fa-user-plus mr-2"></i> Sign Up
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="auth-footer">
+                    <p class="text-center mb-0">
+                        Already have an account? <a href="{% url 'login' %}" class="auth-link">Log In</a>
+                    </p>
+                </div>
             </div>
-        </form>
-        <div class="border-top pt-3">
-            <small class="text-muted">
-                Already Have An Account? <a class="ml-2" href="{%  url 'login' %}">Sign In</a>
-            </small>
         </div>
     </div>
+</div>
+
+<style>
+    .auth-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+    
+    .auth-header {
+        padding: 1.5rem;
+        background:  #40826D;
+        color: white;
+    }
+    
+    .auth-body {
+        padding: 2rem;
+    }
+    
+    .auth-footer {
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-top: 1px solid #eee;
+    }
+    
+    .auth-button {
+        width: 100%;
+        background-color: #40826D;
+        color: white;
+        border: none;
+        padding: 0.75rem;
+        border-radius: 5px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .auth-button:hover {
+        background-color: #244A3A;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .auth-link {
+        color: #40826D;
+        font-weight: 500;
+        transition: color 0.2s ease;
+    }
+    
+    .auth-link:hover {
+        color: #244A3A;
+        text-decoration: none;
+    }
+    
+    .form-group label {
+        font-weight: 500;
+        color: #444;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+        border-color: #9FE2BF;
+        box-shadow: 0 0 0 3px rgba(159, 226, 191, 0.25);
+    }
+</style>
 {% endblock %}

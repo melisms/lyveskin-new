@@ -1,21 +1,93 @@
 {% extends 'lyve/base.html' %}
 
 {% block content %}
-<div class="form-container" style="width: 80%">
-    <form method="post" id="categoryForm">
+<style>
+  .form-container {
+    max-width: 720px;
+    margin: 3rem auto;
+    background: #fff;
+    padding: 2.5rem 2rem;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(64, 130, 109, 0.15);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  label.form-label {
+    font-weight: 600;
+    color: #40826D;
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+  }
+  .mb-4 {
+    margin-bottom: 1.5rem !important;
+  }
+  .text-center {
+    text-align: center !important;
+  }
+  .row {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  .col-md-4 {
+    flex: 0 0 45%;
+    max-width: 45%;
+    text-align: center;
+  }
+  input, select {
+    width: 100%;
+    padding: 0.45rem 0.6rem;
+    border-radius: 8px;
+    border: 1.8px solid #b5d1c0;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+  }
+  input:focus, select:focus {
+    outline: none;
+    border-color: #40826D;
+    box-shadow: 0 0 8px #9FE2BF;
+  }
+  button.btn-success {
+    background-color: #40826D;
+    border-color: #40826D;
+    color: white;
+    font-weight: 700;
+    padding: 0.6rem 2.5rem;
+    font-size: 1.15rem;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+  }
+  button.btn-success:hover {
+    background-color: #9FE2BF;
+    border-color: #9FE2BF;
+    color: #244A3A;
+  }
+  @media (max-width: 576px) {
+    .col-md-4 {
+      flex: 0 0 100%;
+      max-width: 100%;
+      margin-bottom: 1.2rem;
+    }
+  }
+</style>
+
+<div class="form-container">
+    <form method="post" id="categoryForm" novalidate>
         {% csrf_token %}
         <div class="mb-4 text-center">
-            <label class="form-label">{{ form.category.label }}</label>
+            <label class="form-label" for="{{ form.category.id_for_label }}">{{ form.category.label }}</label>
             {{ form.category }}
         </div>
 
-        <div class="row justify-content-center mb-4">
-            <div class="col-md-4 text-center">
-                <label class="form-label">{{ form.item1.label }}</label>
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <label class="form-label" for="{{ form.item1.id_for_label }}">{{ form.item1.label }}</label>
                 {{ form.item1 }}
             </div>
-            <div class="col-md-4 text-center">
-                <label class="form-label">{{ form.item2.label }}</label>
+            <div class="col-md-4">
+                <label class="form-label" for="{{ form.item2.id_for_label }}">{{ form.item2.label }}</label>
                 {{ form.item2 }}
             </div>
         </div>
@@ -27,13 +99,13 @@
 </div>
 
 <script>
-    // Find the category select element
-    const categorySelect = document.getElementById("id_category");  // Django automatically sets id like 'id_FIELDNAME'
+  document.addEventListener('DOMContentLoaded', () => {
+    const categorySelect = document.getElementById("id_category");
     const form = document.getElementById("categoryForm");
 
-    // Listen for changes
-    categorySelect.addEventListener('change', function() {
-        form.submit(); // Auto-submit the form
-    });
+    if (categorySelect && form) {
+      categorySelect.addEventListener('change', () => form.submit());
+    }
+  });
 </script>
 {% endblock %}

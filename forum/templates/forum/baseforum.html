@@ -75,5 +75,120 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <!-- CSRF token'ı meta ile ekliyoruz -->
+<meta name="csrf-token" content="{{ csrf_token }}">
+
+<!-- Chat Toggle Button -->
+<button id="chat-toggle" style="
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #40826D;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  font-size: 28px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  z-index: 10000;
+" onmouseover="this.style.backgroundColor='#9FE2BF';" onmouseout="this.style.backgroundColor='#40826D';">💬</button>
+
+<!-- Chat Box -->
+<div id="chat-box" style="
+  position: fixed; 
+  bottom: 90px; 
+  right: 20px; 
+  width: 320px; 
+  height: 450px; 
+  background: #f9f9f9; 
+  border-radius: 16px; 
+  padding: 10px; 
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15); 
+  display: none; /* Başlangıçta gizli */
+  flex-direction: column; 
+  overflow: hidden;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  z-index: 9999;
+">
+  <div id="messages" style="flex: 1; overflow-y: auto; padding: 10px;"></div>
+  <input id="user-input" type="text" placeholder="Ask a Question." style="
+    border: none; 
+    border-top: 1px solid #ccc; 
+    padding: 12px; 
+    font-size: 14px; 
+    outline: none;
+  ">
+</div>
+
+<script>
+
+  const csrftoken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+  
+  const chatToggle = document.getElementById('chat-toggle');
+  const chatBox = document.getElementById('chat-box');
+
+  chatToggle.addEventListener('click', function() {
+    if (chatBox.style.display === 'none') {
+      chatBox.style.display = 'flex';
+    } else {
+      chatBox.style.display = 'none';
+    }
+  });
+
+
+  document.getElementById('user-input').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+      const input = e.target.value;
+      if (input.trim() === '') return;
+
+      e.target.value = ''; 
+
+      const messageBox = document.getElementById('messages');
+      const userMessage = document.createElement('div');
+      userMessage.innerHTML = '<b>You:</b> ';
+      const userText = document.createElement('span');
+      userText.textContent = input;
+      userMessage.appendChild(userText);
+      messageBox.appendChild(userMessage);
+      fetch('/ask/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(csrftoken && { 'X-CSRFToken': csrftoken })
+        },
+        body: JSON.stringify({ question: input })
+      })
+      .then(response => response.json())
+      .then(data => {
+        const assistantMessage = document.createElement('div');
+        assistantMessage.innerHTML = '<b>Assistant:</b> ';
+        const assistantText = document.createElement('span');
+        assistantText.textContent = data.answer;
+        assistantMessage.appendChild(assistantText);
+        messageBox.appendChild(assistantMessage);
+        messageBox.scrollTop = messageBox.scrollHeight;
+
+        if (data.redirect) {
+          setTimeout(() => {
+            window.location.href = data.redirect;
+          }, 2000); // wait 2 seconds before redirect
+        }
+      })
+      .catch(error => {
+        const errorMessage = document.createElement('div');
+        errorMessage.innerHTML = '<b>Fault:</b> ';
+        const errorText = document.createElement('span');
+        errorText.textContent = error;
+        errorMessage.appendChild(errorText);
+        messageBox.appendChild(errorMessage);
+        messageBox.scrollTop = messageBox.scrollHeight;
+      });
+    }
+  });
+</script>
 </body>
 </html>

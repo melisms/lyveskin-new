@@ -3,79 +3,229 @@
 
 {% block content %}
 <style>
-    .custom-settings-button {
-        background-color: #40826D;
-        border-radius: 10px;
-        padding: 6px 16px;
-        transition: background-color 0.3s ease-in-out;
-    }
-
-    .custom-settings-button:hover {
-        background-color: #1e3b31; /* slightly darker green for hover */
-    }
+  .settings-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .settings-title {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #40826D;
+  }
+  
+  .settings-panel {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    overflow: hidden;
+  }
+  
+  .panel-header {
+    padding: 12px 15px;
+    background-color: #f5f5f5;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .panel-title {
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .panel-icon {
+    transition: transform 0.3s;
+  }
+  
+  .panel-icon.open {
+    transform: rotate(90deg);
+  }
+  
+  .panel-content {
+    padding: 15px;
+    display: none;
+  }
+  
+  .panel-content.active {
+    display: block;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+  
+  .form-input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+  
+  .btn {
+    background-color: #40826D;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .btn:hover {
+    background-color: #346957;
+  }
+  
+  .profile-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 60px;
+    object-fit: cover;
+    margin: 0 auto 15px;
+    display: block;
+    border: 3px solid #eee;
+  }
+  
+  .text-center {
+    text-align: center;
+  }
+  
+  .text-small {
+    font-size: 0.8rem;
+    color: #777;
+  }
 </style>
 
-<div class="container mx-auto p-4">
-    <h1 class="text-2xl font-bold mb-6">Welcome, {{ user_profile.username|capfirst }}</h1>
-    <div class="flex justify-center mt-10">
-        <a href="{% url 'settings_page' %}" class="bg-gray-700 text-white py-2 px-6 rounded-lg hover:bg-gray-800 transition">
-            Settings
-        </a>
-    </div>
+<div class="settings-container">
+  <h1 class="settings-title">Account Settings</h1>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
 
-<!-- Profile Picture Update -->
-<div class="bg-white p-6 rounded shadow">
-    <h2 class="text-xl font-semibold mb-4">Profile Picture</h2>
-    <div class="flex flex-col items-center">
-        <img id="profileImage" 
-             src="{% if user_profile.profile_picture.url %}{{ user_profile.profile_picture.url }}{% else %}https://via.placeholder.com/120{% endif %}" 
-             alt="Profile Picture" 
-             class="rounded-full border-2 border-gray-300 mb-4"
-             style="width: 150px; height: 150px; object-fit: cover;">
-        
-        <form method="POST" enctype="multipart/form-data" action="{% url 'update_settings' %}">
-            {% csrf_token %}
-            <input type="hidden" name="form_type" value="profile_picture">
-            <div class="mb-4">
-                <input type="file" name="profile_picture" accept="image/*" onchange="previewImage(event)" class="block w-full text-sm text-gray-500">
-            </div>
-            <button type="submit" class="nav-item nav-link text-white text-sm font-medium custom-settings-button">Update Photo</button>
-        </form>
-    </div>
-</div>
-
-<!-- Password Change -->
-<div class="bg-white p-6 rounded shadow">
-    <h2 class="text-xl font-semibold mb-4">Change Password</h2>
-    
+<div class="settings-panel">
+  <div class="panel-header" onclick="togglePanel('username-panel')">
+    <div class="panel-title">Username</div>
+    <div class="panel-icon" id="icon-username-panel">›</div>
+  </div>
+  <div class="panel-content" id="username-panel">
     <form method="POST" action="{% url 'update_settings' %}">
-        {% csrf_token %}
-        <input type="hidden" name="form_type" value="change_password">
-        <div class="mb-4">
-            <label class="block mb-2 font-semibold" for="current_password">Current Password</label>
-            <input type="password" id="current_password" name="current_password" class="border rounded w-full py-2 px-3" required>
-        </div>
-        <div class="mb-4">
-            <label class="block mb-2 font-semibold" for="new_password">New Password</label>
-            <input type="password" id="new_password" name="new_password" class="border rounded w-full py-2 px-3" required>
-        </div>
-        <div class="mb-4">
-            <label class="block mb-2 font-semibold" for="confirm_password">Confirm New Password</label>
-            <input type="password" id="confirm_password" name="confirm_password" class="border rounded w-full py-2 px-3" required>
-        </div>
-        <button type="submit" class="nav-item nav-link text-white text-sm font-medium custom-settings-button">Change Password</button>
+      {% csrf_token %}
+      <input type="hidden" name="form_type" value="change_username">
+      <div class="form-group">
+        <label class="form-label" for="username">Username</label>
+        <input class="form-input" type="text" name="username" id="username" value="{{ user.username }}" required>
+      </div>
+      <button type="submit" class="btn">Update</button>
     </form>
+  </div>
 </div>
 
-        
-        
+<div class="settings-panel">
+  <div class="panel-header" onclick="togglePanel('fullname-panel')">
+    <div class="panel-title">Personal Information</div>
+    <div class="panel-icon" id="icon-fullname-panel">›</div>
+  </div>
+  <div class="panel-content" id="fullname-panel">
+    <form method="POST" action="{% url 'update_settings' %}">
+      {% csrf_token %}
+      <input type="hidden" name="form_type" value="change_fullname">
+      <div class="form-group">
+        <label class="form-label" for="first_name">First Name</label>
+        <input class="form-input" type="text" name="first_name" id="first_name" value="{{ user.first_name }}" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="last_name">Last Name</label>
+        <input class="form-input" type="text" name="last_name" id="last_name" value="{{ user.last_name }}" required>
+      </div>
+      <button type="submit" class="btn">Update</button>
+    </form>
+  </div>
+</div>
 
+<div class="settings-panel">
+  <div class="panel-header" onclick="togglePanel('email-panel')">
+    <div class="panel-title">Email Address</div>
+    <div class="panel-icon" id="icon-email-panel">›</div>
+  </div>
+  <div class="panel-content" id="email-panel">
+    <form method="POST" action="{% url 'update_settings' %}">
+      {% csrf_token %}
+      <input type="hidden" name="form_type" value="change_email">
+      <div class="form-group">
+        <label class="form-label" for="email">Email</label>
+        <input class="form-input" type="email" id="email" name="email" value="{{ user.email }}" required>
+        {% if not email_verified %}
+          <div class="text-small">
+            Not verified — 
+            <a href="{% url 'users:resend_verification_email' %}" style="color: #40826D; text-decoration: underline;">
+              send verification email
+            </a>
+          </div>
+        {% endif %}
+      </div>
+      <button type="submit" class="btn">Update</button>
+    </form>
+  </div>
+</div>
+
+<div class="settings-panel">
+  <div class="panel-header" onclick="togglePanel('picture-panel')">
+    <div class="panel-title">Profile Picture</div>
+    <div class="panel-icon" id="icon-picture-panel">›</div>
+  </div>
+  <div class="panel-content" id="picture-panel">
+    <div class="text-center">
+      <img id="profileImage" 
+           src="{% if user_profile.profile_picture %}{{ user_profile.profile_picture.url }}{% else %}https://via.placeholder.com/120{% endif %}"
+           class="profile-image">
+      <form method="POST" enctype="multipart/form-data" action="{% url 'update_settings' %}">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="profile_picture">
+        <div class="form-group">
+          <input type="file" name="profile_picture" accept="image/*" onchange="previewImage(event)">
+        </div>
+        <button type="submit" class="btn">Update Photo</button>
+      </form>
     </div>
+  </div>
 </div>
 
-<!-- Real-time image preview -->
+
+<div class="settings-panel">
+  <div class="panel-header" onclick="togglePanel('password-panel')">
+    <div class="panel-title">Change Password</div>
+    <div class="panel-icon" id="icon-password-panel">›</div>
+  </div>
+  <div class="panel-content" id="password-panel">
+    <form method="POST" action="{% url 'update_settings' %}">
+      {% csrf_token %}
+      <input type="hidden" name="form_type" value="change_password">
+      <div class="form-group">
+        <label class="form-label" for="current_password">Current Password</label>
+        <input class="form-input" type="password" id="current_password" name="current_password" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="new_password">New Password</label>
+        <input class="form-input" type="password" id="new_password" name="new_password" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="confirm_password">Confirm New Password</label>
+        <input class="form-input" type="password" id="confirm_password" name="confirm_password" required>
+      </div>
+      <button type="submit" class="btn">Update Password</button>
+    </form>
+  </div>
+</div>
+
+</div>
+
 <script>
     function previewImage(event) {
         const reader = new FileReader();
@@ -86,5 +236,40 @@
         reader.readAsDataURL(event.target.files[0]);
     }
 </script>
+
+<script>
+  function togglePanel(panelId) {
+    // Tüm panelleri kapat
+    document.querySelectorAll('.panel-content').forEach(panel => {
+      panel.style.display = 'none';
+      panel.classList.remove('active');
+    });
+    
+    document.querySelectorAll('.panel-icon').forEach(icon => {
+      icon.classList.remove('open');
+    });
+    
+    const panel = document.getElementById(panelId);
+    const icon = document.getElementById('icon-' + panelId);
+    
+    if (panel) {
+      panel.style.display = 'block';
+      panel.classList.add('active');
+    }
+    
+    if (icon) {
+      icon.classList.add('open');
+    }
+  }
+  
+  
+  document.addEventListener('DOMContentLoaded', function() {
+
+    togglePanel('username-panel');
+  });
+</script>
+
+
+
 
 {% endblock %}

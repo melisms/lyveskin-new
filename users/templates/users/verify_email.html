@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Email Verification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8fafc;
+            color: #333333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 600px;
+            margin: auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #2d3748;
+        }
+        a.verify-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 24px;
+            background-color: #3182ce;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        a.verify-button:hover {
+            background-color: #2b6cb0;
+        }
+        p {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #4a5568;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #a0aec0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Hello {{ username }},</h2>
+        <p>Thank you for registering an account with us.</p>
+        <p>Please verify your email address by clicking the button below:</p>
+        <a href="{{ verify_link }}" class="verify-button" target="_blank" rel="noopener">Verify Email</a>
+        <p>If the button does not work, please copy and paste the following URL into your browser:</p>
+        <p><a href="{{ verify_link }}" target="_blank" rel="noopener">{{ verify_link }}</a></p>
+        <p>Thank you,<br>The Team</p>
+    </div>
+    <div class="footer">
+        &copy; {{ now.year }} Your Company. All rights reserved.
+    </div>
+</body>
+</html>

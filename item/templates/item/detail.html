@@ -1,8 +1,20 @@
 {% extends 'lyve/base.html' %}
 {% block title %}{{ item.name }}{% endblock %}
 {% block content %}
+<style>
+    .custom-add-routine-button {
+        background-color: #40826D;
+        border-radius: 10px;
+        padding: 6px 16px;
+        transition: background-color 0.3s ease-in-out;
+    }
+
+    .custom-add-routine-button:hover {
+        background-color: #1e3b31;
+    }
+</style>
 <div class="container" style="align-items: flex-start; display: flex; margin: 20px">
-    <img src="{{ item.image.url }}" alt="{{ item.name }}" class="image" style="max-width: 40%; margin-right: 20px">
+    <img src="{% if item.image %}{{ item.image.url }}{% else %}/media/no_image.jpg{% endif %}" alt="{{ item.name }}" class="image" style="max-width: 40%; margin-right: 20px">
     <div class="text" style="width: 80%; overflow-wrap: break-word;word-wrap: break-word;">
         <h1 class="mb-6 text-3xl"><b>{{ item.brands }}</b></h1>
         <p class="mb-6 text-3xl" style="overflow-wrap: break-word;word-wrap: break-word; color: #444444;
@@ -10,13 +22,52 @@
         <p class="mb-6 text-3xl">{{ item.description }}</p>
         <p class="mb-6 text-3xl"><b>Ingredients:</b>
             {% for ingredient in ingredients %}
-                {{ ingredient.name }}{% if not forloop.last %}, {% endif %}
+                <span style="
+                    {% if ingredient.safety == 'S' %}
+                        color: green; font-weight: bold;
+                    {% elif ingredient.safety == 'R' %}
+                        color: darkred; font-weight: bold;
+                    {% else %}
+                        color: black;
+                    {% endif %}
+                ">{{ ingredient.name }}</span>{% if not forloop.last %}, {% endif %}
             {% endfor %}
         </p>
         <p class="mb-6 text-3xl"><strong>Skintype:</strong> {{ item.skintype }}</p>
         <h3 class="mb-6 text-3xl">Health Score: {{ health_score }}/100</h3>
-        <button>Add to Routine</button>
-        <a href="{% url 'item:edit_item' item.id %}" class="btn btn-primary">Edit</a>
+        <div style="display: flex; gap: 12px; align-items: center; margin-top: 16px;">
+            {% if item in request.user.userprofile.favorites.all %}
+                <form method="POST" action="{% url 'item:remove_from_favorites' item.pk %}" style="margin: 0;">
+                    {% csrf_token %}
+                    <button class="custom-add-routine-button text-white text-sm font-medium" type="submit">
+                        Added
+                    </button>
+                </form>
+            {% else %}
+                <form method="POST" action="{% url 'item:add_to_favorites' item.pk %}" style="margin: 0;">
+                    {% csrf_token %}
+                    <button type="submit" class="custom-add-routine-button text-white text-sm font-medium">
+                        Add Routine
+                    </button>
+                </form>
+            {% endif %}
+            {% if request.user.is_superuser %}
+            <a href="{% url 'item:edit_item' item.id %}" class="btn btn-primary" style="height: 36px; display: flex; align-items: center; padding: 0 16px;">
+                Edit
+            </a>
+            </form>
+            <form method="post" action="{% url 'item:remove_item' item.pk %}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this item?');">
+            {% csrf_token %}
+                <button type="submit" class="btn-primary" style="background-color: #dc3545; border: none; color: white; padding: 0.5rem 1.25rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: background-color 0.3s ease;"
+                onmouseover="this.style.backgroundColor='#a71d2a'"
+                onmouseout="this.style.backgroundColor='#dc3545'"
+                >
+                Delete
+                </button>
+            </form>
+            {% endif %}
+        </div>
+
     </div>
 </div>
 {% endblock %}

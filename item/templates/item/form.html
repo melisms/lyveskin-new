@@ -1,35 +1,264 @@
 {% extends 'lyve/base.html' %}
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}{{ title }} | Lyve Skin{% endblock %}
 
 {% block content %}
-    <h1 class="mb-6 text-3xl ml-5">{{ title }}</h1>
+<style>
+    :root {
+        --primary: #40826D;
+        --primary-light: #9FE2BF;
+        --primary-dark: #244A3A;
+    }
+    
+    .form-container {
+        max-width: 900px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .form-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: var(--primary);
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .form-section {
+        margin-bottom: 2rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        display: block;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        color: #333;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        font-size: 1rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: #f9f9f9;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .form-control:focus {
+        border-color: var(--primary-light);
+        box-shadow: 0 0 0 3px rgba(64, 130, 109, 0.1);
+        outline: none;
+        background-color: #fff;
+    }
+    
+    textarea.form-control {
+        min-height: 120px;
+        resize: vertical;
+    }
+    
+    select.form-control {
+        padding: 0.75rem 2rem 0.75rem 0.75rem;
+        appearance: none;
+        height: auto;
+        min-height: 2.5rem;
+        line-height: 1.5;
+        text-align: left;
+        vertical-align: middle;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 1rem;
+    }
+    
+    .help-text {
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: 0.5rem;
+    }
+    
+    .error-message {
+        color: #d32f2f;
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+    }
+    
+    .errors-container {
+        background-color: #ffebee;
+        border-left: 4px solid #d32f2f;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        border-radius: 4px;
+    }
+    
+    .submit-btn {
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+    
+    .submit-btn:hover {
+        background-color: var(--primary-dark);
+    }
+    
+    .submit-btn:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(64, 130, 109, 0.3);
+    }
+    
+    /* Specific field styling */
+    .selectmultiple {
+        height: auto;
+        min-height: 120px;
+    }
+    
+    .file-input-container {
+        position: relative;
+    }
+    
+    .file-input-label {
+        display: inline-block;
+        background-color: #f0f0f0;
+        color: #333;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+        border: 1px solid #ddd;
+        transition: background-color 0.2s ease;
+    }
+    
+    .file-input-label:hover {
+        background-color: #e0e0e0;
+    }
+    
+    .file-name {
+        margin-left: 0.5rem;
+        font-size: 0.9rem;
+        color: #666;
+    }
+    
+    .clearable-file-input {
+        margin-top: 0.5rem;
+    }
+</style>
 
-    <form method="post" action="." enctype="multipart/form-data">
-        {% csrf_token %}
-
-        <div class="space-y-4 ml-5">
-            {% for field in form %}
-                <div class="form-group">
-                    {{ field.label_tag }}<br>
-                    {{ field }}
-                    {% if field.help_text %}
-                        <small class="form-text text-muted">{{ field.help_text }}</small>
-                    {% endif %}
-                    {{ field.errors }}
-                </div>
-            {% endfor %}
-        </div>
-
+<div class="container">
+    <div class="form-container">
+        <h1 class="form-title">{{ title }}</h1>
+        
         {% if form.errors or form.non_field_errors %}
-            <div class="mb-3 p-6 bg-red-100 rounded-xl">
+            <div class="errors-container">
+                <p><strong>Lütfen aşağıdaki hataları düzeltin:</strong></p>
                 {% for field in form %}
-                    {{ field.errors }}
+                    {% for error in field.errors %}
+                        <p class="error-message">{{ field.label }}: {{ error }}</p>
+                    {% endfor %}
                 {% endfor %}
-
-                {{ form.non_field_errors }}
+                
+                {% for error in form.non_field_errors %}
+                    <p class="error-message">{{ error }}</p>
+                {% endfor %}
             </div>
         {% endif %}
-        <button class="ml-5">Submit</button>
-    </form>
+        
+        <form method="post" action="." enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="form-section">
+                {% for field in form %}
+                    <div class="form-group">
+                        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        
+                        {% if field.field.widget.input_type == 'file' %}
+                            <div class="file-input-container">
+                                {{ field }}
+                                {% if field.value %}
+                                    <span class="file-name">Mevcut: {{ field.value }}</span>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            {{ field }}
+                        {% endif %}
+                        
+                        {% if field.help_text %}
+                            <small class="help-text">{{ field.help_text }}</small>
+                        {% endif %}
+                        
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                <div class="error-message">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <div class="text-center">
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-save mr-2"></i> Save
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Form kontrolleri için stil eklemeleri
+        const inputs = document.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            if (input.type !== 'checkbox' && input.type !== 'radio' && input.type !== 'file') {
+                input.classList.add('form-control');
+            }
+            
+            if (input.type === 'file') {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'file-input-label';
+                wrapper.innerHTML = '<i class="fas fa-upload"></i> Dosya Seç';
+                
+                const fileNameSpan = document.createElement('span');
+                fileNameSpan.className = 'file-name';
+                
+                input.parentNode.insertBefore(wrapper, input);
+                input.parentNode.insertBefore(fileNameSpan, input.nextSibling);
+                
+                input.style.opacity = '0';
+                input.style.position = 'absolute';
+                input.style.zIndex = '-1';
+                
+                wrapper.addEventListener('click', () => {
+                    input.click();
+                });
+                
+                input.addEventListener('change', () => {
+                    if (input.files.length > 0) {
+                        fileNameSpan.textContent = input.files[0].name;
+                    } else {
+                        fileNameSpan.textContent = '';
+                    }
+                });
+            }
+        });
+        
+        // Select multiple için stil eklemeleri
+        const multiSelects = document.querySelectorAll('select[multiple]');
+        multiSelects.forEach(select => {
+            select.classList.add('selectmultiple');
+        });
+    });
+</script>
 {% endblock %}

@@ -1,4 +1,5 @@
 from django.db import models
+from .utils import detect_safety
 
 class Category(models.Model):
     name = models.CharField(max_length=200)
@@ -17,7 +18,16 @@ class Ingredient(models.Model):
                 ('N', "Neutral"),
                 ('R', "Risky"),
                 ),max_length=1,default='N',blank=True, null=True)
-
+    note = models.TextField(blank=True, null=True)
+    def save(self, *args, **kwargs):
+        if not self.safety or self.safety == 'N':
+            result = detect_safety(self.name)
+            if isinstance(result, tuple) and len(result) == 2:
+                self.safety, self.note = result
+            else:
+                self.safety = result
+                self.note = ''
+        super().save(*args, **kwargs)
 
     class Meta:
         ordering = ['name']
@@ -36,7 +46,7 @@ class Item(models.Model):
     skintype = models.CharField(max_length=200, blank=True, null=True)
 
     def __str__(self):
-        return self.brands+' '+self.name
+        return (self.brands or '') + ' ' + self.name
 
     def calculate_health_score(self):
         ingredients = self.ingredients.all()
@@ -47,16 +57,9 @@ class Item(models.Model):
         if total_count == 0:
             return {'score': 100, 'safe': 0, 'risky': 0}
 
-        risky_percentage = (risky_count / total_count) * 100
+        score = (safe_count / total_count) * 100
 
-        if risky_percentage == 0:
-            score = 100
-        elif risky_percentage <= 20:
-            score = 80
-        elif risky_percentage <= 50:
-            score = 60
-        else:
-            score = 40
+        score = round(score)
 
         return {
             'score': score,

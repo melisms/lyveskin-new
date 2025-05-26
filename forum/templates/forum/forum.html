@@ -1,38 +1,140 @@
 {% extends "forum/baseforum.html" %}
 {% load static %}
 {% block content %}
-    {% for post in posts %}
-        <article class="media content-section">
-            <div class="media-body">
-                <div class="article-metadata">
-                    {% if post.author.userprofile.profile_picture %}
-                        <img class="mr-3 rounded-circle" src="{{ post.author.userprofile.profile_picture.url }}" alt="Profile Image" width="50" height="50">
-                    {% else %}
-                        <img class="mr-3 rounded-circle" src="{% static 'default_profile.png' %}" alt="Default Profile Image" width="50" height="50">
-                    {% endif %}
-                    <a class="mr-2" href="{% url 'profile' post.author.id %}">{{ post.author }}</a>
-                    <small class="text-muted">{{ post.date_posted|date:"d F, Y" }}</small>
-                </div>
-                <h2><a class="article-title" href="{% url 'forum:post-detail' post.pk %}">{{ post.title }}</a></h2>
-                <p class="article-content">{{ post.content }}</p>
-            </div>
-        </article>
-    {% endfor %}
-    {% if is_paginated %}
-        {% if page_obj.has_previous %}
-            <a class="btn btn-outline-info mb-4"href="?page=1">First</a>
-            <a class="btn btn-outline-info mb-4"href="?page={{ page_obj.previous_page_number }}">Previous</a>
-        {% endif %}
-        {% for num in page_obj.paginator.page_range %}
-            {% if page_obj.number == num %}
-                <a class="btn btn-info mb-4"href="?page={{ num }}">{{ num }}</a>
-            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                <a class="btn btn-outline-info mb-4"href="?page={{ num }}">{{ num }}</a>
-            {% endif %}
-        {% endfor %}
-        {% if page_obj.has_next %}
-            <a class="btn btn-outline-info mb-4"href="?page={{ page_obj.next_page_number }}">Next</a>
-            <a class="btn btn-outline-info mb-4"href="?page={{ page_obj.paginator.num_pages }}">Last</a>
-        {% endif %}
+<style>
+  /* Modern post card styling */
+  .post-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(64, 130, 109, 0.1);
+    margin-bottom: 1.5rem;
+    padding: 1.25rem 1.5rem;
+    transition: box-shadow 0.3s ease;
+  }
+  .post-card:hover {
+    box-shadow: 0 10px 25px rgba(64, 130, 109, 0.2);
+  }
+  .post-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  .profile-pic {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 1rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+  .post-meta {
+    display: flex;
+    flex-direction: column;
+  }
+  .author-name {
+    color: #40826D;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    font-size: 1.05rem;
+  }
+  .author-name:hover {
+    color: #9FE2BF;
+  }
+  .post-date {
+    color: #999;
+    font-size: 0.85rem;
+    margin-top: 3px;
+  }
+  .post-title {
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+  .post-title a {
+    color: #2C3E50;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  .post-title a:hover {
+    color: #40826D;
+  }
+  .post-content {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #444;
+  }
+
+  /* Pagination buttons */
+  .btn {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    margin-right: 0.5rem;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    border: 2px solid transparent;
+  }
+  .btn-outline-info {
+    color: #40826D;
+    border-color: #40826D;
+    background: transparent;
+  }
+  .btn-outline-info:hover {
+    background-color: #40826D;
+    color: #fff;
+  }
+  .btn-info {
+    background-color: #40826D;
+    color: white;
+    border-color: #40826D;
+  }
+  .btn-info:hover {
+    background-color: #2f644f;
+    border-color: #2f644f;
+  }
+</style>
+
+{% for post in posts %}
+  <article class="post-card">
+    <header class="post-header">
+      {% if post.author.userprofile.profile_picture %}
+        <img class="profile-pic" src="{{ post.author.userprofile.profile_picture.url }}" alt="Profile Image">
+      {% else %}
+        <img class="profile-pic" src="{% static 'default_profile.png' %}" alt="Default Profile Image">
+      {% endif %}
+      <div class="post-meta">
+        <a href="{% url 'profile' post.author.id %}" class="author-name" style="text-decoration: none;">{{ post.author }}</a>
+        <time class="post-date">{{ post.date_posted|date:"d F, Y" }}</time>
+      </div>
+    </header>
+    <h2 class="post-title">
+      <a href="{% url 'forum:post-detail' post.pk %}">{{ post.title }}</a>
+    </h2>
+    <p class="post-content">{{ post.content }}</p>
+  </article>
+{% endfor %}
+
+{% if is_paginated %}
+  <nav aria-label="Page navigation">
+    {% if page_obj.has_previous %}
+      <a class="btn btn-outline-info" href="?page=1">&laquo;</a>
+      <a class="btn btn-outline-info" href="?page={{ page_obj.previous_page_number }}">&lsaquo;</a>
     {% endif %}
+    {% for num in page_obj.paginator.page_range %}
+      {% if page_obj.number == num %}
+        <a class="btn btn-info" href="?page={{ num }}">{{ num }}</a>
+      {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+        <a class="btn btn-outline-info" href="?page={{ num }}">{{ num }}</a>
+      {% endif %}
+    {% endfor %}
+    {% if page_obj.has_next %}
+      <a class="btn btn-outline-info" href="?page={{ page_obj.next_page_number }}">&rsaquo;</a>
+      <a class="btn btn-outline-info" href="?page={{ page_obj.paginator.num_pages }}">&raquo;</a>
+    {% endif %}
+  </nav>
+{% endif %}
+
 {% endblock content %}
