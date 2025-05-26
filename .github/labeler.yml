@@ -1,14 +1,18 @@
 frontend:
-  - "frontend/**/*"
-  - "src/frontend/**/*"
+  - 'frontend/**'
+  - 'templates/**'
+  - '**/*.js'
+  - '**/*.css'
 
 backend:
-  - "backend/**/*"
-  - "src/backend/**/*"
+  - 'backend/**'
+  - '**/*.py'
+  - 'item/**'
+  - 'user/**'
 
 docs:
-  - "*.md"
-  - "docs/**/*"
+  - '**/*.md'
 
-tests:
-  - "tests/**/*"
+config:
+  - '.github/**'
+  - '**/*.yml'
