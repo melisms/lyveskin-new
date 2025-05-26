@@ -96,8 +96,8 @@
     
     .ingredients-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 1rem;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
         margin: 1.5rem 0;
     }
     
@@ -105,8 +105,9 @@
         background-color: white;
         border-radius: 6px;
         border: 1px solid #eee;
-        padding: 1rem;
+        padding: 1.25rem;
         transition: background-color 0.2s ease;
+        min-height: 80px;
     }
     
     .ingredient-card:hover {
@@ -116,11 +117,15 @@
     .ingredient-name {
         font-size: 1.2rem;
         font-weight: 600;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
         color: #333;
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: 0.5rem;
+        line-height: 1.4;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        white-space: normal;
     }
     
     .ingredient-name .icon {
