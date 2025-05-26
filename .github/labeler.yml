@@ -1,0 +1,14 @@
+frontend:
+  - "frontend/**/*"
+  - "src/frontend/**/*"
+
+backend:
+  - "backend/**/*"
+  - "src/backend/**/*"
+
+docs:
+  - "*.md"
+  - "docs/**/*"
+
+tests:
+  - "tests/**/*"
