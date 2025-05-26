@@ -8,12 +8,18 @@ from .forms import ComparisonForm,NewItemForm
 from django.contrib import messages
 from .utils import detect_safety, clear_cache_for_detail, clear_cache_for_browse, clear_cache_for_comparison
 from django.views.decorators.cache import cache_page
+from django.core.cache import cache
 
-@cache_page(60 * 10)
 def detail(request, pk):
     item = get_object_or_404(Item, pk=pk)
     ingredients = item.ingredients.all()
-    health_data = item.calculate_health_score()
+    
+    cache_key = f'health_score_item_{pk}'
+    health_data = cache.get(cache_key)
+    
+    if not health_data:
+        health_data = item.calculate_health_score()
+        cache.set(cache_key, health_data, 600)
     
     return render(request, 'item/detail.html', {
         'item': item,
@@ -34,7 +40,7 @@ def add_to_favorites(request, pk):
         messages.success(request, 'Item added to your routine!')
 
     return redirect('item:detail', pk=pk)
-
+@login_required
 def remove_from_favorites(request, pk):
     item = get_object_or_404(Item, pk=pk)
     profile = request.user.userprofile
@@ -59,27 +65,34 @@ def create_item(request):
                     ingredient.note = note
                     ingredient.save()
             clear_cache_for_detail(request, item.pk)
-            clear_cache_for_browse(request)
+            clear_cache_for_browse()
             messages.success(request, 'Item added successfully.')
             return redirect('item:detail', pk=item.pk)
     else:
         form = NewItemForm()
     return render(request, 'item/form.html', {'form': form, 'title': 'Create New Item'})
-@cache_page(60 * 5)
+
 def browse(request):
     query = request.GET.get('query','')
     category_id = request.GET.get('category', 0)
+    cache_key = f'browse_cache::query={query}&category={category_id}'
+    cached_response = cache.get(cache_key)
+    if cached_response:
+        return cached_response
     categories = Category.objects.all()
     items = Item.objects.filter()
     if category_id:
         items = items.filter(category=category_id)
     if query:
         items = items.filter(Q(name__icontains=query)|Q(brands__icontains=query))
-    return render(request, 'item/browse.html',  {
+    response = render(request, 'item/browse.html', {
         'items': items,
         'query': query,
         'categories': categories,
-        'category_id': int(category_id),})
+        'category_id': int(category_id),
+    })
+    cache.set(cache_key, response, 300)
+    return response
 
 def compare_items(request):
     if request.method == 'POST':
@@ -144,7 +157,7 @@ def edit_item(request, item_id):
                     ingredient.note = note
                     ingredient.save()
             clear_cache_for_detail(request, item_id)
-            clear_cache_for_browse(request)
+            clear_cache_for_browse()
             messages.success(request, 'Item updated successfully!')
             return redirect('item:detail', pk=item.id)  # Redirect back to item detail after update
     else:

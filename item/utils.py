@@ -55,6 +55,7 @@ from django.test import RequestFactory
 from django.utils.cache import get_cache_key
 from django.core.cache import cache
 from django.urls import reverse
+
 def clear_cache_for_detail(request, pk):
     rf = RequestFactory()
     path = reverse('item:detail', kwargs={'pk': pk})
@@ -64,14 +65,14 @@ def clear_cache_for_detail(request, pk):
     if key:
         cache.delete(key)
 
-def clear_cache_for_browse(request):
-    rf = RequestFactory()
-    path = reverse('item:browse')
-    fake_request = rf.get(path)
-    fake_request.user = request.user
-    key = get_cache_key(fake_request)
-    if key:
-        cache.delete(key)
+def clear_cache_for_browse():
+    from django.core.cache import cache
+    try:
+        keys = cache.keys('browse_cache::*')  
+        for key in keys:
+            cache.delete(key)
+    except Exception as e:
+        print("Cache clearing failed:", e)
 
 def clear_cache_for_comparison(request, item_id1, item_id2):
     rf = RequestFactory()
