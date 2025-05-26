@@ -72,13 +72,15 @@ def create_item(request):
         form = NewItemForm()
     return render(request, 'item/form.html', {'form': form, 'title': 'Create New Item'})
 
+from django.contrib.messages import get_messages
 def browse(request):
     query = request.GET.get('query','')
     category_id = request.GET.get('category', 0)
-    cache_key = f'browse_cache::query={query}&category={category_id}'
-    cached_response = cache.get(cache_key)
-    if cached_response:
-        return cached_response
+    if not get_messages(request):
+        cache_key = f'browse_cache::query={query}&category={category_id}'
+        cached_response = cache.get(cache_key)
+        if cached_response:
+            return cached_response
     categories = Category.objects.all()
     items = Item.objects.filter()
     if category_id:
@@ -91,7 +93,8 @@ def browse(request):
         'categories': categories,
         'category_id': int(category_id),
     })
-    cache.set(cache_key, response, 300)
+    if not get_messages(request):  
+        cache.set(cache_key, response, 300)
     return response
 
 def compare_items(request):
