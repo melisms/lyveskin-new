@@ -110,7 +110,7 @@
 
 <div class="edit-container">
   <div class="image-wrapper">
-    <img src="{{ item.image.url }}" alt="{{ item.name }}" id="imagePreview" />
+    <img src="{% if item.image %}{{ item.image.url }}{% else %}/media/no_image.jpg{% endif %}" alt="{{ item.name }}" id="imagePreview" />
   </div>
 
   <div class="form-wrapper">

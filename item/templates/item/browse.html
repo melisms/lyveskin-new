@@ -44,8 +44,7 @@
                                     {% if item.image %}
                                         <img src="{{ item.image.url }}" alt="ItemImage" class="rounded-t-xl" style="width: 165px; height: 165px;">
                                     {% else %}
-                                        <!-- Placeholder image or alternative content -->
-                                        <p>No Image Available</p>
+                                        <img src="/media/no_image.jpg" alt="DefaultImage" class="rounded-t-xl" style="width: 165px; height: 165px;">
                                     {% endif %}
                                 </div>
                                 <div class="ml-4">
