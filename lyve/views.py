@@ -95,7 +95,7 @@ def ask_ollama(request):
                     item_name_words = item.name.lower().split()
                     matched_word_count = sum(1 for w in item_name_words if w in words)
 
-                    if matched_word_count >= 2:
+                    if matched_word_count >= 3:
                         matched_items.append(item)
 
                 if matched_items:
