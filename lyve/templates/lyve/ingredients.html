@@ -10,7 +10,7 @@
         --primary-dark: #244A3A;
         --safe: #4caf50;
         --neutral: #f9a825;
-        --risky: #f44336;
+        --risky: #f43665;
     }
     
     .ingredients-header {
@@ -96,7 +96,7 @@
     
     .ingredients-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
         gap: 1.5rem;
         margin: 1.5rem 0;
     }
@@ -108,7 +108,9 @@
         padding: 1.25rem;
         transition: background-color 0.2s ease;
         min-height: 80px;
-    }
+        word-break: break-word;
+        overflow-wrap: break-word;
+}
     
     .ingredient-card:hover {
         background-color: #f9f9f9;
