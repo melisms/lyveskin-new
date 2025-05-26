@@ -1,0 +1,18 @@
+frontend:
+  - 'frontend/**'
+  - 'templates/**'
+  - '**/*.js'
+  - '**/*.css'
+
+backend:
+  - 'backend/**'
+  - '**/*.py'
+  - 'item/**'
+  - 'user/**'
+
+docs:
+  - '**/*.md'
+
+config:
+  - '.github/**'
+  - '**/*.yml'
