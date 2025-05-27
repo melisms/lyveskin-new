@@ -1,9 +1,68 @@
 {% extends 'lyve/base.html' %}
 {% block content%}
-    <h2 class ="text-2xl pl-4"> You have been logged out</h2>
-    <div class="border-top pt-3">
-        <small class="text-muted">
-            <a class ="text-2xl pl-4" href="{% url 'login' %}">Log In Again</a>
-        </small>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="auth-card">
+                <div class="auth-header">
+                    <h2 class="text-center mb-4">Logged Out</h2>
+                </div>
+                <div class="auth-body text-center">
+                    <p class="mb-4">You have been successfully logged out.</p>
+                    <div class="form-group mt-4">
+                        <a href="{% url 'login' %}" class="auth-button">
+                            <i class="fas fa-sign-in-alt mr-2"></i> Log In Again
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
+
+<style>
+    .auth-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+    
+    .auth-header {
+        padding: 1.5rem;
+        background: #40826D;
+        color: white;
+    }
+    
+    .auth-body {
+        padding: 2rem;
+    }
+    
+    .auth-footer {
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-top: 1px solid #eee;
+    }
+    
+    .auth-button {
+        display: inline-block;
+        width: 200px;
+        background-color: #40826D;
+        color: white;
+        border: none;
+        padding: 0.75rem;
+        border-radius: 5px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+    
+    .auth-button:hover {
+        background-color: #244A3A;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        color: white;
+        text-decoration: none;
+    }
+</style>
 {% endblock %}
