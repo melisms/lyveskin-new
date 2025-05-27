@@ -196,179 +196,186 @@
 </div>
 
 <script>
+const csrftoken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
-  const csrftoken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+const chatToggle = document.getElementById('chat-toggle');
+const chatBox = document.getElementById('chat-box');
+const messageBox = document.getElementById('messages');
+const userInput = document.getElementById('user-input');
 
-  
-  const chatToggle = document.getElementById('chat-toggle');
-  const chatBox = document.getElementById('chat-box');
+function saveMessages() {
+  localStorage.setItem('chatMessages', messageBox.innerHTML);
+}
 
-  chatToggle.addEventListener('click', function() {
-    if (chatBox.style.display === 'none') {
-      chatBox.style.display = 'flex';
-    } else {
-      chatBox.style.display = 'none';
-    }
-  });
+function loadMessages() {
+  const saved = localStorage.getItem('chatMessages');
+  if (saved) {
+    messageBox.innerHTML = saved;
+    messageBox.scrollTop = messageBox.scrollHeight;
+  }
+}
 
+// Load chat history when page loads
+window.addEventListener('load', loadMessages);
 
-  // Close button event handler
-  document.getElementById('close-chat').addEventListener('click', function() {
+chatToggle.addEventListener('click', function() {
+  if (chatBox.style.display === 'none') {
+    chatBox.style.display = 'flex';
+  } else {
     chatBox.style.display = 'none';
-  });
+  }
+});
 
-  document.getElementById('user-input').addEventListener('keypress', function (e) {
-    if (e.key === 'Enter') {
-      const input = e.target.value;
-      if (input.trim() === '') return;
+// Close button event handler
+document.getElementById('close-chat').addEventListener('click', function() {
+  chatBox.style.display = 'none';
+});
 
-      e.target.value = ''; 
+userInput.addEventListener('keypress', function (e) {
+  if (e.key === 'Enter') {
+    const input = e.target.value;
+    if (input.trim() === '') return;
 
-      const messageBox = document.getElementById('messages');
-      const userMessage = document.createElement('div');
-      userMessage.innerHTML = '<b>You:</b> ';
-      const userText = document.createElement('span');
-      userText.textContent = input;
-      userMessage.appendChild(userText);
-      messageBox.appendChild(userMessage);
-      
-      // Show typing indicator
-      const typingIndicator = document.createElement('div');
-      typingIndicator.className = 'typing-indicator';
-      typingIndicator.innerHTML = '<b>Assistant:</b> <span>...</span>';
-      messageBox.appendChild(typingIndicator);
+    e.target.value = ''; 
+
+    // Append user message
+    const userMessage = document.createElement('div');
+    userMessage.innerHTML = '<b>You:</b> ';
+    const userText = document.createElement('span');
+    userText.textContent = input;
+    userMessage.appendChild(userText);
+    messageBox.appendChild(userMessage);
+    messageBox.scrollTop = messageBox.scrollHeight;
+    saveMessages();  // Save after user message added
+
+    // Show typing indicator
+    const typingIndicator = document.createElement('div');
+    typingIndicator.className = 'typing-indicator';
+    typingIndicator.innerHTML = '<b>Assistant:</b> <span>...</span>';
+    messageBox.appendChild(typingIndicator);
+    messageBox.scrollTop = messageBox.scrollHeight;
+
+    fetch('/ask/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(csrftoken && { 'X-CSRFToken': csrftoken })
+      },
+      body: JSON.stringify({ question: input })
+    })
+    .then(response => response.json())
+    .then(data => {
+      // Remove typing indicator
+      messageBox.removeChild(typingIndicator);
+
+      const assistantMessage = document.createElement('div');
+      assistantMessage.className = 'assistant-message';
+      assistantMessage.innerHTML = '<b>Assistant:</b> ';
+
+      if (data.product_results) {
+        const textResponse = document.createElement('div');
+        textResponse.textContent = data.answer;
+        textResponse.style.marginBottom = '10px';
+        assistantMessage.appendChild(textResponse);
+
+        const productGrid = document.createElement('div');
+        productGrid.className = 'product-grid';
+        productGrid.style.display = 'grid';
+        productGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        productGrid.style.gap = '10px';
+        productGrid.style.marginTop = '10px';
+
+        data.products.forEach(product => {
+          const productCard = document.createElement('div');
+          productCard.className = 'product-card';
+          productCard.style.border = '1px solid #eee';
+          productCard.style.borderRadius = '8px';
+          productCard.style.padding = '10px';
+          productCard.style.cursor = 'pointer';
+          productCard.style.backgroundColor = '#fff';
+          productCard.style.transition = 'transform 0.2s';
+          productCard.style.display = 'flex';
+          productCard.style.flexDirection = 'column';
+          productCard.style.alignItems = 'center';
+
+          productCard.onmouseover = function() {
+            this.style.transform = 'scale(1.03)';
+            this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+          };
+          productCard.onmouseout = function() {
+            this.style.transform = 'scale(1)';
+            this.style.boxShadow = 'none';
+          };
+          productCard.onclick = function() {
+            window.location.href = product.url;
+          };
+
+          if (product.image) {
+            const img = document.createElement('img');
+            img.src = product.image;
+            img.alt = product.name;
+            img.style.width = '100%';
+            img.style.height = '120px';
+            img.style.objectFit = 'contain';
+            img.style.marginBottom = '8px';
+            productCard.appendChild(img);
+          } else {
+            const placeholder = document.createElement('div');
+            placeholder.style.width = '100%';
+            placeholder.style.height = '120px';
+            placeholder.style.backgroundColor = '#f5f5f5';
+            placeholder.style.display = 'flex';
+            placeholder.style.alignItems = 'center';
+            placeholder.style.justifyContent = 'center';
+            placeholder.style.marginBottom = '8px';
+            placeholder.textContent = 'No Image';
+            productCard.appendChild(placeholder);
+          }
+
+          const name = document.createElement('div');
+          name.textContent = product.name;
+          name.style.fontWeight = 'bold';
+          name.style.fontSize = '12px';
+          name.style.textAlign = 'center';
+          name.style.height = '36px';
+          name.style.overflow = 'hidden';
+          productCard.appendChild(name);
+
+          productGrid.appendChild(productCard);
+        });
+
+        assistantMessage.appendChild(productGrid);
+      } else {
+        const assistantText = document.createElement('span');
+        assistantText.textContent = data.answer;
+        assistantMessage.appendChild(assistantText);
+      }
+
+      messageBox.appendChild(assistantMessage);
       messageBox.scrollTop = messageBox.scrollHeight;
-      
-      fetch('/ask/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(csrftoken && { 'X-CSRFToken': csrftoken })
-        },
-        body: JSON.stringify({ question: input })
-      })
-      .then(response => response.json())
-      .then(data => {
-        // Remove typing indicator
-        messageBox.removeChild(typingIndicator);
-        
-        const assistantMessage = document.createElement('div');
-        assistantMessage.className = 'assistant-message';
-        assistantMessage.innerHTML = '<b>Assistant:</b> ';
-        
-        // Check if we have product results
-        if (data.product_results) {
-          const textResponse = document.createElement('div');
-          textResponse.textContent = data.answer;
-          textResponse.style.marginBottom = '10px';
-          assistantMessage.appendChild(textResponse);
-          
-          // Create product grid container
-          const productGrid = document.createElement('div');
-          productGrid.className = 'product-grid';
-          productGrid.style.display = 'grid';
-          productGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
-          productGrid.style.gap = '10px';
-          productGrid.style.marginTop = '10px';
-          
-          // Add each product to the grid
-          data.products.forEach(product => {
-            const productCard = document.createElement('div');
-            productCard.className = 'product-card';
-            productCard.style.border = '1px solid #eee';
-            productCard.style.borderRadius = '8px';
-            productCard.style.padding = '10px';
-            productCard.style.cursor = 'pointer';
-            productCard.style.backgroundColor = '#fff';
-            productCard.style.transition = 'transform 0.2s';
-            productCard.style.display = 'flex';
-            productCard.style.flexDirection = 'column';
-            productCard.style.alignItems = 'center';
-            
-            // Add hover effect
-            productCard.onmouseover = function() {
-              this.style.transform = 'scale(1.03)';
-              this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
-            };
-            
-            productCard.onmouseout = function() {
-              this.style.transform = 'scale(1)';
-              this.style.boxShadow = 'none';
-            };
-            
-            // Add click handler to navigate to product
-            productCard.onclick = function() {
-              window.location.href = product.url;
-            };
-            
-            // Product image
-            if (product.image) {
-              const img = document.createElement('img');
-              img.src = product.image;
-              img.alt = product.name;
-              img.style.width = '100%';
-              img.style.height = '120px';
-              img.style.objectFit = 'contain';
-              img.style.marginBottom = '8px';
-              productCard.appendChild(img);
-            } else {
-              // Placeholder if no image
-              const placeholder = document.createElement('div');
-              placeholder.style.width = '100%';
-              placeholder.style.height = '120px';
-              placeholder.style.backgroundColor = '#f5f5f5';
-              placeholder.style.display = 'flex';
-              placeholder.style.alignItems = 'center';
-              placeholder.style.justifyContent = 'center';
-              placeholder.style.marginBottom = '8px';
-              placeholder.textContent = 'No Image';
-              productCard.appendChild(placeholder);
-            }
-            
-            // Product name
-            const name = document.createElement('div');
-            name.textContent = product.name;
-            name.style.fontWeight = 'bold';
-            name.style.fontSize = '12px';
-            name.style.textAlign = 'center';
-            name.style.height = '36px';
-            name.style.overflow = 'hidden';
-            productCard.appendChild(name);
-            
-            productGrid.appendChild(productCard);
-          });
-          
-          assistantMessage.appendChild(productGrid);
-        } else {
-          // Regular text response
-          const assistantText = document.createElement('span');
-          assistantText.textContent = data.answer;
-          assistantMessage.appendChild(assistantText);
-        }
-        
-        messageBox.appendChild(assistantMessage);
-        messageBox.scrollTop = messageBox.scrollHeight;
+      saveMessages();  // Save after assistant message added
 
-        if (data.redirect) {
-          setTimeout(() => {
-            window.location.href = data.redirect;
-          }, 2000); // wait 2 seconds before redirect
-        }
-      })
-      .catch(error => {
-        // Remove typing indicator
-        messageBox.removeChild(typingIndicator);
-        
-        const errorMessage = document.createElement('div');
-        errorMessage.innerHTML = '<b>Fault:</b> ';
-        const errorText = document.createElement('span');
-        errorText.textContent = error;
-        errorMessage.appendChild(errorText);
-        messageBox.appendChild(errorMessage);
-        messageBox.scrollTop = messageBox.scrollHeight;
-      });
-    }
-  });
+      if (data.redirect) {
+        setTimeout(() => {
+          window.location.href = data.redirect;
+        }, 2000);
+      }
+    })
+    .catch(error => {
+      messageBox.removeChild(typingIndicator);
+
+      const errorMessage = document.createElement('div');
+      errorMessage.innerHTML = '<b>Fault:</b> ';
+      const errorText = document.createElement('span');
+      errorText.textContent = error;
+      errorMessage.appendChild(errorText);
+      messageBox.appendChild(errorMessage);
+      messageBox.scrollTop = messageBox.scrollHeight;
+      saveMessages();  // Save error message too
+    });
+  }
+});
+
 </script>
 
 

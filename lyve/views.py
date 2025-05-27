@@ -72,214 +72,167 @@ def skincareroutine(request):
 def test(request):
         return render(request, "users/test.html")
     
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.core.cache import cache
 from django.contrib.auth import get_user_model
+import json, requests, difflib, logging
+
 User = get_user_model()
 SESSION_CHAT_HISTORY_KEY = 'ollama_chat_history'
+OLLAMA_API_URL = "http://host.docker.internal:11434/api/generate"
+
 def get_chat_history(session):
     return session.get(SESSION_CHAT_HISTORY_KEY, [])
 
 def add_to_chat_history(session, user_input, model_response):
-    history = session.get(SESSION_CHAT_HISTORY_KEY, [])
+    history = get_chat_history(session)
     history.append({'user': user_input, 'bot': model_response})
-    session[SESSION_CHAT_HISTORY_KEY] = history  
+    session[SESSION_CHAT_HISTORY_KEY] = history
     session.modified = True
+
+def serialize_items(items):
+    product_data = []
+    for item in items:
+        image_url = getattr(item.image, 'url', None) if hasattr(item, 'image') else None
+        if not image_url:
+            image_url = item.image if isinstance(item.image, str) else '/static/images/product-placeholder.jpg'
+        product_data.append({
+            'id': item.id,
+            'name': item.name,
+            'image': image_url,
+            'url': f"/items/{item.id}/"
+        })
+    return product_data
+
+def build_prompt(session, question):
+    history = get_chat_history(session)
+    formatted = "\n".join([f"User: {msg['user']}\nAssistant: {msg['bot']}" for msg in history])
+    return f"""
+    You are a helpful assistant for a skincare product website.
+    Answer the user's question concisely and clearly.
+    {formatted}
+    User: {question}
+    Assistant:
+    """
+
 @csrf_exempt
 def ask_ollama(request):
-    if request.method == 'POST':
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST method required'})
+
+    try:
         try:
             body = json.loads(request.body)
-            question = body.get('question', '').lower()
-            words = question.split()
-            
-            cache_key = f"ollama_response:{question}"
-            cached_answer = cache.get(cache_key)
-            if cached_answer:
-                return JsonResponse({'answer': cached_answer})
-            
-            if len(words) >= 2:
-                items = Item.objects.all()
-                matched_items = []
+        except json.JSONDecodeError:
+            return JsonResponse({'answer': '[JSON Error] Invalid input.'})
 
-                for item in items:
-                    item_name_words = item.name.lower().split()
-                    matched_word_count = sum(1 for w in item_name_words if w in words)
+        question = body.get('question', '').lower()
+        words = question.split()
+        cache_key = f"ollama_response:{question}"
 
-                    if matched_word_count >= 3:
-                        matched_items.append(item)
+        if cached_answer := cache.get(cache_key):
+            return JsonResponse({'answer': cached_answer})
 
-                if matched_items:
-                    matched_item = matched_items[0]  
+        # Match specific item name
+        if len(words) >= 2:
+            items = cache.get("items_name_list")
+            if not items:
+                from item.models import Item  # Local import for performance
+                items = list(Item.objects.values("id", "name"))
+                cache.set("items_name_list", items, 600)
+
+            for item in items:
+                item_words = item['name'].lower().split()
+                if sum(1 for w in item_words if w in words) >= 3:
                     return JsonResponse({
-                        'answer': f"You can visit {matched_item.name} page.",
-                        'redirect': f"/items/{matched_item.id}/"
+                        'answer': f"You can visit {item['name']} page.",
+                        'redirect': f"/items/{item['id']}/"
                     })
-            
-            # routes = {
-            #     "home": "/",
-            #     "compare": "/items/compare/",
-            #     "ingredients": "/ingredient/",
-            #     "ingredient": "/ingredient/",
-            #     "forum": "/forum/",
-            #     "skin type": "/skintype/",
-            #     "skintype": "/skintype/",
-            #     "skincare routine": "/skincareroutine/",
-            #     "labeling system": "/labeling/",
-            #     "labeling": "/labeling/",
-            #     "routine": "/skincareroutine/",
-            #     "items": "/items/browse/",
-            #     "item": "/items/browse/",
-            #     "add product": "/items/new/",
-            #     "add": "/items/new/",
-            #     "products": "/items/browse/",
-            #     "product": "/items/browse/",
-            # }
-            
-            category_keywords = {
-                "lip care": "Lip Care",
-                "tonic": "Tonic",
-                "cleanser": "Cleanser",
-                "moisturizer": "Moisturizer",
-                "serum": "Serum",
-                "sunscreen": "Sunscreen",
-            }
-            
-            # for keyword, route in routes.items():
-            #     if keyword in question:
-            #         return JsonResponse({
-            #             'answer': f"You can visit {keyword.title()} page.",
-            #             'redirect': route
-            #         })
-                    
-            for keyword, category_name in category_keywords.items():
-                if keyword in question:
-                    items = Item.objects.filter(category__name__icontains=category_name)
-                    if items.exists():
-                        products_data = []
-                        for item in items[:10]:
-              
-                            image_url = None
-                            
-                            if hasattr(item, 'image'):
-                                if item.image and hasattr(item.image, 'url'):
-                                    image_url = item.image.url
-                                elif isinstance(item.image, str):
-                                    image_url = item.image
-                    
-                            if not image_url:
-                                image_url = '/static/images/product-placeholder.jpg'
-                                
-                            product_info = {
-                                'id': item.id,
-                                'name': item.name,
-                                'image': image_url,
-                                'url': f"/items/{item.id}/"
-                            }
-                            products_data.append(product_info)
-                        
-                        answer = f"We have the following {category_name.lower()} products:"
-                   
-                        return JsonResponse({
-                            'answer': answer,
-                            'product_results': True,
-                            'category': category_name,
-                            'products': products_data
-                        })
-                    else:
-                        answer = f"Sorry, we don't currently have any {category_name.lower()} products listed."
-                        cache.set(cache_key, answer, timeout=600)
-                        return JsonResponse({'answer': answer})
-            
-            if any(word in question for word in ['items', 'products']) and len(words) >= 3:
-                general_items = Item.objects.all()
-                if general_items.exists():
-                    products_data = []
-                    for item in general_items[:10]:
-                        # Resim URL'sini al
-                        image_url = None
-                        if hasattr(item, 'image'):
-                            if item.image and hasattr(item.image, 'url'):
-                                image_url = item.image.url
-                            elif isinstance(item.image, str):
-                                image_url = item.image
-                        
-                        if not image_url:
-                            image_url = '/static/images/product-placeholder.jpg'
-                            
-                        product_info = {
-                            'id': item.id,
-                            'name': item.name,
-                            'image': image_url,
-                            'url': f"/items/{item.id}/"
-                        }
-                        products_data.append(product_info)
-                    
-                    answer = "Here are some of our products:"
+
+        # Match by category keywords
+        category_keywords = {
+            "lip care": "Lip Care", "tonic": "Tonic",
+            "cleanser": "Cleanser", "moisturizer": "Moisturizer",
+            "serum": "Serum", "sunscreen": "Sunscreen",
+        }
+
+        for keyword, category_name in category_keywords.items():
+            if keyword in question:
+                from item.models import Item
+                items = Item.objects.filter(category__name__icontains=category_name)[:10]
+                if items.exists():
                     return JsonResponse({
-                        'answer': answer,
+                        'answer': f"We have the following {category_name.lower()} products:",
                         'product_results': True,
-                        'category': 'Our Products',
-                        'products': products_data
+                        'category': category_name,
+                        'products': serialize_items(items)
                     })
                 else:
-                    answer = "Sorry, we don't have any products listed currently."
+                    answer = f"Sorry, we don't currently have any {category_name.lower()} products listed."
                     cache.set(cache_key, answer, timeout=600)
-                    return JsonResponse({'answer': answer})    
-                    
-            if "profile" in question and request.user.is_authenticated:
+                    return JsonResponse({'answer': answer})
+
+        # General products response
+        if any(w in question for w in ['items', 'products']) and len(words) >= 3:
+            from item.models import Item
+            items = Item.objects.all()[:10]
+            if items.exists():
                 return JsonResponse({
-                    "answer": "Redirecting to your profile page.",
-                    "redirect": f"/profile/{request.user.id}/"
+                    'answer': "Here are some of our products:",
+                    'product_results': True,
+                    'category': 'Our Products',
+                    'products': serialize_items(items)
                 })
-            if "profile" in words:
-                possible_names = [w for w in words if w != "profile"]
+            else:
+                answer = "Sorry, we don't have any products listed currently."
+                cache.set(cache_key, answer, timeout=600)
+                return JsonResponse({'answer': answer})
 
-                if possible_names:
-                    users = User.objects.all()
-                    usernames = [user.username.lower() for user in users]
+        # User profile (self)
+        if "profile" in question and request.user.is_authenticated:
+            return JsonResponse({
+                "answer": "Redirecting to your profile page.",
+                "redirect": f"/profile/{request.user.id}/"
+            })
 
-                    for name in possible_names:
-                        matches = difflib.get_close_matches(name, usernames, n=1, cutoff=0.7)
-                        if matches:
-                            matched_username = matches[0]
-                            user = User.objects.get(username__iexact=matched_username)
-                            return JsonResponse({
-                                "answer": f"Redirecting to {user.username}'s profile page.",
-                                "redirect": f"/profile/{user.id}/"
-                            })            
-            chat_history = get_chat_history(request.session)
-            history_prompt = "\n".join([f"User: {msg['user']}\nAssistant: {msg['bot']}" for msg in chat_history])
-            prompt = f"""
-            You are a helpful assistant for a skincare product website.
-            Answer the user's question concisely and clearly.
-            {history_prompt}
-            User: {question}
-            Assistant:
-            """
-            ollama_response = requests.post(
-                "http://host.docker.internal:11434/api/generate",
-                json={
-                    "model": "mistral",
-                    "prompt": prompt,
-                    "stream": False
-                },
-              
+        # User profile (others)
+        if "profile" in words:
+            possible_names = [w for w in words if w != "profile"]
+            if possible_names:
+                usernames = cache.get("all_usernames")
+                if not usernames:
+                    usernames = list(User.objects.values_list('username', flat=True))
+                    cache.set("all_usernames", usernames, 600)
+
+                for name in possible_names:
+                    matches = difflib.get_close_matches(name, [u.lower() for u in usernames], n=1, cutoff=0.7)
+                    if matches:
+                        matched_user = User.objects.get(username__iexact=matches[0])
+                        return JsonResponse({
+                            "answer": f"Redirecting to {matched_user.username}'s profile page.",
+                            "redirect": f"/profile/{matched_user.id}/"
+                        })
+
+        # Default: Ask Ollama
+        prompt = build_prompt(request.session, question)
+        try:
+            response = requests.post(
+                OLLAMA_API_URL,
+                json={"model": "mistral", "prompt": prompt, "stream": False},
+                
             )
-            ollama_response.raise_for_status() 
-            response_json = ollama_response.json()
-            answer = response_json.get('response', 'No answer found.')
-            add_to_chat_history(request.session, question, answer)
-            cache.set(cache_key, answer, timeout=600)
-
-            return JsonResponse({'answer': answer})
+            response.raise_for_status()
         except requests.exceptions.RequestException as e:
             print(f"RequestException occurred: {e}")
-            return JsonResponse({'answer': '[Request Error] An error occurred while processing your request.'})
-        except ValueError as e:
-            print(f"ValueError occurred: {e}")
-            return JsonResponse({'answer': '[JSONDecodeError] Invalid JSON response received.'})
-        except Exception as e:
-            logger = logging.getLogger(__name__)
-            logger.error("An unexpected error occurred in ask_ollama", exc_info=True)
-            return JsonResponse({'answer': 'An internal error has occurred.'})
-    else:
-        return JsonResponse({'error': 'POST method required'})
+            return JsonResponse({'answer': '[Request Error] Failed to connect to language model.'})
+
+        answer = response.json().get('response', 'No answer found.')
+        add_to_chat_history(request.session, question, answer)
+        cache.set(cache_key, answer, timeout=600)
+        return JsonResponse({'answer': answer})
+
+    except Exception as e:
+        logging.getLogger(__name__).error("Unexpected error in ask_ollama", exc_info=True)
+        return JsonResponse({'answer': 'An internal error has occurred.'})
+
