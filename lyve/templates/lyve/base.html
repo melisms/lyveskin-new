@@ -177,13 +177,26 @@
     border-bottom: 1px solid #eee;
   ">
     <h4 style="margin: 0; color: #40826D;">Lyve Skin Assistant</h4>
-    <button id="close-chat" style="
-      background: none;
-      border: none;
-      font-size: 20px;
-      cursor: pointer;
-      color: #888;
-    ">&times;</button>
+    <div>
+      <button id="clear-chat" style="
+        background: none;
+        border: none;
+        font-size: 14px;
+        cursor: pointer;
+        color: #888;
+        margin-right: 10px;
+        padding: 2px 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      ">Clear</button>
+      <button id="close-chat" style="
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: #888;
+      ">&times;</button>
+    </div>
   </div>
   <div id="messages" style="flex: 1; overflow-y: auto; padding: 10px;"></div>
   <input id="user-input" type="text" placeholder="Ask about products, categories, or skincare..." style="
@@ -284,6 +297,19 @@ chatToggle.addEventListener('click', function() {
 // Close button event handler
 document.getElementById('close-chat').addEventListener('click', function() {
   chatBox.style.display = 'none';
+});
+
+document.getElementById('clear-chat').addEventListener('click', function() {
+
+  messageBox.innerHTML = '';
+  
+  
+  const systemMessage = document.createElement('div');
+  systemMessage.innerHTML = '<i>Chat has been cleared.</i>';
+  systemMessage.style.textAlign = 'center';
+  systemMessage.style.color = '#888';
+  systemMessage.style.padding = '10px';
+  messageBox.appendChild(systemMessage);
 });
 
 userInput.addEventListener('keypress', function (e) {
