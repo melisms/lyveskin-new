@@ -199,13 +199,25 @@
     </div>
   </div>
   <div id="messages" style="flex: 1; overflow-y: auto; padding: 10px;"></div>
-  <input id="user-input" type="text" placeholder="Ask about products, categories, or skincare..." style="
-    border: none; 
-    border-top: 1px solid #ccc; 
-    padding: 12px; 
-    font-size: 14px; 
-    outline: none;
-  ">
+  <div style="display: flex; border-top: 1px solid #ccc;">
+    <input id="user-input" type="text" placeholder="Ask about products, categories, or skincare..." style="
+      flex: 1;
+      border: none; 
+      padding: 12px; 
+      font-size: 14px; 
+      outline: none;
+    ">
+    <button id="send-message" style="
+      background: none;
+      border: none;
+      padding: 0 15px;
+      color: #40826D;
+      cursor: pointer;
+      font-size: 18px;
+    ">
+      <i class="fas fa-paper-plane"></i>
+    </button>
+  </div>
 </div>
 
 <script>
@@ -303,7 +315,10 @@ document.getElementById('clear-chat').addEventListener('click', function() {
 
   messageBox.innerHTML = '';
   
+
+  localStorage.removeItem(storageKey);
   
+
   const systemMessage = document.createElement('div');
   systemMessage.innerHTML = '<i>Chat has been cleared.</i>';
   systemMessage.style.textAlign = 'center';
@@ -312,152 +327,158 @@ document.getElementById('clear-chat').addEventListener('click', function() {
   messageBox.appendChild(systemMessage);
 });
 
-userInput.addEventListener('keypress', function (e) {
+function sendMessage() {
+  const input = userInput.value;
+  if (input.trim() === '') return;
+
+  userInput.value = ''; 
+
+  const userMessage = document.createElement('div');
+  userMessage.innerHTML = '<b>You:</b> ';
+  const userText = document.createElement('span');
+  userText.textContent = input;
+  userMessage.appendChild(userText);
+  messageBox.appendChild(userMessage);
+  messageBox.scrollTop = messageBox.scrollHeight;
+  saveMessages();  // Save after user message added
+
+  // Show typing indicator
+  const typingIndicator = document.createElement('div');
+  typingIndicator.className = 'typing-indicator';
+  typingIndicator.innerHTML = '<b>Assistant:</b> <span>...</span>';
+  messageBox.appendChild(typingIndicator);
+  messageBox.scrollTop = messageBox.scrollHeight;
+  
+  // Send the message to the server
+  fetch('/ask/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(csrftoken && { 'X-CSRFToken': csrftoken })
+    },
+    body: JSON.stringify({ question: input })
+  })
+  .then(response => response.json())
+  .then(data => {
+    // Remove typing indicator
+    messageBox.removeChild(typingIndicator);
+
+    const assistantMessage = document.createElement('div');
+    assistantMessage.className = 'assistant-message';
+    assistantMessage.innerHTML = '<b>Assistant:</b> ';
+
+    if (data.product_results) {
+      const textResponse = document.createElement('div');
+      textResponse.textContent = data.answer;
+      textResponse.style.marginBottom = '10px';
+      assistantMessage.appendChild(textResponse);
+
+      const productGrid = document.createElement('div');
+      productGrid.className = 'product-grid';
+      productGrid.style.display = 'grid';
+      productGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+      productGrid.style.gap = '10px';
+      productGrid.style.marginTop = '10px';
+
+      data.products.forEach(product => {
+        const productCard = document.createElement('div');
+        productCard.className = 'product-card';
+        productCard.style.border = '1px solid #eee';
+        productCard.style.borderRadius = '8px';
+        productCard.style.padding = '10px';
+        productCard.style.cursor = 'pointer';
+        productCard.style.backgroundColor = '#fff';
+        productCard.style.transition = 'transform 0.2s';
+        productCard.style.display = 'flex';
+        productCard.style.flexDirection = 'column';
+        productCard.style.alignItems = 'center';
+
+        productCard.onmouseover = function() {
+          this.style.transform = 'scale(1.03)';
+          this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+        };
+        productCard.onmouseout = function() {
+          this.style.transform = 'scale(1)';
+          this.style.boxShadow = 'none';
+        };
+        // Ürün URL'sini veri özelliği olarak sakla
+        productCard.setAttribute('data-url', product.url);
+        productCard.onclick = function() {
+          window.location.href = product.url;
+        };
+
+        if (product.image) {
+          const img = document.createElement('img');
+          img.src = product.image;
+          img.alt = product.name;
+          img.style.width = '100%';
+          img.style.height = '120px';
+          img.style.objectFit = 'contain';
+          img.style.marginBottom = '8px';
+          productCard.appendChild(img);
+        } else {
+          const placeholder = document.createElement('div');
+          placeholder.style.width = '100%';
+          placeholder.style.height = '120px';
+          placeholder.style.backgroundColor = '#f5f5f5';
+          placeholder.style.display = 'flex';
+          placeholder.style.alignItems = 'center';
+          placeholder.style.justifyContent = 'center';
+          placeholder.style.marginBottom = '8px';
+          placeholder.textContent = 'No Image';
+          productCard.appendChild(placeholder);
+        }
+
+        const name = document.createElement('div');
+        name.textContent = product.name;
+        name.style.fontWeight = 'bold';
+        name.style.fontSize = '12px';
+        name.style.textAlign = 'center';
+        name.style.height = '36px';
+        name.style.overflow = 'hidden';
+        productCard.appendChild(name);
+
+        productGrid.appendChild(productCard);
+      });
+
+      assistantMessage.appendChild(productGrid);
+    } else {
+      const assistantText = document.createElement('span');
+      assistantText.textContent = data.answer;
+      assistantMessage.appendChild(assistantText);
+    }
+
+    messageBox.appendChild(assistantMessage);
+    messageBox.scrollTop = messageBox.scrollHeight;
+    saveMessages();  // Save after assistant message added
+
+    if (data.redirect) {
+      setTimeout(() => {
+        window.location.href = data.redirect;
+      }, 2000);
+    }
+  })
+  .catch(error => {
+    messageBox.removeChild(typingIndicator);
+
+    const errorMessage = document.createElement('div');
+    errorMessage.innerHTML = '<b>Fault:</b> ';
+    const errorText = document.createElement('span');
+    errorText.textContent = error;
+    errorMessage.appendChild(errorText);
+    messageBox.appendChild(errorMessage);
+    messageBox.scrollTop = messageBox.scrollHeight;
+    saveMessages();  // Save error message too
+  });
+}
+
+userInput.addEventListener('keypress', function(e) {
   if (e.key === 'Enter') {
-    const input = e.target.value;
-    if (input.trim() === '') return;
-
-    e.target.value = ''; 
-
-    // Append user message
-    const userMessage = document.createElement('div');
-    userMessage.innerHTML = '<b>You:</b> ';
-    const userText = document.createElement('span');
-    userText.textContent = input;
-    userMessage.appendChild(userText);
-    messageBox.appendChild(userMessage);
-    messageBox.scrollTop = messageBox.scrollHeight;
-    saveMessages();  // Save after user message added
-
-    // Show typing indicator
-    const typingIndicator = document.createElement('div');
-    typingIndicator.className = 'typing-indicator';
-    typingIndicator.innerHTML = '<b>Assistant:</b> <span>...</span>';
-    messageBox.appendChild(typingIndicator);
-    messageBox.scrollTop = messageBox.scrollHeight;
-
-    fetch('/ask/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(csrftoken && { 'X-CSRFToken': csrftoken })
-      },
-      body: JSON.stringify({ question: input })
-    })
-    .then(response => response.json())
-    .then(data => {
-      // Remove typing indicator
-      messageBox.removeChild(typingIndicator);
-
-      const assistantMessage = document.createElement('div');
-      assistantMessage.className = 'assistant-message';
-      assistantMessage.innerHTML = '<b>Assistant:</b> ';
-
-      if (data.product_results) {
-        const textResponse = document.createElement('div');
-        textResponse.textContent = data.answer;
-        textResponse.style.marginBottom = '10px';
-        assistantMessage.appendChild(textResponse);
-
-        const productGrid = document.createElement('div');
-        productGrid.className = 'product-grid';
-        productGrid.style.display = 'grid';
-        productGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
-        productGrid.style.gap = '10px';
-        productGrid.style.marginTop = '10px';
-
-        data.products.forEach(product => {
-          const productCard = document.createElement('div');
-          productCard.className = 'product-card';
-          productCard.style.border = '1px solid #eee';
-          productCard.style.borderRadius = '8px';
-          productCard.style.padding = '10px';
-          productCard.style.cursor = 'pointer';
-          productCard.style.backgroundColor = '#fff';
-          productCard.style.transition = 'transform 0.2s';
-          productCard.style.display = 'flex';
-          productCard.style.flexDirection = 'column';
-          productCard.style.alignItems = 'center';
-
-          productCard.onmouseover = function() {
-            this.style.transform = 'scale(1.03)';
-            this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
-          };
-          productCard.onmouseout = function() {
-            this.style.transform = 'scale(1)';
-            this.style.boxShadow = 'none';
-          };
-          // Ürün URL'sini veri özelliği olarak sakla
-          productCard.setAttribute('data-url', product.url);
-          productCard.onclick = function() {
-            window.location.href = product.url;
-          };
-
-          if (product.image) {
-            const img = document.createElement('img');
-            img.src = product.image;
-            img.alt = product.name;
-            img.style.width = '100%';
-            img.style.height = '120px';
-            img.style.objectFit = 'contain';
-            img.style.marginBottom = '8px';
-            productCard.appendChild(img);
-          } else {
-            const placeholder = document.createElement('div');
-            placeholder.style.width = '100%';
-            placeholder.style.height = '120px';
-            placeholder.style.backgroundColor = '#f5f5f5';
-            placeholder.style.display = 'flex';
-            placeholder.style.alignItems = 'center';
-            placeholder.style.justifyContent = 'center';
-            placeholder.style.marginBottom = '8px';
-            placeholder.textContent = 'No Image';
-            productCard.appendChild(placeholder);
-          }
-
-          const name = document.createElement('div');
-          name.textContent = product.name;
-          name.style.fontWeight = 'bold';
-          name.style.fontSize = '12px';
-          name.style.textAlign = 'center';
-          name.style.height = '36px';
-          name.style.overflow = 'hidden';
-          productCard.appendChild(name);
-
-          productGrid.appendChild(productCard);
-        });
-
-        assistantMessage.appendChild(productGrid);
-      } else {
-        const assistantText = document.createElement('span');
-        assistantText.textContent = data.answer;
-        assistantMessage.appendChild(assistantText);
-      }
-
-      messageBox.appendChild(assistantMessage);
-      messageBox.scrollTop = messageBox.scrollHeight;
-      saveMessages();  // Save after assistant message added
-
-      if (data.redirect) {
-        setTimeout(() => {
-          window.location.href = data.redirect;
-        }, 2000);
-      }
-    })
-    .catch(error => {
-      messageBox.removeChild(typingIndicator);
-
-      const errorMessage = document.createElement('div');
-      errorMessage.innerHTML = '<b>Fault:</b> ';
-      const errorText = document.createElement('span');
-      errorText.textContent = error;
-      errorMessage.appendChild(errorText);
-      messageBox.appendChild(errorMessage);
-      messageBox.scrollTop = messageBox.scrollHeight;
-      saveMessages();  // Save error message too
-    });
+    sendMessage();
   }
 });
+
+document.getElementById('send-message').addEventListener('click', sendMessage);
 
 </script>
 
