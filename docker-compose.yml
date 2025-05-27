@@ -9,6 +9,8 @@ services:
       - "8000:8000"
     volumes:
       - .:/app
+      - static_volume:/app/static
+      - media_volume:/app/media
     environment:
       - PYTHONUNBUFFERED=1
     depends_on:
@@ -36,6 +38,8 @@ services:
       - "80:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - static_volume:/app/static
+      - media_volume:/app/media
     depends_on:
       - app
       
@@ -48,3 +52,5 @@ services:
 
 volumes:
   ollama-data:
+  static_volume:
+  media_volume:
