@@ -162,7 +162,7 @@
         
         {% if form.errors or form.non_field_errors %}
             <div class="errors-container">
-                <p><strong>Lütfen aşağıdaki hataları düzeltin:</strong></p>
+                <p><strong>Please correct the following errors:</strong></p>
                 {% for field in form %}
                     {% for error in field.errors %}
                         <p class="error-message">{{ field.label }}: {{ error }}</p>
@@ -187,7 +187,7 @@
                             <div class="file-input-container">
                                 {{ field }}
                                 {% if field.value %}
-                                    <span class="file-name">Mevcut: {{ field.value }}</span>
+                                    <span class="file-name">Current: {{ field.value }}</span>
                                 {% endif %}
                             </div>
                         {% else %}
