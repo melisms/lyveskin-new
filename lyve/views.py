@@ -91,9 +91,16 @@ def add_to_chat_history(session, user_input, model_response):
     session[SESSION_CHAT_HISTORY_KEY] = history
     session.modified = True
 
+import random
+
 def serialize_items(items):
     product_data = []
-    for item in items:
+  
+    items_list = list(items)
+ 
+    random.shuffle(items_list)
+    
+    for item in items_list:
         image_url = getattr(item.image, 'url', None) if hasattr(item, 'image') else None
         if not image_url:
             image_url = item.image if isinstance(item.image, str) else '/static/images/product-placeholder.jpg'
