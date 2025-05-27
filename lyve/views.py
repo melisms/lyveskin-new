@@ -74,6 +74,15 @@ def test(request):
     
 from django.contrib.auth import get_user_model
 User = get_user_model()
+SESSION_CHAT_HISTORY_KEY = 'ollama_chat_history'
+def get_chat_history(session):
+    return session.get(SESSION_CHAT_HISTORY_KEY, [])
+
+def add_to_chat_history(session, user_input, model_response):
+    history = session.get(SESSION_CHAT_HISTORY_KEY, [])
+    history.append({'user': user_input, 'bot': model_response})
+    session[SESSION_CHAT_HISTORY_KEY] = history  
+    session.modified = True
 @csrf_exempt
 def ask_ollama(request):
     if request.method == 'POST':
@@ -237,12 +246,14 @@ def ask_ollama(request):
                                 "answer": f"Redirecting to {user.username}'s profile page.",
                                 "redirect": f"/profile/{user.id}/"
                             })            
+            chat_history = get_chat_history(request.session)
+            history_prompt = "\n".join([f"User: {msg['user']}\nAssistant: {msg['bot']}" for msg in chat_history])
             prompt = f"""
             You are a helpful assistant for a skincare product website.
             Answer the user's question concisely and clearly.
-
-            Question: {question}
-            Answer:
+            {history_prompt}
+            User: {question}
+            Assistant:
             """
             ollama_response = requests.post(
                 "http://host.docker.internal:11434/api/generate",
@@ -256,6 +267,7 @@ def ask_ollama(request):
             ollama_response.raise_for_status() 
             response_json = ollama_response.json()
             answer = response_json.get('response', 'No answer found.')
+            add_to_chat_history(request.session, question, answer)
             cache.set(cache_key, answer, timeout=600)
 
             return JsonResponse({'answer': answer})
