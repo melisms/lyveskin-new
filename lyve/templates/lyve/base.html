@@ -230,6 +230,43 @@ function loadMessages() {
   if (saved) {
     messageBox.innerHTML = saved;
     messageBox.scrollTop = messageBox.scrollHeight;
+    
+    // Yüklenen ürün kartlarına tıklama özelliğini tekrar ekle
+    const productCards = messageBox.querySelectorAll('.product-card');
+    console.log('Bulunan ürün kartları:', productCards.length);
+    
+    productCards.forEach(card => {
+      // Stil efektlerini yeniden ekle
+      card.onmouseover = function() {
+        this.style.transform = 'scale(1.03)';
+        this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+      };
+      card.onmouseout = function() {
+        this.style.transform = 'scale(1)';
+        this.style.boxShadow = 'none';
+      };
+      
+      // URL bilgisini data attribute'undan al
+      const productUrl = card.getAttribute('data-url');
+      console.log('Ürün URL:', productUrl);
+      
+      // Tıklama olayını ekle - daha güvenilir bir yöntem
+      card.style.cursor = 'pointer'; // İmleci pointer yaparak tıklanabilir olduğunu belirt
+      card.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        try {
+          if (productUrl) {
+            console.log('Yönlendiriliyor:', productUrl);
+            window.location.href = productUrl;
+          } else {
+            console.error('Ürün URL\'si bulunamadı');
+          }
+        } catch (error) {
+          console.error('Yönlendirme hatası:', error);
+        }
+      });
+    });
   }
 }
 
@@ -324,6 +361,8 @@ userInput.addEventListener('keypress', function (e) {
             this.style.transform = 'scale(1)';
             this.style.boxShadow = 'none';
           };
+          // Ürün URL'sini veri özelliği olarak sakla
+          productCard.setAttribute('data-url', product.url);
           productCard.onclick = function() {
             window.location.href = product.url;
           };
