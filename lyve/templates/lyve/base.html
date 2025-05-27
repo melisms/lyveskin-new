@@ -25,7 +25,7 @@
 
     <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
     <link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}">
-
+    <meta name="current-user-id" content="{% if user.is_authenticated %}{{ user.id }}{% else %}anonymous{% endif %}">
 </head>
 <body style="display: flex; flex-direction: column; min-height: 100vh;">
     <header class="site-header">
@@ -200,15 +200,33 @@ const csrftoken = document.querySelector('meta[name="csrf-token"]')?.getAttribut
 
 const chatToggle = document.getElementById('chat-toggle');
 const chatBox = document.getElementById('chat-box');
+const userId = document.querySelector('meta[name="current-user-id"]').getAttribute('content');
+const storageKey = `chatMessages_${userId}`;
 const messageBox = document.getElementById('messages');
 const userInput = document.getElementById('user-input');
+const currentUserId = userId;
+const lastUserIdKey = 'lastUserId';
+
+window.addEventListener('DOMContentLoaded', () => {
+  const lastUserId = localStorage.getItem(lastUserIdKey);
+  if (lastUserId !== currentUserId) {
+    localStorage.removeItem(`chatMessages_${lastUserId}`);
+    localStorage.removeItem(storageKey);  
+  }
+  localStorage.setItem(lastUserIdKey, currentUserId);
+  const saved = localStorage.getItem(storageKey);
+  if (saved) {
+    messageBox.innerHTML = saved;
+    messageBox.scrollTop = messageBox.scrollHeight;
+  }
+});
 
 function saveMessages() {
-  localStorage.setItem('chatMessages', messageBox.innerHTML);
+  localStorage.setItem(storageKey, messageBox.innerHTML);
 }
 
 function loadMessages() {
-  const saved = localStorage.getItem('chatMessages');
+  const saved = localStorage.getItem(storageKey);
   if (saved) {
     messageBox.innerHTML = saved;
     messageBox.scrollTop = messageBox.scrollHeight;
