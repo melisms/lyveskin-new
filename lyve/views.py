@@ -91,6 +91,15 @@ def add_to_chat_history(session, user_input, model_response):
     session[SESSION_CHAT_HISTORY_KEY] = history
     session.modified = True
 
+def cache_ollama_answer(question, answer):
+    cache_key = f"ollama_response:{question}"
+    cache.set(cache_key, answer, timeout=600)
+
+    # Track cached keys in a set stored in cache
+    keys = cache.get('ollama_cached_questions', set())
+    keys.add(cache_key)
+    cache.set('ollama_cached_questions', keys, timeout=None)
+    
 import random
 
 def serialize_items(items):
@@ -188,7 +197,7 @@ def ask_ollama(request):
                     })
                 else:
                     answer = f"Sorry, we don't currently have any {category_name.lower()} products listed."
-                    cache.set(cache_key, answer, timeout=600)
+                    cache_ollama_answer(question, answer)
                     return JsonResponse({'answer': answer})
 
       
@@ -204,7 +213,7 @@ def ask_ollama(request):
                 })
             else:
                 answer = "Sorry, we don't have any products listed currently."
-                cache.set(cache_key, answer, timeout=600)
+                cache_ollama_answer(question, answer)
                 return JsonResponse({'answer': answer})
 
       
@@ -247,7 +256,7 @@ def ask_ollama(request):
 
         answer = response.json().get('response', 'No answer found.')
         add_to_chat_history(request.session, question, answer)
-        cache.set(cache_key, answer, timeout=600)
+        cache_ollama_answer(question, answer)
         return JsonResponse({'answer': answer})
 
     except Exception as e:
