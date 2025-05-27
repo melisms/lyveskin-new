@@ -39,7 +39,7 @@ from django.core.paginator import Paginator
 def ingredients(request):
     ingredient_list = Ingredient.objects.all()
 
-    # Paginate the ingredient list
+    
     paginator = Paginator(ingredient_list, 100)  
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -141,23 +141,34 @@ def ask_ollama(request):
         if cached_answer := cache.get(cache_key):
             return JsonResponse({'answer': cached_answer})
 
-        # Match specific item name
+       
         if len(words) >= 2:
             items = cache.get("items_name_list")
             if not items:
-                from item.models import Item  # Local import for performance
+                from item.models import Item  
                 items = list(Item.objects.values("id", "name"))
                 cache.set("items_name_list", items, 600)
 
             for item in items:
                 item_words = item['name'].lower().split()
                 if sum(1 for w in item_words if w in words) >= 3:
-                    return JsonResponse({
-                        'answer': f"You can visit {item['name']} page.",
-                        'redirect': f"/items/{item['id']}/"
-                    })
+               
+               
+                    from item.models import Item  
+                    product_item = Item.objects.filter(id=item['id']).first()
+                    if product_item:
+                        return JsonResponse({
+                            'answer': f"Here is the {item['name']} you asked about:",
+                            'product_results': True,
+                            'category': 'Product Search',
+                            'products': serialize_items([product_item])
+                        })
+                    else:
+                        return JsonResponse({
+                            'answer': f"Sorry, I couldn't find the product you're looking for."
+                        })
 
-        # Match by category keywords
+       
         category_keywords = {
             "lip care": "Lip Care", "tonic": "Tonic",
             "cleanser": "Cleanser", "moisturizer": "Moisturizer",
@@ -180,7 +191,7 @@ def ask_ollama(request):
                     cache.set(cache_key, answer, timeout=600)
                     return JsonResponse({'answer': answer})
 
-        # General products response
+      
         if any(w in question for w in ['items', 'products']) and len(words) >= 3:
             from item.models import Item
             items = Item.objects.all()[:10]
@@ -196,14 +207,14 @@ def ask_ollama(request):
                 cache.set(cache_key, answer, timeout=600)
                 return JsonResponse({'answer': answer})
 
-        # User profile (self)
+      
         if "profile" in question and request.user.is_authenticated:
             return JsonResponse({
                 "answer": "Redirecting to your profile page.",
                 "redirect": f"/profile/{request.user.id}/"
             })
 
-        # User profile (others)
+      
         if "profile" in words:
             possible_names = [w for w in words if w != "profile"]
             if possible_names:
@@ -221,7 +232,7 @@ def ask_ollama(request):
                             "redirect": f"/profile/{matched_user.id}/"
                         })
 
-        # Default: Ask Ollama
+ 
         prompt = build_prompt(request.session, question)
         try:
             response = requests.post(
