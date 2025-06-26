@@ -3,7 +3,7 @@ crispy-bootstrap4==2024.10
 Django==5.2.2
 django-bootstrap4==25.1
 django-crispy-forms==2.4
-packaging==24.2
+packaging==25.0
 pillow==11.2.1
 psutil==6.1.0
 Pygments==2.18.0
