@@ -250,6 +250,15 @@ function saveMessages() {
   localStorage.setItem(storageKey, messageBox.innerHTML);
 }
 
+function isValidUrl(url) {
+  try {
+    const parsedUrl = new URL(url);
+    return ['http:', 'https:'].includes(parsedUrl.protocol);
+  } catch (e) {
+    return false;
+  }
+}
+
 function loadMessages() {
   const saved = localStorage.getItem(storageKey);
   if (saved) {
@@ -281,11 +290,11 @@ function loadMessages() {
         e.preventDefault();
         e.stopPropagation();
         try {
-          if (productUrl) {
+          if (productUrl && isValidUrl(productUrl)) {
             console.log('Yönlendiriliyor:', productUrl);
             window.location.href = productUrl;
           } else {
-            console.error('Ürün URL\'si bulunamadı');
+            console.error('Geçersiz veya bulunamayan ürün URL\'si:', productUrl);
           }
         } catch (error) {
           console.error('Yönlendirme hatası:', error);
