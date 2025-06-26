@@ -1,0 +1,52 @@
+name: Sync Main to Develop
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Check for new commits from main to develop
+        id: check
+        run: |
+          git fetch origin develop
+          if git rev-list origin/develop..origin/main --quiet; then
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No new commits from main to develop. Skipping PR."
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Create Pull Request to develop
+        if: steps.check.outputs.has_changes == 'true'
+        id: cpr
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore: sync main to develop'
+          title: 'Sync main to develop'
+          body: 'Automated PR to sync changes from main to develop'
+          base: develop
+          branch: sync/main-to-develop
+          delete-branch: true
+
+      - name: Enable Auto-Merge after successful checks
+        if: steps.cpr.outputs.pull-request-number != ''
+        run: |
+          gh pr merge ${{ steps.cpr.outputs.pull-request-number }} \
+            --merge \
+            --repo ${{ github.repository }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
