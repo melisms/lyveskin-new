@@ -291,8 +291,9 @@ function loadMessages() {
         e.stopPropagation();
         try {
           if (productUrl && isValidUrl(productUrl)) {
-            console.log('Yönlendiriliyor:', productUrl);
-            window.location.href = productUrl;
+            const sanitizedUrl = encodeURI(productUrl);
+            console.log('Yönlendiriliyor:', sanitizedUrl);
+            window.location.href = sanitizedUrl;
           } else {
             console.error('Geçersiz veya bulunamayan ürün URL\'si:', productUrl);
           }
