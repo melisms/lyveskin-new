@@ -12,7 +12,7 @@ soupsieve==2.7
 sqlparse==0.5.3
 typing_extensions==4.14.0
 gunicorn==23.0.0
-dj-database-url==2.3.0
+dj-database-url==3.0.0
 requests==2.32.4
 redis==6.1.0
 django-redis==5.4.0
