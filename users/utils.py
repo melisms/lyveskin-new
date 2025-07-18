@@ -47,3 +47,25 @@ def verify_email(user):
     msg = EmailMultiAlternatives(subject, text_content, from_email, to)
     msg.attach_alternative(html_content, "text/html")
     msg.send(fail_silently=False)
+    
+def send_password_reset_email(user):
+    subject = 'Reset Your Password'
+    from_email = settings.DEFAULT_FROM_EMAIL
+    to = [user.email]
+
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    token = default_token_generator.make_token(user)
+    reset_url = reverse('users:password_reset_confirm', kwargs={'uidb64': uid, 'token': token})
+    reset_link = f"{settings.SITE_URL}{reset_url}"
+
+    context = {
+        'username': user.username,
+        'reset_link': reset_link
+    }
+
+    html_content = render_to_string('users/password_reset_email.html', context)
+    text_content = f"Hi {user.username},\nYou can reset your password using this link: {reset_link}"
+
+    msg = EmailMultiAlternatives(subject, text_content, from_email, to)
+    msg.attach_alternative(html_content, "text/html")
+    msg.send(fail_silently=False)
