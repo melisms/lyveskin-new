@@ -22,7 +22,6 @@ from django.contrib.auth import views as auth_views
 from django.urls import path, include
 from users import views as user_views
 
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('register/', user_views.register, name='register'),
@@ -35,6 +34,6 @@ urlpatterns = [
     path('settings/update/', user_views.update_settings, name='update_settings'),
     path('settings/', user_views.settings_page, name='settings_page'),
     path('users/', include(('users.urls', 'users'), namespace='users')),
-
+    path("forgot-password/", user_views.forgot_password_view, name="forgot_password"),
 
     ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

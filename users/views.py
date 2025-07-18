@@ -9,10 +9,12 @@ from django.contrib.auth.decorators import login_required
 from item.models import Item
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-from .utils import send_welcome_email, verify_email
+from .utils import send_welcome_email, verify_email, send_password_reset_email
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_decode
 from django.core.cache import cache
+from django.contrib.auth.forms import PasswordResetForm
+from django.urls import reverse
 
 CACHE_TIMEOUT = 60 * 5
 
@@ -177,3 +179,24 @@ def settings_page(request):
     response = render(request, 'users/settings.html', user_data)
     list(get_messages(request))
     return response
+
+def forgot_password_view(request):
+    if request.method == "POST":
+        form = PasswordResetForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data["email"]
+            users = User.objects.filter(email=email)
+            for user in users:
+                send_password_reset_email(user)
+            messages.success(request, "If that email exists in our system, we've sent a reset link.")
+            return redirect('forgot_password')
+    else:
+        form = PasswordResetForm()
+    return render(request, "users/request_email.html", {"form": form})
+
+from django.contrib.auth.views import PasswordResetConfirmView
+from django.urls import reverse_lazy
+
+class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = 'users/new_password.html'
+    success_url = reverse_lazy('users:password_reset_complete')
