@@ -13,6 +13,7 @@ class Category(models.Model):
 
 class Ingredient(models.Model):
     name = models.CharField(max_length=255)
+    base_ingredient = models.ForeignKey('BaseIngredient', on_delete=models.SET_NULL, null=True, blank=True)
     safety = models.CharField(
         choices=(('S', "Safe"),
                 ('N', "Neutral"),
@@ -66,4 +67,12 @@ class Item(models.Model):
             'safe': safe_count,
             'risky': risky_count,
         }
-    
+
+class BaseIngredient(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name

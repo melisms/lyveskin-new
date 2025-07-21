@@ -32,14 +32,32 @@
     max-width: 350px;
     text-align: center;
   }
-  .item-image {
-    max-width: 100%;
-    height: auto;
-    border: 1.5px solid #40826d;
-    border-radius: 14px 14px 0 0;
-    margin-bottom: 1rem;
-    object-fit: contain;
+
+  .chart-image-wrapper {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    margin: 0 auto 1rem auto;
   }
+  .chart-image-wrapper canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+  }
+  .chart-image-wrapper img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 185px;  
+    height: 185px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+  
+    z-index: 2;
+  }
+
   .item-name {
     font-weight: 700;
     font-size: 1.5rem;
@@ -79,10 +97,13 @@
     color: #2c3e50;
   }
   canvas {
-    max-width: 280px;
-    margin: 0 auto;
-    display: block;
-  }
+  position: relative;
+  z-index: 10; /* Tooltip üstte çıksın */
+}
+.chartjs-tooltip {
+  z-index: 9999 !important; /* Tooltip her şeyin üstünde */
+}
+
   @media (max-width: 768px) {
     .items-row {
       flex-direction: column;
@@ -101,7 +122,13 @@
     <div class="items-row">
         <!-- Item 1 -->
         <div class="item-card">
-            <img src="{{ item1.image.url }}" alt="{{ item1 }}" class="item-image" />
+            <div class="chart-image-wrapper">
+                <canvas id="healthChart1" width="280" height="280"></canvas>
+                <img src="{{ item1.image.url }}" alt="{{ item1 }}" />
+            </div>
+            <h3 class="health-score">Health Score: <span id="healthScoreItem1">{{ item1_health_score }}</span>/100</h3>
+
+
             <p class="item-name">{{ item1 }}</p>
 
             <p class="ingredient-stats">
@@ -116,13 +143,16 @@
                 {% endfor %}
             </p>
 
-            <h3 class="health-score" id="healthScoreItem1">Health Score: {{ item1_health_score }}/100</h3>
-            <canvas id="healthChart1" width="280" height="280"></canvas>
         </div>
 
         <!-- Item 2 -->
         <div class="item-card">
-            <img src="{{ item2.image.url }}" alt="{{ item2 }}" class="item-image" />
+            <div class="chart-image-wrapper">
+                <canvas id="healthChart2" width="280" height="280"></canvas>
+                <img src="{{ item2.image.url }}" alt="{{ item2 }}" />
+            </div>
+            <h3 class="health-score"> Health Score: <span id="healthScoreItem2">{{ item2_health_score }}</span>/100</h3>
+
             <p class="item-name">{{ item2 }}</p>
 
             <p class="ingredient-stats">
@@ -137,8 +167,7 @@
                 {% endfor %}
             </p>
 
-            <h3 class="health-score" id="healthScoreItem2">Health Score: {{ item2_health_score }}/100</h3>
-            <canvas id="healthChart2" width="280" height="280"></canvas>
+            
         </div>
     </div>
 </div>
@@ -159,46 +188,120 @@
     const item1HealthScore = calculateHealthScore(item1SafeCount, item1RiskyCount);
     const item2HealthScore = calculateHealthScore(item2SafeCount, item2RiskyCount);
 
-    document.getElementById('healthScoreItem1').innerText = `Health Score: ${item1HealthScore}/100`;
-    document.getElementById('healthScoreItem2').innerText = `Health Score: ${item2HealthScore}/100`;
+    function getScoreColor(score) {
+        if (score <= 40) return '#F44336';   // kırmızı
+        if (score <= 75) return '#FFC107';   // sarı
+        return '#4CAF50';                    // yeşil
+    }
 
-    // Chart config shared
-    const chartOptions = {
-        cutout: '70%',
-        plugins: { legend: { position: 'bottom' } }
-    };
+    // Sadece sayı kısmını renklendir
+    const scoreElem1 = document.getElementById('healthScoreItem1');
+    scoreElem1.innerText = item1HealthScore;
+    scoreElem1.style.color = getScoreColor(item1HealthScore);
 
-    // Item 1 Chart
+    const scoreElem2 = document.getElementById('healthScoreItem2');
+    scoreElem2.innerText = item2HealthScore;
+    scoreElem2.style.color = getScoreColor(item2HealthScore);
+
+    // Chart config
+   const chartOptions = {
+  cutout: '70%',
+  plugins: {
+    legend: { display: false }, // Alt legend kapalı
+    tooltip: {
+      enabled: false, // Default tooltip kapalı
+      external: function(context) {
+        let tooltipEl = document.getElementById('chartjs-tooltip');
+        if (!tooltipEl) {
+          tooltipEl = document.createElement('div');
+          tooltipEl.id = 'chartjs-tooltip';
+          tooltipEl.style.position = 'absolute';
+          tooltipEl.style.background = 'rgba(0, 0, 0, 0.85)';
+          tooltipEl.style.color = '#fff';
+          tooltipEl.style.borderRadius = '6px';
+          tooltipEl.style.padding = '8px 12px';
+          tooltipEl.style.fontSize = '14px';
+          tooltipEl.style.fontWeight = '600';
+          tooltipEl.style.boxShadow = '0 4px 10px rgba(0,0,0,0.3)';
+          tooltipEl.style.pointerEvents = 'none';
+          tooltipEl.style.transition = 'all 0.1s ease';
+          tooltipEl.style.zIndex = '9999'; 
+          document.body.appendChild(tooltipEl);
+        }
+
+        const tooltipModel = context.tooltip;
+        if (tooltipModel.opacity === 0) {
+          tooltipEl.style.opacity = 0;
+          return;
+        }
+
+        if (tooltipModel.body) {
+          const dataPoint = tooltipModel.dataPoints[0];
+          const label = dataPoint.label; // Safe / Risky
+          const value = parseFloat(dataPoint.raw);
+          
+          // Toplam ve yüzde hesapla
+          const total = dataPoint.dataset.data.reduce((a, b) => a + b, 0);
+          const percentage = ((value / total) * 100).toFixed(1);
+
+          // Renk kutucuğunu bul
+          const colorBox = dataPoint.element.options.backgroundColor;
+
+          tooltipEl.innerHTML = `
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="
+                width:12px;
+                height:12px;
+                background:${colorBox};
+                display:inline-block;
+                border-radius:3px;
+              "></span>
+              <span>${label}: ${percentage}%</span>
+            </div>
+          `;
+        }
+
+        const position = context.chart.canvas.getBoundingClientRect();
+        tooltipEl.style.opacity = 1;
+        tooltipEl.style.left = position.left + window.scrollX + tooltipModel.caretX + 15 + 'px';
+        tooltipEl.style.top = position.top + window.scrollY + tooltipModel.caretY + 15 + 'px';
+      }
+    }
+  }
+};
+
+
+
     const ctx1 = document.getElementById('healthChart1').getContext('2d');
-    new Chart(ctx1, {
-        type: 'doughnut',
-        data: {
-            labels: ['Safe Ingredients', 'Risky Ingredients'],
-            datasets: [{
-                label: 'Ingredient Safety',
-                data: [item1SafeCount, item1RiskyCount],
-                backgroundColor: ['#4CAF50', '#F44336'],
-                hoverOffset: 4
-            }]
-        },
-        options: chartOptions
-    });
+   new Chart(ctx1, {
+  type: 'doughnut',
+  data: {
+    labels: ['Safe', 'Risky'],
+    datasets: [{
+      data: [item1SafeCount, item1RiskyCount],
+      backgroundColor: ['#4CAF50', '#F44336'],
+      hoverOffset: 4
+    }]
+  },
+  options: chartOptions
+});
 
-    // Item 2 Chart
     const ctx2 = document.getElementById('healthChart2').getContext('2d');
     new Chart(ctx2, {
-        type: 'doughnut',
-        data: {
-            labels: ['Safe Ingredients', 'Risky Ingredients'],
-            datasets: [{
-                label: 'Ingredient Safety',
-                data: [item2SafeCount, item2RiskyCount],
-                backgroundColor: ['#4CAF50', '#F44336'],
-                hoverOffset: 4
-            }]
-        },
-        options: chartOptions
-    });
+  type: 'doughnut',
+  data: {
+    labels: ['Safe', 'Risky'],
+    datasets: [{
+      data: [item2SafeCount, item2RiskyCount],
+      backgroundColor: ['#4CAF50', '#F44336'],
+      hoverOffset: 4
+    }]
+  },
+  options: chartOptions
+});
+
 </script>
+
+
 
 {% endblock %}
