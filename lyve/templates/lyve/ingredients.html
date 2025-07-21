@@ -79,16 +79,20 @@
         font-weight: 500;
         font-size: 0.9rem;
         color: #333;
-        text-decoration: none;
         background-color: white;
         transition: all 0.2s ease;
+        text-decoration: none;
     }
     
     .alpha-link:hover {
         background-color: var(--primary-light);
         color: var(--primary-dark);
     }
-    
+
+    .alpha-link:any-link {
+        text-decoration: none;
+    }
+
     .alpha-link.active {
         background-color: var(--primary);
         color: white;
@@ -110,7 +114,7 @@
         min-height: 80px;
         word-break: break-word;
         overflow-wrap: break-word;
-}
+    }
     
     .ingredient-card:hover {
         background-color: #f9f9f9;
@@ -165,13 +169,18 @@
         font-size: 0.85rem;
         text-decoration: none;
         background-color: #f5f5f5;
-        color: #555;
+        color: #40826D;
     }
-    
+
     .page-btn:hover {
         background-color: #e0e0e0;
+        color: #40826D;
+        text-decoration: none;
     }
-    
+    .page-btn:any-link {
+        text-decoration: none !important;
+        border-bottom: none !important;
+    }
     .page-btn.active {
         background-color: var(--primary);
         color: white;
@@ -180,6 +189,7 @@
     .page-btn.nav-btn {
         font-weight: 600;
         color: var(--primary);
+        text-decoration: none;
     }
     
     .badge {
@@ -213,6 +223,7 @@
     .labeling-btn:hover {
         background-color: var(--primary);
         color: white;
+        text-decoration: none;
     }
     
     .empty-state {
