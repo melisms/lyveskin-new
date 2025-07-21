@@ -1,100 +1,149 @@
 {% extends 'lyve/base.html' %}
 {% block title %}{{ item.name }}{% endblock %}
 {% block content %}
-<style>
-    .custom-add-routine-button {
-        background-color: #40826D;
-        border-radius: 10px;
-        padding: 6px 16px;
-        transition: background-color 0.3s ease-in-out;
-    }
 
-    .custom-add-routine-button:hover {
-        background-color: #1e3b31;
-    }
-</style>
-<div class="container" style="align-items: flex-start; display: flex; margin: 20px">
-    <img src="{% if item.image %}{{ item.image.url }}{% else %}/media/no_image.jpg{% endif %}" alt="{{ item.name }}" class="image" style="max-width: 40%; margin-right: 20px">
-    <div class="text" style="width: 80%; overflow-wrap: break-word;word-wrap: break-word;">
-        <h1 class="mb-6 text-3xl"><b>{{ item.brands }}</b></h1>
-        <p class="mb-6 text-3xl" style="overflow-wrap: break-word;word-wrap: break-word; color: #444444;
-  white-space: nowrap; font-size: 25px"><b>{{ item.name }}</b></p>
-        <p class="mb-6 text-3xl">{{ item.description }}</p>
-        <p class="mb-6 text-3xl"><b>Ingredients:</b>
-            {% for ingredient in ingredients %}
-                <span style="
-                    {% if ingredient.safety == 'S' %}
-                        color: green; font-weight: bold;
-                    {% elif ingredient.safety == 'R' %}
-                        color: darkred; font-weight: bold;
-                    {% else %}
-                        color: black;
-                    {% endif %}
-                ">{{ ingredient.name }}</span>{% if not forloop.last %}, {% endif %}
-            {% endfor %}
-        </p>
-        <p class="mb-6 text-3xl"><strong>Skintype:</strong> {{ item.skintype }}</p>
-        <h3 class="mb-6 text-3xl">Health Score: {{ health_score }}/100</h3>
-        <div style="display: flex; gap: 12px; align-items: center; margin-top: 16px;">
-            {% if item in request.user.userprofile.favorites.all %}
-                <form method="POST" action="{% url 'item:remove_from_favorites' item.pk %}" style="margin: 0;">
-                    {% csrf_token %}
-                    <button class="custom-add-routine-button text-white text-sm font-medium" type="submit">
-                        Added
-                    </button>
-                </form>
-            {% else %}
-                <form method="POST" action="{% url 'item:add_to_favorites' item.pk %}" style="margin: 0;">
-                    {% csrf_token %}
-                    <button type="submit" class="custom-add-routine-button text-white text-sm font-medium">
-                        Add Routine
-                    </button>
-                </form>
-            {% endif %}
-            {% if request.user.is_superuser %}
+
+<div style="position: relative; width: 300px; height: 300px; margin: 40px auto;">
+  <canvas id="circleChart"
+          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></canvas>
+
+  <img src="{% if item.image %}{{ item.image.url }}{% else %}/media/no_image.jpg{% endif %}"
+       alt="{{ item.name }}"
+       style="
+         position: absolute;
+         top: 50%; left: 50%;
+         transform: translate(-50%, -50%);
+         width: 190px; height: 190px;
+         border-radius: 50%;
+         object-fit: cover;
+         box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+       ">
+       
+</div>
+
+
+<div class="text" style="width: 80%; overflow-wrap: break-word; word-wrap: break-word; margin:auto; max-width:800px;">
+  
+  <h3 class="mb-6 text-3xl">
+      Health Score: 
+      <span style="
+          {% if health_score >= 75 %}
+              color: green;
+          {% elif health_score >= 40 %}
+              color: orange;
+          {% else %}
+              color: red;
+          {% endif %}
+      ">
+        {{ health_score }}
+      </span>
+      /100
+  </h3>
+
+
+
+
+
+    <h1 class="mb-6 text-3xl"><b>{{ item.brands }}</b></h1>
+    <p class="mb-6 text-3xl" style="color: #444; white-space: nowrap; font-size: 25px;"><b>{{ item.name }}</b></p>
+    <p class="mb-6 text-3xl">{{ item.description }}</p>
+
+    <p class="mb-6 text-3xl"><b>Ingredients:</b>
+        {% for ingredient in ingredients %}
+            <span style="
+                {% if ingredient.safety == 'S' %}
+                    color: green; font-weight: bold;
+                {% elif ingredient.safety == 'R' %}
+                    color: darkred; font-weight: bold;
+                {% else %}
+                    color: black;
+                {% endif %}
+            ">{{ ingredient.name }}</span>{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    </p>
+
+    <p class="mb-6 text-3xl"><strong>Skintype:</strong> {{ item.skintype }}</p>
+    </div>
+    
+
+    <div style="display: flex; gap: 12px; align-items: center; margin-top: 16px;">
+        {% if item in request.user.userprofile.favorites.all %}
+            <form method="POST" action="{% url 'item:remove_from_favorites' item.pk %}" style="margin: 0;">
+                {% csrf_token %}
+                <button class="custom-add-routine-button text-white text-sm font-medium" type="submit">
+                    Added
+                </button>
+            </form>
+        {% else %}
+            <form method="POST" action="{% url 'item:add_to_favorites' item.pk %}" style="margin: 0;">
+                {% csrf_token %}
+                <button type="submit" class="custom-add-routine-button text-white text-sm font-medium">
+                    Add Routine
+                </button>
+            </form>
+        {% endif %}
+
+        {% if request.user.is_superuser %}
             <a href="{% url 'item:edit_item' item.id %}" class="btn btn-primary" style="height: 36px; display: flex; align-items: center; padding: 0 16px;">
                 Edit
             </a>
-            </form>
             <form method="post" action="{% url 'item:remove_item' item.pk %}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this item?');">
-            {% csrf_token %}
-                <button type="submit" class="btn-primary" style="background-color: #dc3545; border: none; color: white; padding: 0.5rem 1.25rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: background-color 0.3s ease;"
-                onmouseover="this.style.backgroundColor='#a71d2a'"
-                onmouseout="this.style.backgroundColor='#dc3545'"
-                >
-                Delete
+                {% csrf_token %}
+                <button type="submit" class="btn-primary"
+                        style="background-color: #dc3545; border: none; color: white; padding: 0.5rem 1.25rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: background-color 0.3s ease;"
+                        onmouseover="this.style.backgroundColor='#a71d2a'"
+                        onmouseout="this.style.backgroundColor='#dc3545'">
+                    Delete
                 </button>
             </form>
-            {% endif %}
-        </div>
-
+        {% endif %}
     </div>
 </div>
-{% endblock %}
+<!-- ✅ Chart.js sadece 1 kez -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const ctx = document.getElementById('circleChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+      
+            labels: ['Safe', 'Risky'],
+            datasets: [{
+                data: [
+                    {{ safe_count|default:0 }},
+                    {{ risky_count|default:0 }}
+                ],
+                backgroundColor: [
+                    'rgba(76, 175, 80, 0.7)',  // yeşil safe
+                    'rgba(244, 67, 54, 0.7)'   // kırmızı risky
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: false,
+            cutout: '70%',
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+});
+</script>
 
 <style>
-    .container {
-        display: flex;
-        align-items: flex-start; /* Aligns items to the start of the container (top) */
-        margin: 20px; /* Optional: Add some space around the container */
-    }
-
-    .image {
-        max-width: 50%; /* Adjust the width of the image as needed */
-        height: auto; /* Maintain the aspect ratio of the image */
-        margin-right: 20px; /* Optional: Add some space between the image and the text */
-        border-radius: 0.75rem; /* Rounded corners for the image */
-    }
-
-    .text {
-        max-width: 50%; /* Adjust the width of the text container as needed */
-    }
-
-    .mb-6 {
-        margin-bottom: 1.5rem; /* Optional: Margin bottom for spacing */
-    }
-
-    .text-3xl {
-        font-size: 1.875rem; /* Optional: Text size */
-    }
+  .custom-add-routine-button {
+      background-color: #40826D;
+      border-radius: 10px;
+      padding: 6px 16px;
+      transition: background-color 0.3s ease-in-out;
+  }
+  .custom-add-routine-button:hover {
+      background-color: #1e3b31;
+  }
 </style>
+
+
+{% endblock %}
+
