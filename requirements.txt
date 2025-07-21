@@ -16,3 +16,4 @@ dj-database-url==3.0.1
 requests==2.32.4
 redis==6.2.0
 django-redis==6.0.0
+rapidfuzz
