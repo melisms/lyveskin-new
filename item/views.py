@@ -20,14 +20,24 @@ def detail(request, pk):
     if not health_data:
         health_data = item.calculate_health_score()
         cache.set(cache_key, health_data, 600)
-    
+
+    total_ingredients = ingredients.count()
+    safe_count = health_data.get('safe', 0) or 0
+    risky_count = health_data.get('risky', 0) or 0
+    neutral_count = total_ingredients - (safe_count + risky_count)
+    if neutral_count < 0:  # güvenlik
+        neutral_count = 0
+
     return render(request, 'item/detail.html', {
         'item': item,
         'ingredients': ingredients,
-        'health_score': health_data['score'],
-        'safe_count': health_data['safe'],
-        'risky_count': health_data['risky'],
+        'health_score': health_data.get('score', 0),
+        'safe_count': safe_count,
+        'risky_count': risky_count,
+        'neutral_count': neutral_count,
     })
+
+
 @login_required
 def add_to_favorites(request, pk):
     item = get_object_or_404(Item, pk=pk)
@@ -176,3 +186,4 @@ def remove_item(request, pk):
         messages.success(request, 'Item deleted successfully!')
         return redirect('item:browse')
     return render(request, 'item/remove_item.html', {'item': item})
+
