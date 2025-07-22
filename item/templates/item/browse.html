@@ -1,61 +1,131 @@
 {% extends 'lyve/base.html' %}
-
-{% block title %} Search {% endblock %}
+{% block title %}Search{% endblock %}
 
 {% block content %}
-    <div class="container">
-        <div class="row">
-            <div class="col-md-3">
-                <form method="get" action="{% url 'item:browse' %}">
-                    <input name="query" class="form-control mb-2" type="text" value="{{ query }}" placeholder="Find a product">
-                    <button class="btn btn-primary btn-block mb-2" style="background-color: #40826D; border-color: #40826D;" onmouseover="this.style.backgroundColor='#9FE2BF'; this.style.borderColor='#9FE2BF';" onmouseout="this.style.backgroundColor='#40826D'; this.style.borderColor='#40826D';">Search</button>
-                </form>
-                <hr>
-                <p class="font-weight-bold">Categories</p>
-                <ul class="list-unstyled">
-                    {% for category in categories %}
-                    <li class="mb-2">
-                        <form action="{% url 'item:browse' %}" method="get">
-                            <input type="hidden" name="query" value="{{ query }}">
-                            {% if category.id != category_id %}
-                                <input type="hidden" name="category" value="{{ category.id }}">
-                            {% endif %}
-                            <button type="submit"
-                                    class="btn btn-block {% if category.id == category_id %} bg-secondary text-white {% else %} btn-light {% endif %}"
-                                    style="background-color: #F3F3F3; color: black; border-color: #F3F3F3;" onmouseover="this.style.backgroundColor='#6c757d'; this.style.borderColor='#6c757d';" onmouseout="this.style.backgroundColor='#F3F3F3'; this.style.borderColor='#F3F3F3';">
-                                {{ category.name }}
-                            </button>
-                        </form>
-                    </li>                    
-                    {% endfor %}
-                </ul>
-                <a href="{% url 'item:browse' %}"
-                    class="btn btn-warning btn-block text-white"
-                    style="background-color: #40826D; border-color: #40826D;" onmouseover="this.style.backgroundColor='#9FE2BF'; this.style.borderColor='#9FE2BF';" onmouseout="this.style.backgroundColor='#40826D'; this.style.borderColor='#40826D';">
-                    Clear Filters
-                </a>             
-            </div>
-            <div class="col-md-9">
-                <div class="clearfix">
-                    {% for item in items %}
-                        <div class="item-container border rounded" style="display: inline-block; vertical-align: top; width: 22%; box-sizing: border-box; padding: 10px;">
-                            <a href="{% url 'item:detail' item.id %}" class="flex items-center p-6 bg-white rounded-xl mb-4" style="background-color: #fafafa; text-decoration: none;">
-                                <div>
-                                    {% if item.image %}
-                                        <img src="{{ item.image.url }}" alt="ItemImage" class="rounded-t-xl" style="width: 165px; height: 165px;">
-                                    {% else %}
-                                        <img src="/media/no_image.jpg" alt="DefaultImage" class="rounded-t-xl" style="width: 165px; height: 165px;">
-                                    {% endif %}
-                                </div>
-                                <div class="ml-4">
-                                    <h2 class="text-2xl" style="font-size: 18px" onmouseover="this.style.color='#9FE2BF';" onmouseout="this.style.color='#444444';"><b>{{ item.brands }}</b></h2>
-                                    <h3 class="text-xl" style="font-size: 16px; max-width: 182px; overflow: hidden; text-overflow: ellipsis;" onmouseover="this.style.color='#9FE2BF';" onmouseout="this.style.color='#444444';">{{ item.name }}</h3>
-                                </div>
-                            </a>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
+<div class="container">
+  <div class="row">
+
+    <div class="col-md-3">
+      <form method="get" action="{% url 'item:browse' %}">
+        <input name="query" class="form-control mb-2" type="text" value="{{ query }}" placeholder="Find a product">
+        <button class="btn btn-primary btn-block mb-2"
+                style="background-color: #40826D; border-color: #40826D;"
+                onmouseover="this.style.backgroundColor='#9FE2BF';"
+                onmouseout="this.style.backgroundColor='#40826D';">Search</button>
+      </form>
+      <hr>
+      <p class="font-weight-bold">Categories</p>
+      <ul class="list-unstyled">
+        {% for category in categories %}
+        <li class="mb-2">
+          <form action="{% url 'item:browse' %}" method="get">
+            <input type="hidden" name="query" value="{{ query }}">
+            {% if category.id != category_id %}
+              <input type="hidden" name="category" value="{{ category.id }}">
+            {% endif %}
+            <button type="submit"
+                    class="btn btn-block {% if category.id == category_id %} bg-secondary text-white {% else %} btn-light {% endif %}"
+                    style="background-color: #F3F3F3; color: black; border-color: #F3F3F3;"
+                    onmouseover="this.style.backgroundColor='#6c757d';"
+                    onmouseout="this.style.backgroundColor='#F3F3F3';">
+              {{ category.name }}
+            </button>
+          </form>
+        </li>
+        {% endfor %}
+      </ul>
+      <a href="{% url 'item:browse' %}"
+         class="btn btn-warning btn-block text-white"
+         style="background-color: #40826D; border-color: #40826D;"
+         onmouseover="this.style.backgroundColor='#9FE2BF';"
+         onmouseout="this.style.backgroundColor='#40826D';">
+        Clear Filters
+      </a>
     </div>
+
+
+    <div class="col-md-9 d-flex flex-wrap" style="gap:15px;">
+      {% for item in items %}
+      <div class="border rounded p-3" style="width: 22%; text-align:center; background:#fafafa;">
+
+       <div style="position: relative; width: 150px; height: 150px; margin: 0 auto;">
+
+  <canvas id="chart-{{ item.id }}" width="150" height="150"></canvas>
+
+  <img src="{% if item.image %}{{ item.image.url }}{% else %}/media/no_image.jpg{% endif %}"
+       alt="{{ item.name }}"
+       style="
+         position: absolute;
+         top: 50%;
+         left: 50%;
+         transform: translate(-50%, -50%);
+         width: 100px;
+         height: 100px;
+         border-radius: 50%;
+         object-fit: cover;
+         box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+       ">
+</div>
+
+
+        <a href="{% url 'item:detail' item.id %}" style="text-decoration:none; color:#444;">
+          <h2 style="font-size:16px; margin-top:10px;"><b>{{ item.brands }}</b></h2>
+          <h3 style="font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+            {{ item.name }}
+          </h3>
+        </a>
+
+        <p style="margin:5px 0;">
+          <b>Health Score:</b>
+          <span style="
+            {% if item.health_score >= 75 %}
+              color:green;
+            {% elif item.health_score >= 40 %}
+              color:orange;
+            {% else %}
+              color:red;
+            {% endif %}
+          ">
+            {{ item.health_score }}
+          </span>
+        </p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  {% for item in items %}
+  const ctx{{ item.id }} = document.getElementById("chart-{{ item.id }}").getContext("2d");
+  new Chart(ctx{{ item.id }}, {
+    type: 'doughnut',
+    data: {
+        labels: ['Safe', 'Risky'],
+        datasets: [{
+            data: [{{ item.safe_count|default:0 }}, {{ item.risky_count|default:0 }}],
+            backgroundColor: [
+                'rgba(76, 175, 80, 0.8)',
+                'rgba(244, 67, 54, 0.8)'
+            ],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        responsive: false,
+        cutout: '70%',  
+        plugins: {
+            legend: { display: false },
+            tooltip: { enabled: false } 
+        }
+    }
+});
+
+  {% endfor %}
+
+</script>
+
 {% endblock %}

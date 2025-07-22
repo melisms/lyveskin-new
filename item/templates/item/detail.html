@@ -2,30 +2,30 @@
 {% block title %}{{ item.name }}{% endblock %}
 {% block content %}
 
+<div style="display: flex; justify-content: center; align-items: flex-start; gap: 60px; margin: 50px auto; max-width: 1100px;">
 
-<div style="position: relative; width: 300px; height: 300px; margin: 40px auto;">
-  <canvas id="circleChart"
-          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></canvas>
+  <div style="flex-shrink: 0; position: relative; width: 320px; height: 320px;">
+    <canvas id="circleChart"
+            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></canvas>
 
-  <img src="{% if item.image %}{{ item.image.url }}{% else %}/media/no_image.jpg{% endif %}"
-       alt="{{ item.name }}"
-       style="
-         position: absolute;
-         top: 50%; left: 50%;
-         transform: translate(-50%, -50%);
-         width: 200px; height: 200px;
-         border-radius: 50%;
-         object-fit: cover;
-         box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-       ">
-       
-</div>
+    <img src="{% if item.image %}{{ item.image.url }}{% else %}/media/no_image.jpg{% endif %}"
+         alt="{{ item.name }}"
+         style="
+           position: absolute;
+           top: 50%; left: 50%;
+           transform: translate(-50%, -50%);
+           width: 213px; height: 213px;
+           border-radius: 50%;
+           object-fit: cover;
+           box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+         ">
+  </div>
 
+ 
+  <div style="flex: 1; max-width: 700px;">
 
-<div class="text" style="width: 80%; overflow-wrap: break-word; word-wrap: break-word; margin:auto; max-width:800px;">
-  
-  <h3 class="mb-6 text-3xl">
-      Health Score: 
+    <h3 style="font-size: 1.8rem; margin-bottom: 20px;">
+      Health Score:
       <span style="
           {% if health_score >= 75 %}
               color: green;
@@ -38,67 +38,66 @@
         {{ health_score }}
       </span>
       /100
-  </h3>
+    </h3>
 
+    <h1 style="font-size: 2rem; font-weight: bold; margin-bottom: 10px;">{{ item.brands }}</h1>
+    <h2 style="font-size: 1.5rem; color: #444; margin-bottom: 15px;">{{ item.name }}</h2>
 
+    <p style="margin-bottom: 20px; line-height: 1.6; font-size: 1rem;">{{ item.description }}</p>
 
-
-
-    <h1 class="mb-6 text-3xl"><b>{{ item.brands }}</b></h1>
-    <p class="mb-6 text-3xl" style="color: #444; white-space: nowrap; font-size: 25px;"><b>{{ item.name }}</b></p>
-    <p class="mb-6 text-3xl">{{ item.description }}</p>
-
-    <p class="mb-6 text-3xl"><b>Ingredients:</b>
-        {% for ingredient in ingredients %}
-            <span style="
-                {% if ingredient.safety == 'S' %}
-                    color: green; font-weight: bold;
-                {% elif ingredient.safety == 'R' %}
-                    color: darkred; font-weight: bold;
-                {% else %}
-                    color: black;
-                {% endif %}
-            ">{{ ingredient.name }}</span>{% if not forloop.last %}, {% endif %}
-        {% endfor %}
+    <p style="margin-bottom: 20px; line-height: 1.6; font-size: 1rem;">
+      <b>Ingredients:</b><br>
+      {% for ingredient in ingredients %}
+        <span style="
+            {% if ingredient.safety == 'S' %}
+                color: green; font-weight: bold;
+            {% elif ingredient.safety == 'R' %}
+                color: darkred; font-weight: bold;
+            {% else %}
+                color: black;
+            {% endif %}
+        ">{{ ingredient.name }}</span>{% if not forloop.last %}, {% endif %}
+      {% endfor %}
     </p>
 
-    <p class="mb-6 text-3xl"><strong>Skintype:</strong> {{ item.skintype }}</p>
-    </div>
-    
+    <p style="font-size: 1.2rem; margin-bottom: 25px;"><strong>Skintype:</strong> {{ item.skintype }}</p>
+
 
     <div style="display: flex; gap: 12px; align-items: center; margin-top: 16px;">
-        {% if item in request.user.userprofile.favorites.all %}
-            <form method="POST" action="{% url 'item:remove_from_favorites' item.pk %}" style="margin: 0;">
-                {% csrf_token %}
-                <button class="custom-add-routine-button text-white text-sm font-medium" type="submit">
-                    Added
-                </button>
-            </form>
-        {% else %}
-            <form method="POST" action="{% url 'item:add_to_favorites' item.pk %}" style="margin: 0;">
-                {% csrf_token %}
-                <button type="submit" class="custom-add-routine-button text-white text-sm font-medium">
-                    Add Routine
-                </button>
-            </form>
-        {% endif %}
+      {% if item in request.user.userprofile.favorites.all %}
+          <form method="POST" action="{% url 'item:remove_from_favorites' item.pk %}" style="margin: 0;">
+              {% csrf_token %}
+              <button class="custom-add-routine-button text-white text-sm font-medium" type="submit">
+                  Added
+              </button>
+          </form>
+      {% else %}
+          <form method="POST" action="{% url 'item:add_to_favorites' item.pk %}" style="margin: 0;">
+              {% csrf_token %}
+              <button type="submit" class="custom-add-routine-button text-white text-sm font-medium">
+                  Add Routine
+              </button>
+          </form>
+      {% endif %}
 
-        {% if request.user.is_superuser %}
-            <a href="{% url 'item:edit_item' item.id %}" class="btn btn-primary" style="height: 36px; display: flex; align-items: center; padding: 0 16px;">
-                Edit
-            </a>
-            <form method="post" action="{% url 'item:remove_item' item.pk %}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this item?');">
-                {% csrf_token %}
-                <button type="submit" class="btn-primary"
-                        style="background-color: #dc3545; border: none; color: white; padding: 0.5rem 1.25rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: background-color 0.3s ease;"
-                        onmouseover="this.style.backgroundColor='#a71d2a'"
-                        onmouseout="this.style.backgroundColor='#dc3545'">
-                    Delete
-                </button>
-            </form>
-        {% endif %}
+      {% if request.user.is_superuser %}
+          <a href="{% url 'item:edit_item' item.id %}" class="btn btn-primary" style="height: 36px; display: flex; align-items: center; padding: 0 16px;">
+              Edit
+          </a>
+          <form method="post" action="{% url 'item:remove_item' item.pk %}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this item?');">
+              {% csrf_token %}
+              <button type="submit" class="btn-primary"
+                      style="background-color: #dc3545; border: none; color: white; padding: 0.5rem 1.25rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: background-color 0.3s ease;"
+                      onmouseover="this.style.backgroundColor='#a71d2a'"
+                      onmouseout="this.style.backgroundColor='#dc3545'">
+                  Delete
+              </button>
+          </form>
+      {% endif %}
     </div>
+  </div>
 </div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -107,7 +106,6 @@ document.addEventListener("DOMContentLoaded", function() {
     new Chart(ctx, {
         type: 'doughnut',
         data: {
-      
             labels: ['Safe', 'Risky'],
             datasets: [{
                 data: [
@@ -115,8 +113,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     {{ risky_count|default:0 }}
                 ],
                 backgroundColor: [
-                    'rgba(76, 175, 80, 0.7)',  // yeşil safe
-                    'rgba(244, 67, 54, 0.7)'   // kırmızı risky
+                    'rgba(76, 175, 80, 0.7)',
+                    'rgba(244, 67, 54, 0.7)'
                 ],
                 borderWidth: 0
             }]
@@ -144,6 +142,4 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 </style>
 
-
 {% endblock %}
-
