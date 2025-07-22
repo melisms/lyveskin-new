@@ -10,7 +10,7 @@ from .utils import detect_safety, clear_cache_for_detail, clear_cache_for_browse
 from django.views.decorators.cache import cache_page
 from django.core.cache import cache
 
-def detail(request, pk):
+def detail(request, pk): 
     item = get_object_or_404(Item, pk=pk)
     ingredients = item.ingredients.all()
     
@@ -19,13 +19,13 @@ def detail(request, pk):
     
     if not health_data:
         health_data = item.calculate_health_score()
-        cache.set(cache_key, health_data, 600)
+        cache.set(cache_key, health_data, 1)
 
     total_ingredients = ingredients.count()
     safe_count = health_data.get('safe', 0) or 0
     risky_count = health_data.get('risky', 0) or 0
     neutral_count = total_ingredients - (safe_count + risky_count)
-    if neutral_count < 0:  # güvenlik
+    if neutral_count < 0: 
         neutral_count = 0
 
     return render(request, 'item/detail.html', {
@@ -84,27 +84,58 @@ def create_item(request):
 
 from django.contrib.messages import get_messages
 def browse(request):
-    query = request.GET.get('query','')
+    query = request.GET.get('query', '')
     category_id = request.GET.get('category', 0)
+
     if not get_messages(request):
         cache_key = f'browse_cache::query={query}&category={category_id}'
         cached_response = cache.get(cache_key)
         if cached_response:
             return cached_response
+
     categories = Category.objects.all()
-    items = Item.objects.filter()
+    items = Item.objects.all()
+
     if category_id:
         items = items.filter(category=category_id)
+    
+   
     if query:
-        items = items.filter(Q(name__icontains=query)|Q(brands__icontains=query))
+        items = items.filter(Q(name__icontains=query) | Q(brands__icontains=query))
+
+    enriched_items = []
+    for item in items:
+        cache_key_item = f'health_score_item_{item.id}'
+        health_data = cache.get(cache_key_item)
+        if not health_data:
+            health_data = item.calculate_health_score()
+            cache.set(cache_key_item, health_data, 5)
+
+        safe_count = health_data.get('safe', 0) or 0
+        risky_count = health_data.get('risky', 0) or 0
+        score = health_data.get('score', 0)
+
+    
+        item.health_score = score
+        item.safe_count = safe_count
+        item.risky_count = risky_count
+
+        enriched_items.append(item)
+
+   
+    enriched_items.sort(key=lambda x: x.health_score, reverse=True)
+
     response = render(request, 'item/browse.html', {
-        'items': items,
+        'items': enriched_items,
         'query': query,
         'categories': categories,
         'category_id': int(category_id),
     })
-    if not get_messages(request):  
-        cache.set(cache_key, response, 300)
+
+
+    if not get_messages(request):
+        cache.set(cache_key, response, 1)
+
     return response
 
 def compare_items(request):
