@@ -98,34 +98,33 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-  {% for item in items %}
-  const ctx{{ item.id }} = document.getElementById("chart-{{ item.id }}").getContext("2d");
-  new Chart(ctx{{ item.id }}, {
-    type: 'doughnut',
-    data: {
-        labels: ['Safe', 'Risky'],
-        datasets: [{
-            data: [{{ item.safe_count|default:0 }}, {{ item.risky_count|default:0 }}],
-            backgroundColor: [
-                'rgba(76, 175, 80, 0.8)',
-                'rgba(244, 67, 54, 0.8)'
-            ],
-            borderWidth: 0
-        }]
-    },
-    options: {
-        responsive: false,
-        cutout: '70%',  
-        plugins: {
-            legend: { display: false },
-            tooltip: { enabled: false } 
-        }
-    }
-});
-
-  {% endfor %}
-
+  document.addEventListener("DOMContentLoaded", function () {
+    {% for item in items %}
+    const ctx{{ item.id }} = document.getElementById("chart-{{ item.id }}").getContext("2d");
+    new Chart(ctx{{ item.id }}, {
+      type: 'doughnut',
+      data: {
+          labels: ['Safe', 'Risky'],
+          datasets: [{
+              data: [{{ item.safe_count|default:0 }}, {{ item.risky_count|default:0 }}],
+              backgroundColor: [
+                  'rgba(76, 175, 80, 0.8)',
+                  'rgba(244, 67, 54, 0.8)'
+              ],
+              borderWidth: 0
+          }]
+      },
+      options: {
+          responsive: false,
+          cutout: '70%',  
+          plugins: {
+              legend: { display: false },
+              tooltip: { enabled: false } 
+          }
+      }
+    });
+    {% endfor %}
+  });
 </script>
 
 {% endblock %}
