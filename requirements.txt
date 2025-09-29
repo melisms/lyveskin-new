@@ -1,4 +1,4 @@
-beautifulsoup4==4.13.5
+beautifulsoup4==4.14.0
 crispy-bootstrap4==2025.6
 Django==5.2.2
 django-bootstrap4==25.2
