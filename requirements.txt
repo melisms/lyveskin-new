@@ -8,7 +8,7 @@ pillow==12.1.0
 psutil==7.2.1
 Pygments==2.19.2
 psycopg2-binary==2.9.11
-soupsieve==2.8.2
+soupsieve==2.8.3
 sqlparse==0.5.5
 typing_extensions==4.15.0
 gunicorn==23.0.0
