@@ -1,6 +1,6 @@
 beautifulsoup4==4.14.3
 crispy-bootstrap4==2025.6
-Django==6.0.1
+Django==6.0.2
 django-bootstrap4==26.1
 django-crispy-forms==2.5
 packaging==26.0
