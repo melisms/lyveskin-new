@@ -4,7 +4,7 @@ Django==6.0.2
 django-bootstrap4==26.1
 django-crispy-forms==2.5
 packaging==26.0
-pillow==12.1.0
+pillow==12.1.1
 psutil==7.2.2
 Pygments==2.19.2
 psycopg2-binary==2.9.11
