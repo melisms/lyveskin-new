@@ -6,7 +6,7 @@ django-crispy-forms==2.6
 packaging==26.0
 pillow==12.1.1
 psutil==7.2.2
-Pygments==2.19.2
+Pygments==2.20.0
 psycopg2-binary==2.9.11
 soupsieve==2.8.3
 sqlparse==0.5.5
