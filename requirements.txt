@@ -11,7 +11,7 @@ psycopg2-binary==2.9.12
 soupsieve==2.9.2
 sqlparse==0.6.0
 typing_extensions==4.16.0
-gunicorn==26.1.0
+gunicorn==26.2.0
 dj-database-url==3.1.2
 requests==2.34.2
 redis==8.1.0
