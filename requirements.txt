@@ -7,7 +7,7 @@ packaging==26.3
 pillow==12.3.0
 psutil==7.2.2
 Pygments==2.21.0
-psycopg2-binary==2.9.12
+psycopg2-binary==2.9.13
 soupsieve==2.9.2
 sqlparse==0.6.0
 typing_extensions==4.16.0
