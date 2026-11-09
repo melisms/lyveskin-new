@@ -9,7 +9,7 @@ psutil==7.2.2
 Pygments==2.21.0
 psycopg2-binary==2.9.13
 soupsieve==3.0.4
-sqlparse==0.6.0
+sqlparse==0.6.1
 typing_extensions==4.16.0
 gunicorn==26.2.0
 dj-database-url==3.1.2
